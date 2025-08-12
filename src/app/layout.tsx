@@ -60,7 +60,7 @@ export default function RootLayout({
       lang="en" 
       className={`${inter.variable} ${playfairDisplay.variable} ${poppins.variable} antialiased`}
     >
-      <body className="min-h-screen bg-background text-foreground">
+      <body className="min-h-screen bg-background text-foreground" suppressHydrationWarning>
         <div id="root" className="relative">
           {children}
           <Toaster />

@@ -13,6 +13,11 @@ interface BirthdayCardProps extends React.HTMLAttributes<HTMLDivElement> {
 const BirthdayCard = React.forwardRef<HTMLDivElement, BirthdayCardProps>(
   ({ className, variant = 'default', withHearts = false, glowEffect = false, children, ...props }, ref) => {
     const [isHovered, setIsHovered] = React.useState(false)
+    const [isMounted, setIsMounted] = React.useState(false)
+
+    React.useEffect(() => {
+      setIsMounted(true)
+    }, [])
 
     const getVariantStyles = () => {
       switch (variant) {
@@ -53,7 +58,7 @@ const BirthdayCard = React.forwardRef<HTMLDivElement, BirthdayCardProps>(
         )}
 
         {/* Sparkle effects on hover */}
-        {variant === 'sparkle' && isHovered && (
+        {isMounted && variant === 'sparkle' && isHovered && (
           <div className="absolute inset-0 pointer-events-none">
             <span className="absolute top-2 left-4 text-primary animate-sparkle">✨</span>
             <span className="absolute top-4 right-8 text-primary animate-sparkle" style={{ animationDelay: '0.2s' }}>✨</span>
@@ -63,7 +68,7 @@ const BirthdayCard = React.forwardRef<HTMLDivElement, BirthdayCardProps>(
         )}
 
         {/* Gradient overlay for gradient variant */}
-        {variant === 'gradient' && isHovered && (
+        {isMounted && variant === 'gradient' && isHovered && (
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent transform -skew-x-12 -translate-x-full transition-transform duration-1000 translate-x-full" />
         )}
 

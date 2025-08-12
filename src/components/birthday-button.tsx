@@ -13,6 +13,11 @@ interface BirthdayButtonProps extends Omit<ButtonProps, 'variant'> {
 const BirthdayButton = React.forwardRef<HTMLButtonElement, BirthdayButtonProps>(
   ({ className, variant = 'primary', withHearts = false, sparkle = false, children, ...props }, ref) => {
     const [isHovered, setIsHovered] = React.useState(false)
+    const [isMounted, setIsMounted] = React.useState(false)
+
+    React.useEffect(() => {
+      setIsMounted(true)
+    }, [])
 
     const getVariantStyles = () => {
       switch (variant) {
@@ -47,15 +52,15 @@ const BirthdayButton = React.forwardRef<HTMLButtonElement, BirthdayButtonProps>(
         {...props}
       >
         {/* Floating hearts effect */}
-        {withHearts && isHovered && (
+        {isMounted && withHearts && isHovered && (
           <>
             <span className="absolute -top-2 left-1/4 text-xs animate-float opacity-70">♥</span>
             <span className="absolute -top-3 right-1/4 text-xs animate-float opacity-60" style={{ animationDelay: '0.5s' }}>♥</span>
           </>
         )}
-        
+
         {/* Sparkle effect */}
-        {sparkle && isHovered && (
+        {isMounted && sparkle && isHovered && (
           <>
             <span className="absolute top-1 left-2 text-xs animate-sparkle">✨</span>
             <span className="absolute bottom-1 right-2 text-xs animate-sparkle" style={{ animationDelay: '0.3s' }}>✨</span>
