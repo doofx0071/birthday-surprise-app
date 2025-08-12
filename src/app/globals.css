@@ -1,0 +1,203 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
+/* Custom CSS Variables for Birthday Theme */
+:root {
+  --color-pure-white: #ffffff;
+  --color-soft-pink: #ffb6c1;
+  --color-rose-gold: #e8b4b8;
+  --color-charcoal-black: #2d2d2d;
+  --color-light-gray: #f8f9fa;
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, var(--color-pure-white) 0%, var(--color-soft-pink) 100%);
+  --gradient-accent: linear-gradient(135deg, var(--color-soft-pink) 0%, var(--color-rose-gold) 100%);
+  
+  /* Shadows */
+  --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-large: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Base Styles */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--color-pure-white);
+  color: var(--color-charcoal-black);
+  line-height: 1.6;
+}
+
+/* Typography Classes */
+.font-display {
+  font-family: 'Playfair Display', serif;
+}
+
+.font-body {
+  font-family: 'Inter', sans-serif;
+}
+
+.font-countdown {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Custom Utility Classes */
+.gradient-primary {
+  background: var(--gradient-primary);
+}
+
+.gradient-accent {
+  background: var(--gradient-accent);
+}
+
+.shadow-soft {
+  box-shadow: var(--shadow-soft);
+}
+
+.shadow-medium {
+  box-shadow: var(--shadow-medium);
+}
+
+.shadow-large {
+  box-shadow: var(--shadow-large);
+}
+
+/* Floating Hearts Animation */
+.floating-hearts {
+  position: relative;
+  overflow: hidden;
+}
+
+.floating-hearts::before {
+  content: '♥';
+  position: absolute;
+  top: -10px;
+  left: 10%;
+  font-size: 1.5rem;
+  color: var(--color-soft-pink);
+  animation: float 3s ease-in-out infinite;
+  opacity: 0.7;
+}
+
+.floating-hearts::after {
+  content: '♥';
+  position: absolute;
+  top: -15px;
+  right: 15%;
+  font-size: 1.2rem;
+  color: var(--color-rose-gold);
+  animation: float 4s ease-in-out infinite reverse;
+  opacity: 0.6;
+}
+
+/* Sparkle Effect */
+.sparkle-effect {
+  position: relative;
+}
+
+.sparkle-effect::before {
+  content: '✨';
+  position: absolute;
+  top: 10%;
+  left: 20%;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+.sparkle-effect::after {
+  content: '✨';
+  position: absolute;
+  bottom: 10%;
+  right: 20%;
+  animation: sparkle 2.5s ease-in-out infinite 0.5s;
+}
+
+/* Heart Beat Effect */
+.heart-beat {
+  animation: heart-beat 1.2s ease-in-out infinite;
+}
+
+/* Smooth Transitions */
+.transition-all {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Focus States */
+.focus-ring:focus {
+  outline: 2px solid var(--color-soft-pink);
+  outline-offset: 2px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-light-gray);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-rose-gold);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-soft-pink);
+}
+
+/* Loading Animation */
+.loading-spinner {
+  border: 3px solid var(--color-light-gray);
+  border-top: 3px solid var(--color-soft-pink);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive Typography */
+@media (max-width: 640px) {
+  .text-responsive-xl {
+    font-size: 2rem;
+    line-height: 2.5rem;
+  }
+  
+  .text-responsive-2xl {
+    font-size: 2.5rem;
+    line-height: 3rem;
+  }
+  
+  .text-responsive-3xl {
+    font-size: 3rem;
+    line-height: 3.5rem;
+  }
+}
+
+@media (min-width: 641px) {
+  .text-responsive-xl {
+    font-size: 3rem;
+    line-height: 3.5rem;
+  }
+  
+  .text-responsive-2xl {
+    font-size: 4rem;
+    line-height: 4.5rem;
+  }
+  
+  .text-responsive-3xl {
+    font-size: 5rem;
+    line-height: 5.5rem;
+  }
+}
