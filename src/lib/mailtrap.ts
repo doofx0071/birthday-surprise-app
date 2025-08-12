@@ -1,7 +1,17 @@
+import { MailtrapClient } from 'mailtrap'
 import nodemailer from 'nodemailer'
 import type { EmailTemplateData } from '@/types'
 
-// Mailtrap SMTP configuration
+// Mailtrap API Client (for advanced features)
+const createMailtrapClient = () => {
+  const token = process.env.MAILTRAP_API_TOKEN
+  if (!token) {
+    throw new Error('MAILTRAP_API_TOKEN environment variable is required for API features')
+  }
+  return new MailtrapClient({ token })
+}
+
+// Mailtrap SMTP configuration (for reliable email sending)
 const createTransporter = () => {
   return nodemailer.createTransport({
     host: process.env.MAILTRAP_HOST || 'live.smtp.mailtrap.io',
@@ -236,14 +246,51 @@ const createThankYouTemplate = (data: EmailTemplateData) => {
   }
 }
 
-// Main email sending functions
+// Enhanced email sending functions using Mailtrap API Client
+export const sendBirthdayReminderAPI = async (
+  to: string,
+  templateData: EmailTemplateData
+) => {
+  try {
+    const client = createMailtrapClient()
+    const template = createBirthdayReminderTemplate(templateData)
+
+    const sender = {
+      name: 'Birthday Surprise Team',
+      email: process.env.EMAIL_FROM || 'noreply@yourdomain.com'
+    }
+
+    const result = await client.send({
+      from: sender,
+      to: [{ email: to, name: templateData.recipientName }],
+      subject: template.subject,
+      html: template.html,
+      text: template.text,
+      category: 'Birthday Reminder',
+      custom_variables: {
+        recipient_name: templateData.recipientName,
+        girlfriend_name: templateData.girlfriendName,
+        message_count: templateData.messageCount.toString(),
+        contributor_count: templateData.contributorCount.toString(),
+      },
+    })
+
+    console.log('Birthday reminder sent via API:', result)
+    return { success: true, messageId: result.message_ids?.[0], result }
+  } catch (error) {
+    console.error('Failed to send birthday reminder via API:', error)
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+}
+
+// SMTP fallback for birthday reminders
 export const sendBirthdayReminder = async (
   to: string,
   templateData: EmailTemplateData
 ) => {
   const transporter = createTransporter()
   const template = createBirthdayReminderTemplate(templateData)
-  
+
   try {
     const info = await transporter.sendMail({
       from: process.env.EMAIL_FROM,
@@ -251,23 +298,68 @@ export const sendBirthdayReminder = async (
       subject: template.subject,
       html: template.html,
       text: template.text,
+      headers: {
+        'X-Category': 'Birthday Reminder',
+        'X-Custom-Variables': JSON.stringify({
+          recipient_name: templateData.recipientName,
+          girlfriend_name: templateData.girlfriendName,
+          message_count: templateData.messageCount.toString(),
+          contributor_count: templateData.contributorCount.toString(),
+        }),
+      },
     })
-    
-    console.log('Birthday reminder sent:', info.messageId)
+
+    console.log('Birthday reminder sent via SMTP:', info.messageId)
     return { success: true, messageId: info.messageId }
   } catch (error) {
-    console.error('Failed to send birthday reminder:', error)
+    console.error('Failed to send birthday reminder via SMTP:', error)
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
   }
 }
 
+// Enhanced thank you email using Mailtrap API Client
+export const sendThankYouEmailAPI = async (
+  to: string,
+  templateData: EmailTemplateData
+) => {
+  try {
+    const client = createMailtrapClient()
+    const template = createThankYouTemplate(templateData)
+
+    const sender = {
+      name: 'Birthday Surprise Team',
+      email: process.env.EMAIL_FROM || 'noreply@yourdomain.com'
+    }
+
+    const result = await client.send({
+      from: sender,
+      to: [{ email: to, name: templateData.recipientName }],
+      subject: template.subject,
+      html: template.html,
+      text: template.text,
+      category: 'Thank You',
+      custom_variables: {
+        recipient_name: templateData.recipientName,
+        girlfriend_name: templateData.girlfriendName,
+      },
+    })
+
+    console.log('Thank you email sent via API:', result)
+    return { success: true, messageId: result.message_ids?.[0], result }
+  } catch (error) {
+    console.error('Failed to send thank you email via API:', error)
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+}
+
+// SMTP fallback for thank you emails
 export const sendThankYouEmail = async (
   to: string,
   templateData: EmailTemplateData
 ) => {
   const transporter = createTransporter()
   const template = createThankYouTemplate(templateData)
-  
+
   try {
     const info = await transporter.sendMail({
       from: process.env.EMAIL_FROM,
@@ -275,26 +367,102 @@ export const sendThankYouEmail = async (
       subject: template.subject,
       html: template.html,
       text: template.text,
+      headers: {
+        'X-Category': 'Thank You',
+        'X-Custom-Variables': JSON.stringify({
+          recipient_name: templateData.recipientName,
+          girlfriend_name: templateData.girlfriendName,
+        }),
+      },
     })
-    
-    console.log('Thank you email sent:', info.messageId)
+
+    console.log('Thank you email sent via SMTP:', info.messageId)
     return { success: true, messageId: info.messageId }
   } catch (error) {
-    console.error('Failed to send thank you email:', error)
+    console.error('Failed to send thank you email via SMTP:', error)
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
   }
 }
 
-// Test email connection
+// Enhanced connection testing
 export const testMailtrapConnection = async () => {
   const transporter = createTransporter()
-  
+
   try {
     await transporter.verify()
-    console.log('Mailtrap connection successful')
-    return { success: true }
+    console.log('Mailtrap SMTP connection successful')
+    return { success: true, method: 'SMTP' }
   } catch (error) {
-    console.error('Mailtrap connection failed:', error)
-    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    console.error('Mailtrap SMTP connection failed:', error)
+    return { success: false, method: 'SMTP', error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+}
+
+// Test Mailtrap API connection
+export const testMailtrapAPI = async () => {
+  try {
+    const _client = createMailtrapClient()
+
+    // Test with a minimal API call (this would need to be a valid endpoint)
+    // For now, we'll just test client creation
+    console.log('Mailtrap API client created successfully')
+    return { success: true, method: 'API' }
+  } catch (error) {
+    console.error('Mailtrap API connection failed:', error)
+    return { success: false, method: 'API', error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+}
+
+// Comprehensive connection test
+export const testAllConnections = async () => {
+  const smtpTest = await testMailtrapConnection()
+  const apiTest = await testMailtrapAPI()
+
+  return {
+    smtp: smtpTest,
+    api: apiTest,
+    overall: smtpTest.success || apiTest.success,
+  }
+}
+
+// Smart email sending (tries API first, falls back to SMTP)
+export const sendEmailSmart = async (
+  type: 'birthday' | 'thank_you',
+  to: string,
+  templateData: EmailTemplateData
+) => {
+  // Try API first for better tracking and features
+  try {
+    if (type === 'birthday') {
+      const result = await sendBirthdayReminderAPI(to, templateData)
+      if (result.success) {
+        return { ...result, method: 'API' }
+      }
+    } else {
+      const result = await sendThankYouEmailAPI(to, templateData)
+      if (result.success) {
+        return { ...result, method: 'API' }
+      }
+    }
+  } catch (error) {
+    console.log('API method failed, falling back to SMTP:', error)
+  }
+
+  // Fallback to SMTP
+  try {
+    if (type === 'birthday') {
+      const result = await sendBirthdayReminder(to, templateData)
+      return { ...result, method: 'SMTP' }
+    } else {
+      const result = await sendThankYouEmail(to, templateData)
+      return { ...result, method: 'SMTP' }
+    }
+  } catch (error) {
+    console.error('Both API and SMTP methods failed:', error)
+    return {
+      success: false,
+      method: 'NONE',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }
   }
 }
