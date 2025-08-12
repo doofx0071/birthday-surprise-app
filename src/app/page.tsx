@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Badge } from '@/components/ui/badge'
 import { BirthdayButton } from '@/components/birthday-button'
 import { BirthdayCard, BirthdayCardHeader, BirthdayCardTitle, BirthdayCardContent } from '@/components/birthday-card'
+import CountdownTimer from '@/components/countdown/countdown-timer'
 
 export const metadata: Metadata = {
   title: 'Home',
@@ -33,22 +34,18 @@ export default function HomePage() {
             Something magical is coming...
           </p>
 
-          {/* Countdown Placeholder */}
-          <BirthdayCard
-            variant="floating"
-            withHearts={true}
-            glowEffect={true}
-            className="p-8 md:p-12 mb-8"
-          >
-            <BirthdayCardContent className="p-0">
-              <div className="font-countdown text-6xl md:text-8xl font-bold text-primary mb-4 animate-heart-beat">
-                🎂
-              </div>
-              <p className="font-body text-lg md:text-xl text-muted-foreground">
-                Countdown timer will be here soon!
-              </p>
-            </BirthdayCardContent>
-          </BirthdayCard>
+          {/* Countdown Timer */}
+          <div className="mb-8">
+            <CountdownTimer
+              birthdayMonth={12}
+              birthdayDay={25}
+              girlfriendName="Sarah"
+              variant="large"
+              showSparkles={true}
+              enableFlipAnimation={true}
+              enableCelebration={true}
+            />
+          </div>
 
           {/* Call to Action */}
           <div className="space-y-4">
