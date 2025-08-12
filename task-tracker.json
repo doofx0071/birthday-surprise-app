@@ -32,13 +32,13 @@
       "id": 1,
       "title": "Project Setup and GitHub Repository",
       "description": "Initialize the project repository, set up GitHub with proper workflow, configure development environment",
-      "status": "in-progress",
+      "status": "done",
       "priority": "high",
       "phase": 1,
       "dependencies": [],
       "estimatedHours": 4,
       "startDate": "2025-01-12T00:00:00Z",
-      "completedDate": null,
+      "completedDate": "2025-01-12T01:00:00Z",
       "assignee": "developer",
       "tags": ["setup", "github", "environment"],
       "mcpTools": ["Context7", "Sequential Thinking"],
@@ -301,21 +301,21 @@
   ],
   "progress": {
     "totalTasks": 15,
-    "completedTasks": 0,
-    "inProgressTasks": 1,
+    "completedTasks": 1,
+    "inProgressTasks": 0,
     "pendingTasks": 14,
     "deferredTasks": 0,
-    "completionPercentage": 0,
-    "currentTask": 1,
+    "completionPercentage": 6.7,
+    "currentTask": 2,
     "nextTask": 2,
     "estimatedCompletionDate": null,
     "actualStartDate": "2025-01-12T00:00:00Z"
   },
   "metadata": {
-    "lastUpdated": "2025-01-12T00:00:00Z",
+    "lastUpdated": "2025-01-12T01:00:00Z",
     "version": "1.0.0",
     "createdBy": "TaskMaster System",
-    "repository": null,
+    "repository": "https://github.com/doofx0071/birthday-surprise-app",
     "deploymentUrl": null
   }
 }
