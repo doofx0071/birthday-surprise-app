@@ -1,21 +1,22 @@
-# Task 10: Automated Email Notification System
+# Task 10: Automated Email Notification System (Mailtrap)
 
 ## 📋 Task Information
 - **ID**: 10
-- **Title**: Automated Email Notification System
+- **Title**: Automated Email Notification System (Mailtrap)
 - **Priority**: High
 - **Status**: pending
 - **Dependencies**: [08, 09]
 - **Estimated Time**: 12 hours
 
 ## 📝 Description
-Implement automated email notification system using Resend and React Email to send beautiful birthday notifications at exactly 12:00 AM on the girlfriend's birthday, with personalized content and tracking.
+Implement automated email notification system using Mailtrap.io, Nodemailer, and React Email to send beautiful birthday notifications at exactly 12:00 AM on the girlfriend's birthday, with personalized content and tracking.
 
 ## 🔍 Details
 
 ### Email System Architecture
 1. **Email Service Setup**
-   - Resend API integration
+   - Mailtrap.io SMTP integration
+   - Nodemailer for email sending
    - React Email for templates
    - Scheduled email delivery
    - Delivery tracking and analytics
@@ -134,25 +135,38 @@ Implement automated email notification system using Resend and React Email to se
    - Accessible color contrasts
 
 ### Email Delivery System
-1. **Resend Integration**
+1. **Mailtrap Integration**
    ```typescript
-   import { Resend } from 'resend';
-   
-   const resend = new Resend(process.env.RESEND_API_KEY);
-   
+   import nodemailer from 'nodemailer';
+   import { render } from '@react-email/render';
+
+   const transporter = nodemailer.createTransporter({
+     host: process.env.MAILTRAP_HOST,
+     port: parseInt(process.env.MAILTRAP_PORT || '587'),
+     secure: false,
+     auth: {
+       user: process.env.MAILTRAP_USERNAME,
+       pass: process.env.MAILTRAP_PASSWORD,
+     },
+   });
+
    export async function sendBirthdayEmail(
      to: string,
      template: React.ReactElement
    ) {
      try {
-       const { data, error } = await resend.emails.send({
-         from: 'Birthday Surprise <noreply@yourdomain.com>',
-         to: [to],
+       const html = render(template);
+       const text = render(template, { plainText: true });
+
+       const info = await transporter.sendMail({
+         from: process.env.EMAIL_FROM,
+         to,
          subject: `🎂 It's ${girlfriendName}'s Birthday!`,
-         react: template,
+         html,
+         text,
        });
-       
-       return { success: true, data };
+
+       return { success: true, messageId: info.messageId };
      } catch (error) {
        return { success: false, error };
      }
@@ -237,7 +251,8 @@ Implement automated email notification system using Resend and React Email to se
 ## 🔧 MCP Tools Required
 
 ### Context7
-- Resend API documentation
+- Mailtrap.io API documentation
+- Nodemailer documentation
 - React Email component library
 - Vercel Cron Jobs setup
 - Email deliverability best practices
@@ -298,14 +313,14 @@ Implement automated email notification system using Resend and React Email to se
 - **PR**: Create PR with email functionality
 
 ## 📁 Files to Create/Modify
-- `src/lib/email/resend.ts`
+- `src/lib/mailtrap.ts` (already created)
 - `src/lib/email/scheduler.ts`
 - `src/components/emails/BirthdayNotification.tsx`
 - `src/components/emails/ContributorNotification.tsx`
 - `src/api/cron/birthday-emails.ts`
 - `src/lib/email/templates.ts`
 - `src/types/email.ts`
-- `.env.local.example` (update with email vars)
+- `.env.local.example` (already updated with Mailtrap vars)
 
 ## 🎯 Success Metrics
 - 100% email delivery on birthday

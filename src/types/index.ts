@@ -203,7 +203,12 @@ export interface EnvironmentConfig {
   supabaseUrl: string
   supabaseAnonKey: string
   mapboxToken: string
-  resendApiKey: string
+  mailtrapHost: string
+  mailtrapPort: number
+  mailtrapUsername: string
+  mailtrapPassword: string
+  mailtrapApiToken?: string
+  emailFrom: string
   isDevelopment: boolean
   isProduction: boolean
 }
