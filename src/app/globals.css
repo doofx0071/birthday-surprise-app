@@ -201,3 +201,74 @@ body {
     line-height: 5.5rem;
   }
 }
+
+
+
+@layer base {
+  :root {
+    /* Birthday Theme Colors - White/Pink/Black */
+    --background: 0 0% 100%; /* Pure white */
+    --foreground: 210 11% 18%; /* Charcoal black */
+    --card: 0 0% 100%; /* Pure white */
+    --card-foreground: 210 11% 18%; /* Charcoal black */
+    --popover: 0 0% 100%; /* Pure white */
+    --popover-foreground: 210 11% 18%; /* Charcoal black */
+    --primary: 351 100% 86%; /* Soft pink */
+    --primary-foreground: 0 0% 100%; /* Pure white */
+    --secondary: 351 25% 91%; /* Rose gold */
+    --secondary-foreground: 210 11% 18%; /* Charcoal black */
+    --muted: 0 0% 97%; /* Light gray */
+    --muted-foreground: 0 0% 45%; /* Medium gray */
+    --accent: 351 100% 86%; /* Soft pink */
+    --accent-foreground: 210 11% 18%; /* Charcoal black */
+    --destructive: 0 84% 60%; /* Red for errors */
+    --destructive-foreground: 0 0% 98%; /* White */
+    --border: 0 0% 90%; /* Light border */
+    --input: 0 0% 97%; /* Light input background */
+    --ring: 351 100% 86%; /* Soft pink focus ring */
+    --chart-1: 351 100% 86%; /* Soft pink */
+    --chart-2: 351 25% 91%; /* Rose gold */
+    --chart-3: 210 11% 18%; /* Charcoal black */
+    --chart-4: 0 0% 100%; /* Pure white */
+    --chart-5: 0 0% 97%; /* Light gray */
+    --radius: 0.75rem; /* Slightly more rounded for birthday theme */
+  }
+  .dark {
+    /* Dark mode for birthday theme - elegant dark with pink accents */
+    --background: 210 11% 18%; /* Charcoal black */
+    --foreground: 0 0% 98%; /* Pure white */
+    --card: 210 11% 22%; /* Slightly lighter charcoal */
+    --card-foreground: 0 0% 98%; /* Pure white */
+    --popover: 210 11% 18%; /* Charcoal black */
+    --popover-foreground: 0 0% 98%; /* Pure white */
+    --primary: 351 100% 86%; /* Soft pink */
+    --primary-foreground: 210 11% 18%; /* Charcoal black */
+    --secondary: 210 11% 25%; /* Dark gray */
+    --secondary-foreground: 0 0% 98%; /* Pure white */
+    --muted: 210 11% 25%; /* Dark gray */
+    --muted-foreground: 0 0% 65%; /* Light gray */
+    --accent: 351 100% 86%; /* Soft pink */
+    --accent-foreground: 210 11% 18%; /* Charcoal black */
+    --destructive: 0 62% 50%; /* Dark red */
+    --destructive-foreground: 0 0% 98%; /* Pure white */
+    --border: 210 11% 25%; /* Dark border */
+    --input: 210 11% 25%; /* Dark input background */
+    --ring: 351 100% 86%; /* Soft pink focus ring */
+    --chart-1: 351 100% 86%; /* Soft pink */
+    --chart-2: 351 25% 91%; /* Rose gold */
+    --chart-3: 0 0% 98%; /* Pure white */
+    --chart-4: 210 11% 35%; /* Medium gray */
+    --chart-5: 210 11% 45%; /* Lighter gray */
+  }
+}
+
+
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

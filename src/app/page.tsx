@@ -1,4 +1,7 @@
 import type { Metadata } from 'next'
+import { Badge } from '@/components/ui/badge'
+import { BirthdayButton } from '@/components/birthday-button'
+import { BirthdayCard, BirthdayCardHeader, BirthdayCardTitle, BirthdayCardContent } from '@/components/birthday-card'
 
 export const metadata: Metadata = {
   title: 'Home',
@@ -31,21 +34,34 @@ export default function HomePage() {
           </p>
 
           {/* Countdown Placeholder */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-4xl shadow-large p-8 md:p-12 mb-8">
-            <div className="font-countdown text-6xl md:text-8xl font-bold text-soft-pink mb-4">
-              🎂
-            </div>
-            <p className="font-body text-lg md:text-xl text-charcoal-black/70">
-              Countdown timer will be here soon!
-            </p>
-          </div>
+          <BirthdayCard
+            variant="floating"
+            withHearts={true}
+            glowEffect={true}
+            className="p-8 md:p-12 mb-8"
+          >
+            <BirthdayCardContent className="p-0">
+              <div className="font-countdown text-6xl md:text-8xl font-bold text-primary mb-4 animate-heart-beat">
+                🎂
+              </div>
+              <p className="font-body text-lg md:text-xl text-muted-foreground">
+                Countdown timer will be here soon!
+              </p>
+            </BirthdayCardContent>
+          </BirthdayCard>
 
           {/* Call to Action */}
           <div className="space-y-4">
-            <button className="bg-gradient-accent text-white font-semibold px-8 py-4 rounded-full shadow-medium hover:shadow-large transition-all duration-300 transform hover:scale-105">
+            <BirthdayButton
+              variant="heart"
+              size="lg"
+              withHearts={true}
+              sparkle={true}
+              className="px-8 py-6 text-lg"
+            >
               Add Your Birthday Message
-            </button>
-            <p className="font-body text-sm text-charcoal-black/60">
+            </BirthdayButton>
+            <p className="font-body text-sm text-muted-foreground">
               Join family and friends in creating something special
             </p>
           </div>
@@ -53,33 +69,60 @@ export default function HomePage() {
       </section>
 
       {/* Features Preview */}
-      <section className="py-16 px-4 bg-white/50">
+      <section className="py-16 px-4 bg-secondary/20">
         <div className="max-w-6xl mx-auto">
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-center text-charcoal-black mb-12">
+          <h2 className="font-display text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
             What&apos;s Coming
           </h2>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             {/* Feature 1 */}
-            <div className="text-center p-6 bg-white rounded-2xl shadow-soft">
-              <div className="text-4xl mb-4">⏰</div>
-              <h3 className="font-display text-xl font-semibold mb-2">Countdown Timer</h3>
-              <p className="text-charcoal-black/70">Beautiful real-time countdown to the special day</p>
-            </div>
+            <BirthdayCard variant="gradient" glowEffect={true}>
+              <BirthdayCardHeader>
+                <div className="text-4xl mb-2 animate-pulse-soft">⏰</div>
+                <BirthdayCardTitle>
+                  Countdown Timer
+                </BirthdayCardTitle>
+              </BirthdayCardHeader>
+              <BirthdayCardContent>
+                <p className="text-muted-foreground mb-3">Beautiful real-time countdown to the special day</p>
+                <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
+                  Coming Soon
+                </Badge>
+              </BirthdayCardContent>
+            </BirthdayCard>
 
             {/* Feature 2 */}
-            <div className="text-center p-6 bg-white rounded-2xl shadow-soft">
-              <div className="text-4xl mb-4">💌</div>
-              <h3 className="font-display text-xl font-semibold mb-2">Message Collection</h3>
-              <p className="text-charcoal-black/70">Heartfelt messages from family and friends</p>
-            </div>
+            <BirthdayCard variant="sparkle" withHearts={true} glowEffect={true}>
+              <BirthdayCardHeader>
+                <div className="text-4xl mb-2 animate-heart-beat">💌</div>
+                <BirthdayCardTitle>
+                  Message Collection
+                </BirthdayCardTitle>
+              </BirthdayCardHeader>
+              <BirthdayCardContent>
+                <p className="text-muted-foreground mb-3">Heartfelt messages from family and friends</p>
+                <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
+                  Coming Soon
+                </Badge>
+              </BirthdayCardContent>
+            </BirthdayCard>
 
             {/* Feature 3 */}
-            <div className="text-center p-6 bg-white rounded-2xl shadow-soft">
-              <div className="text-4xl mb-4">🗺️</div>
-              <h3 className="font-display text-xl font-semibold mb-2">Memory Map</h3>
-              <p className="text-charcoal-black/70">Interactive map showing love from around the world</p>
-            </div>
+            <BirthdayCard variant="floating" glowEffect={true}>
+              <BirthdayCardHeader>
+                <div className="text-4xl mb-2 animate-float">🗺️</div>
+                <BirthdayCardTitle>
+                  Memory Map
+                </BirthdayCardTitle>
+              </BirthdayCardHeader>
+              <BirthdayCardContent>
+                <p className="text-muted-foreground mb-3">Interactive map showing love from around the world</p>
+                <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
+                  Coming Soon
+                </Badge>
+              </BirthdayCardContent>
+            </BirthdayCard>
           </div>
         </div>
       </section>

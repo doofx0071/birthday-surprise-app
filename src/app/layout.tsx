@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter, Playfair_Display, Poppins } from 'next/font/google'
+import { Toaster } from '@/components/ui/toaster'
 import './globals.css'
 
 const inter = Inter({
@@ -59,9 +60,10 @@ export default function RootLayout({
       lang="en" 
       className={`${inter.variable} ${playfairDisplay.variable} ${poppins.variable} antialiased`}
     >
-      <body className="min-h-screen bg-pure-white text-charcoal-black">
+      <body className="min-h-screen bg-background text-foreground">
         <div id="root" className="relative">
           {children}
+          <Toaster />
         </div>
       </body>
     </html>
