@@ -10,6 +10,7 @@ import {
   useCountdownAnimations,
   useCelebrationEffects,
   getTimeDescription,
+  formatTargetDate,
   type CountdownConfig,
   type TimeRemaining
 } from './countdown-hooks'
@@ -20,6 +21,8 @@ interface CountdownDisplayProps extends Omit<CountdownConfig, 'onComplete' | 'on
   showSparkles?: boolean
   enableFlipAnimation?: boolean
   enableCelebration?: boolean
+  showTargetDate?: boolean
+  dateFormat?: 'default' | 'long' | 'short'
   className?: string
   onComplete?: () => void
   onTick?: (timeRemaining: TimeRemaining) => void
@@ -27,11 +30,14 @@ interface CountdownDisplayProps extends Omit<CountdownConfig, 'onComplete' | 'on
 
 export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
   targetDate,
+  timezone,
   girlfriendName = "Your Special Someone",
   variant = 'default',
   showSparkles = true,
   enableFlipAnimation = true,
   enableCelebration = true,
+  showTargetDate = false,
+  dateFormat = 'default',
   className,
   onComplete,
   onTick,
@@ -42,6 +48,7 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
 
   const timeRemaining = useCountdown({
     targetDate,
+    timezone,
     updateInterval,
     onComplete: () => {
       if (enableCelebration) {
@@ -61,27 +68,27 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
     switch (variant) {
       case 'large':
         return {
-          container: 'p-8 md:p-12',
-          title: 'text-3xl md:text-5xl lg:text-6xl mb-6',
-          subtitle: 'text-xl md:text-2xl mb-8',
-          grid: 'grid-cols-2 md:grid-cols-4 gap-4 md:gap-6',
-          description: 'text-lg md:text-xl mt-8',
+          container: 'p-4 sm:p-6 md:p-8 lg:p-12 xl:p-16',
+          title: 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl mb-4 sm:mb-6',
+          subtitle: 'text-lg sm:text-xl md:text-2xl lg:text-3xl mb-6 sm:mb-8',
+          grid: 'grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8',
+          description: 'text-base sm:text-lg md:text-xl lg:text-2xl mt-6 sm:mt-8',
         }
       case 'compact':
         return {
-          container: 'p-4 md:p-6',
-          title: 'text-xl md:text-2xl mb-4',
-          subtitle: 'text-base md:text-lg mb-4',
-          grid: 'grid-cols-4 gap-2 md:gap-3',
-          description: 'text-sm md:text-base mt-4',
+          container: 'p-3 sm:p-4 md:p-6',
+          title: 'text-lg sm:text-xl md:text-2xl mb-3 sm:mb-4',
+          subtitle: 'text-sm sm:text-base md:text-lg mb-3 sm:mb-4',
+          grid: 'grid-cols-4 gap-2 sm:gap-3 md:gap-4',
+          description: 'text-xs sm:text-sm md:text-base mt-3 sm:mt-4',
         }
       default:
         return {
-          container: 'p-6 md:p-8',
-          title: 'text-2xl md:text-4xl lg:text-5xl mb-6',
-          subtitle: 'text-lg md:text-xl mb-6',
-          grid: 'grid-cols-2 md:grid-cols-4 gap-3 md:gap-4',
-          description: 'text-base md:text-lg mt-6',
+          container: 'p-4 sm:p-6 md:p-8 lg:p-10',
+          title: 'text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl mb-4 sm:mb-6',
+          subtitle: 'text-base sm:text-lg md:text-xl lg:text-2xl mb-4 sm:mb-6',
+          grid: 'grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6',
+          description: 'text-sm sm:text-base md:text-lg lg:text-xl mt-4 sm:mt-6',
         }
     }
   }
@@ -109,8 +116,9 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
     <div
       className={cn(
         'relative bg-gradient-to-br from-white to-primary/10',
-        'rounded-3xl shadow-xl border border-primary/20',
-        'overflow-hidden',
+        'rounded-2xl sm:rounded-3xl shadow-xl border border-primary/20',
+        'overflow-hidden w-full max-w-6xl mx-auto',
+        'countdown-container countdown-text',
         styles.container,
         className
       )}
@@ -151,6 +159,13 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
           )}>
             {girlfriendName}&apos;s Birthday
           </h2>
+
+          {/* Target Date Display */}
+          {showTargetDate && (
+            <p className="font-body text-sm md:text-base text-charcoal-black/60 mt-2">
+              {formatTargetDate(targetDate, dateFormat, timezone)}
+            </p>
+          )}
         </div>
 
         {/* Countdown grid */}
@@ -166,7 +181,11 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
           </div>
         ) : (
           <>
-            <div className={cn('grid', styles.grid)}>
+            <div className={cn(
+              'grid w-full',
+              'countdown-mobile-grid sm:countdown-tablet-grid md:countdown-desktop-grid',
+              styles.grid
+            )}>
               {enableFlipAnimation ? (
                 <>
                   <FlipTimeUnit
@@ -175,6 +194,7 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
                     label="Days"
                     variant={variant}
                     showSparkles={showSparkles && timeRemaining.days > 0}
+                    className="countdown-time-unit"
                   />
                   <FlipTimeUnit
                     value={timeRemaining.hours}
@@ -182,6 +202,7 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
                     label="Hours"
                     variant={variant}
                     showSparkles={showSparkles && timeRemaining.hours > 0}
+                    className="countdown-time-unit"
                   />
                   <FlipTimeUnit
                     value={timeRemaining.minutes}
@@ -189,6 +210,7 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
                     label="Minutes"
                     variant={variant}
                     showSparkles={showSparkles && timeRemaining.minutes > 0}
+                    className="countdown-time-unit"
                   />
                   <FlipTimeUnit
                     value={timeRemaining.seconds}
@@ -196,6 +218,7 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
                     label="Seconds"
                     variant={variant}
                     showSparkles={showSparkles}
+                    className="countdown-time-unit"
                   />
                 </>
               ) : (
@@ -206,6 +229,7 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
                     variant={variant}
                     isAnimating={isAnimating}
                     showSparkles={showSparkles && timeRemaining.days > 0}
+                    className="countdown-time-unit"
                   />
                   <TimeUnit
                     value={timeRemaining.hours}
@@ -213,6 +237,7 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
                     variant={variant}
                     isAnimating={isAnimating}
                     showSparkles={showSparkles && timeRemaining.hours > 0}
+                    className="countdown-time-unit"
                   />
                   <TimeUnit
                     value={timeRemaining.minutes}
@@ -220,6 +245,7 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
                     variant={variant}
                     isAnimating={isAnimating}
                     showSparkles={showSparkles && timeRemaining.minutes > 0}
+                    className="countdown-time-unit"
                   />
                   <TimeUnit
                     value={timeRemaining.seconds}
@@ -227,6 +253,7 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
                     variant={variant}
                     isAnimating={isAnimating}
                     showSparkles={showSparkles}
+                    className="countdown-time-unit"
                   />
                 </>
               )}
@@ -234,7 +261,8 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
 
             {/* Time description */}
             <div className={cn(
-              'text-center text-charcoal-black/70 font-body',
+              'text-center text-charcoal-black/70 font-body countdown-mobile-text',
+              'px-4 sm:px-6',
               styles.description
             )}>
               {timeDescription}
@@ -244,15 +272,16 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
 
         {/* Decorative hearts */}
         {showSparkles && !timeRemaining.isComplete && (
-          <div className="flex justify-center items-center mt-6 space-x-2">
+          <div className="flex justify-center items-center mt-4 sm:mt-6 space-x-1 sm:space-x-2 px-4">
             {Array.from({ length: 7 }).map((_, i) => (
               <HeartIcon
                 key={i}
                 size="xs"
                 color="pink"
                 className={cn(
-                  'animate-pulse-soft opacity-60',
-                  i % 2 === 0 && 'animate-float'
+                  'animate-pulse-soft opacity-60 transition-all duration-300',
+                  i % 2 === 0 && 'animate-float',
+                  'hover:scale-110 hover:opacity-80'
                 )}
                 style={{ animationDelay: `${i * 0.2}s` }}
               />
@@ -267,6 +296,9 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
           <CelebrationAnimation
             isActive={isCelebrating}
             showConfetti={showConfetti}
+            showFireworks={true}
+            showRainbow={true}
+            intensity="high"
             message={`🎉 Happy Birthday ${girlfriendName}! 🎉`}
           />
           <PulseCelebration

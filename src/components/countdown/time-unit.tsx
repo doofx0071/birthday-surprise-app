@@ -22,27 +22,27 @@ export const TimeUnit: React.FC<TimeUnitProps> = ({
   showSparkles = false,
   className,
 }) => {
-  const formattedValue = formatTimeUnit(value, variant === 'large' ? 3 : 2)
+  const formattedValue = formatTimeUnit(value, variant === 'large' ? 3 : 2, label.toLowerCase())
 
   const getVariantStyles = () => {
     switch (variant) {
       case 'large':
         return {
-          container: 'p-6 md:p-8',
-          value: 'text-4xl md:text-6xl lg:text-7xl font-countdown font-black',
-          label: 'text-sm md:text-base font-body font-semibold tracking-wider',
+          container: 'p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10',
+          value: 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-countdown font-black',
+          label: 'text-xs sm:text-sm md:text-base lg:text-lg font-body font-semibold tracking-wider',
         }
       case 'compact':
         return {
-          container: 'p-3 md:p-4',
-          value: 'text-2xl md:text-3xl font-countdown font-bold',
-          label: 'text-xs md:text-sm font-body font-medium tracking-wide',
+          container: 'p-2 sm:p-3 md:p-4',
+          value: 'text-lg sm:text-xl md:text-2xl lg:text-3xl font-countdown font-bold',
+          label: 'text-xs sm:text-xs md:text-sm font-body font-medium tracking-wide',
         }
       default:
         return {
-          container: 'p-4 md:p-6',
-          value: 'text-3xl md:text-4xl lg:text-5xl font-countdown font-bold',
-          label: 'text-xs md:text-sm font-body font-semibold tracking-wide',
+          container: 'p-3 sm:p-4 md:p-5 lg:p-6',
+          value: 'text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-countdown font-bold',
+          label: 'text-xs sm:text-xs md:text-sm lg:text-base font-body font-semibold tracking-wide',
         }
     }
   }
@@ -141,8 +141,8 @@ export const FlipTimeUnit: React.FC<FlipTimeUnitProps> = ({
   className,
 }) => {
   const [isFlipping, setIsFlipping] = React.useState(false)
-  const formattedValue = formatTimeUnit(value, variant === 'large' ? 3 : 2)
-  const formattedPrevious = formatTimeUnit(previousValue || value, variant === 'large' ? 3 : 2)
+  const formattedValue = formatTimeUnit(value, variant === 'large' ? 3 : 2, label.toLowerCase())
+  const formattedPrevious = formatTimeUnit(previousValue || value, variant === 'large' ? 3 : 2, label.toLowerCase())
 
   React.useEffect(() => {
     if (previousValue !== undefined && previousValue !== value) {
@@ -156,21 +156,21 @@ export const FlipTimeUnit: React.FC<FlipTimeUnitProps> = ({
     switch (variant) {
       case 'large':
         return {
-          container: 'p-6 md:p-8',
-          value: 'text-4xl md:text-6xl lg:text-7xl font-countdown font-black',
-          label: 'text-sm md:text-base font-body font-semibold tracking-wider',
+          container: 'p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10',
+          value: 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-countdown font-black',
+          label: 'text-xs sm:text-sm md:text-base lg:text-lg font-body font-semibold tracking-wider',
         }
       case 'compact':
         return {
-          container: 'p-3 md:p-4',
-          value: 'text-2xl md:text-3xl font-countdown font-bold',
-          label: 'text-xs md:text-sm font-body font-medium tracking-wide',
+          container: 'p-2 sm:p-3 md:p-4',
+          value: 'text-lg sm:text-xl md:text-2xl lg:text-3xl font-countdown font-bold',
+          label: 'text-xs sm:text-xs md:text-sm font-body font-medium tracking-wide',
         }
       default:
         return {
-          container: 'p-4 md:p-6',
-          value: 'text-3xl md:text-4xl lg:text-5xl font-countdown font-bold',
-          label: 'text-xs md:text-sm font-body font-semibold tracking-wide',
+          container: 'p-3 sm:p-4 md:p-5 lg:p-6',
+          value: 'text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-countdown font-bold',
+          label: 'text-xs sm:text-xs md:text-sm lg:text-base font-body font-semibold tracking-wide',
         }
     }
   }

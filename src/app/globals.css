@@ -373,3 +373,141 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Enhanced Celebration Animations */
+@keyframes firework-burst {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5) rotate(180deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0.5) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes firework-particle {
+  0% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(50px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes bounce-gentle {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.animate-firework-burst {
+  animation: firework-burst 1.5s ease-out forwards;
+}
+
+.animate-firework-particle {
+  animation: firework-particle 1s ease-out forwards;
+}
+
+.animate-bounce-gentle {
+  animation: bounce-gentle 2s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 1s ease-out forwards;
+  animation-delay: 0.5s;
+  opacity: 0;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+
+/* Responsive Design Utilities */
+@media (max-width: 640px) {
+  .countdown-mobile-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .countdown-mobile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .countdown-mobile-text {
+    text-align: center;
+    line-height: 1.2;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+  .countdown-tablet-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 769px) {
+  .countdown-desktop-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* Touch-friendly improvements for mobile */
+@media (hover: none) and (pointer: coarse) {
+  .countdown-container {
+    padding: 1rem;
+    margin: 0.5rem;
+  }
+
+  .countdown-time-unit {
+    min-height: 4rem;
+    touch-action: manipulation;
+  }
+}
+
+/* High DPI display optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .countdown-text {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}

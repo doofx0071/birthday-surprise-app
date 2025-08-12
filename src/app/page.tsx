@@ -23,27 +23,29 @@ export default function HomePage() {
         </div>
 
         {/* Main Content */}
-        <div className="relative z-10 text-center max-w-4xl mx-auto">
+        <div className="relative z-10 text-center w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Title */}
-          <h1 className="font-display text-responsive-3xl font-bold text-charcoal-black mb-6">
+          <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-charcoal-black mb-4 sm:mb-6 lg:mb-8">
             Birthday Surprise
           </h1>
-          
+
           {/* Subtitle */}
-          <p className="font-body text-xl md:text-2xl text-charcoal-black/80 mb-8 max-w-2xl mx-auto">
+          <p className="font-body text-base sm:text-lg md:text-xl lg:text-2xl text-charcoal-black/80 mb-6 sm:mb-8 lg:mb-12 max-w-4xl mx-auto">
             Something magical is coming...
           </p>
 
           {/* Countdown Timer */}
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8 lg:mb-12 w-full">
             <CountdownTimer
-              birthdayMonth={12}
-              birthdayDay={25}
-              girlfriendName="Sarah"
+              targetDate={process.env.NEXT_PUBLIC_BIRTHDAY_DATE}
+              timezone={process.env.NEXT_PUBLIC_TIMEZONE}
+              girlfriendName={process.env.NEXT_PUBLIC_GIRLFRIEND_NAME?.replace(/"/g, '') || "Your Special Someone"}
               variant="large"
               showSparkles={true}
               enableFlipAnimation={true}
               enableCelebration={true}
+              showTargetDate={true}
+              dateFormat="long"
             />
           </div>
 
