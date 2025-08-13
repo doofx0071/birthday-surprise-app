@@ -15,22 +15,44 @@ const locationSchema = z.object({
 
 // Main message form validation schema
 export const messageFormSchema = z.object({
-  // Name: Required, 2-50 characters
+  // Name: Required, 2-100 characters (updated to match database constraint)
   name: z.string()
     .min(2, "Name must be at least 2 characters")
-    .max(50, "Name must be less than 50 characters")
+    .max(100, "Name must be less than 100 characters")
     .regex(/^[a-zA-Z\s'-]+$/, "Name can only contain letters, spaces, hyphens, and apostrophes"),
 
   // Email: Required, valid email format
   email: z.string()
     .email("Please enter a valid email address")
-    .max(100, "Email must be less than 100 characters"),
+    .max(255, "Email must be less than 255 characters"),
 
-  // Location: Optional string for manual entry
+  // Location: Optional string for manual entry (legacy field)
   location: z.string()
     .max(100, "Location must be less than 100 characters")
     .optional()
     .or(z.literal("")),
+
+  // New location fields for better structure
+  locationCity: z.string()
+    .max(100, "City must be less than 100 characters")
+    .optional()
+    .or(z.literal("")),
+
+  locationCountry: z.string()
+    .max(100, "Country must be less than 100 characters")
+    .optional()
+    .or(z.literal("")),
+
+  // Coordinates for precise location
+  latitude: z.number()
+    .min(-90, "Latitude must be between -90 and 90")
+    .max(90, "Latitude must be between -90 and 90")
+    .optional(),
+
+  longitude: z.number()
+    .min(-180, "Longitude must be between -180 and 180")
+    .max(180, "Longitude must be between -180 and 180")
+    .optional(),
 
   // Message: Required, 10-500 characters
   message: z.string()
@@ -87,6 +109,10 @@ export const defaultFormValues: Partial<MessageFormData> = {
   name: '',
   email: '',
   location: '',
+  locationCity: '',
+  locationCountry: '',
+  latitude: undefined,
+  longitude: undefined,
   message: '',
   wantsReminders: false,
   detectedLocation: undefined,

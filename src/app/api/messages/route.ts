@@ -42,7 +42,11 @@ export async function POST(request: NextRequest) {
     const insertData: MessageInsert = {
       name: messageData.name,
       email: messageData.email,
-      location: messageData.location,
+      location: messageData.location, // Legacy field for backward compatibility
+      location_city: messageData.locationCity,
+      location_country: messageData.locationCountry,
+      latitude: messageData.latitude,
+      longitude: messageData.longitude,
       message: messageData.message,
       wants_reminders: messageData.wantsReminders || false,
       ip_address: ip,
@@ -58,9 +62,12 @@ export async function POST(request: NextRequest) {
       name: savedMessage.name,
       email: savedMessage.email,
       location: savedMessage.location,
+      location_city: savedMessage.location_city,
+      location_country: savedMessage.location_country,
       messageLength: savedMessage.message.length,
       wantsReminders: savedMessage.wants_reminders,
-      status: savedMessage.status,
+      isApproved: savedMessage.is_approved,
+      isVisible: savedMessage.is_visible,
       createdAt: savedMessage.created_at,
     })
 
@@ -71,7 +78,8 @@ export async function POST(request: NextRequest) {
         message: 'Birthday message submitted successfully!',
         data: {
           id: savedMessage.id,
-          status: savedMessage.status,
+          isApproved: savedMessage.is_approved,
+          isVisible: savedMessage.is_visible,
           submittedAt: savedMessage.created_at,
         },
       },
@@ -110,8 +118,13 @@ export async function GET(request: NextRequest) {
       id: msg.id,
       name: msg.name,
       message: msg.message,
-      location: msg.location,
-      status: msg.status,
+      location: msg.location, // Legacy field
+      location_city: msg.location_city,
+      location_country: msg.location_country,
+      latitude: msg.latitude,
+      longitude: msg.longitude,
+      isApproved: msg.is_approved,
+      isVisible: msg.is_visible,
       submittedAt: msg.created_at,
       // Don't expose email addresses, IP addresses, or user agents publicly
     }))
@@ -141,51 +154,46 @@ export async function GET(request: NextRequest) {
 
 /**
  * DELETE /api/messages
- * Clear all messages (for development/testing purposes)
+ * Delete all messages (admin only - for development/testing purposes)
  */
 export async function DELETE(request: NextRequest) {
   try {
-    const previousCount = messages.length
-    messages = []
-
-    console.log(`Cleared ${previousCount} birthday messages`)
-
-    return NextResponse.json(
-      {
-        success: true,
-        message: `Cleared ${previousCount} messages`,
-        data: {
-          previousCount,
-          currentCount: 0,
-        },
-      },
-      { status: 200 }
-    )
-
-  } catch (error) {
-    console.error('Error clearing birthday messages:', error)
-    
+    // This would be an admin-only operation in production
+    // For now, we'll just return an error as this is dangerous
     return NextResponse.json(
       {
         success: false,
-        message: 'Failed to clear messages',
+        message: 'Delete all messages is not implemented for safety reasons',
+      },
+      { status: 501 }
+    )
+
+  } catch (error) {
+    console.error('Error in DELETE /api/messages:', error)
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: 'Failed to process delete request',
       },
       { status: 500 }
     )
   }
 }
 
-// Export the current messages for server-side access
-export function getStoredMessages() {
-  return messages.filter(msg => msg.isApproved)
-}
-
 // Helper function to get message statistics
-export function getMessageStats() {
-  return {
-    total: messages.length,
-    approved: messages.filter(msg => msg.isApproved).length,
-    withLocation: messages.filter(msg => msg.location || msg.detectedLocation).length,
-    wantsReminders: messages.filter(msg => msg.wantsReminders).length,
+export async function getMessageStats() {
+  try {
+    return await messageOperations.getStats()
+  } catch (error) {
+    console.error('Error getting message stats:', error)
+    return {
+      total_messages: 0,
+      total_countries: 0,
+      total_media: 0,
+      latest_message: null,
+      pending_messages: 0,
+      total_with_reminders: 0,
+    }
   }
 }
