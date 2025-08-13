@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -11,6 +11,7 @@ import { messageFormSchema, type MessageFormData, defaultFormValues } from '@/li
 import { BirthdayInput } from '@/design-system/components/forms/birthday-input'
 import { BirthdayTextarea } from '@/design-system/components/forms/birthday-textarea'
 import { LocationPicker } from './location-picker'
+import { DraftIndicator } from './draft-indicator'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
@@ -32,6 +33,7 @@ import {
   AnimatedCelebrationIcon 
 } from '@/design-system/icons/animated-birthday-icons'
 import { BirthdayCard, BirthdayCardContent, BirthdayCardHeader } from '@/components/birthday-card'
+import { useAutoSave } from '@/hooks/use-auto-save'
 
 interface MessageFormProps {
   onSubmit?: (data: MessageFormData) => Promise<void>
@@ -51,6 +53,8 @@ export const MessageForm: React.FC<MessageFormProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [isAutoSaving, setIsAutoSaving] = useState(false)
+  const [lastSaved, setLastSaved] = useState<number | undefined>()
 
   // Initialize form with React Hook Form and Zod validation
   const form = useForm<MessageFormData>({
@@ -58,6 +62,35 @@ export const MessageForm: React.FC<MessageFormProps> = ({
     defaultValues: defaultFormValues,
     mode: 'onBlur', // Validate on blur for better UX
   })
+
+  // Auto-save functionality
+  const autoSave = useAutoSave({
+    watch: form.watch,
+    enabled: !disabled && !isSubmitting,
+    onSave: (data) => {
+      setIsAutoSaving(true)
+      setTimeout(() => {
+        setIsAutoSaving(false)
+        setLastSaved(Date.now())
+      }, 500) // Show saving indicator briefly
+    },
+    onRestore: (data) => {
+      // Restore form data from draft
+      Object.keys(data).forEach((key) => {
+        const value = data[key as keyof MessageFormData]
+        if (value !== undefined) {
+          form.setValue(key as keyof MessageFormData, value)
+        }
+      })
+    }
+  })
+
+  // Check for draft on component mount
+  useEffect(() => {
+    if (autoSave.hasDraft()) {
+      // Draft will be shown via DraftIndicator component
+    }
+  }, [autoSave])
 
   // Handle form submission
   const handleSubmit = async (data: MessageFormData) => {
@@ -89,6 +122,8 @@ export const MessageForm: React.FC<MessageFormProps> = ({
       // Success handling
       setSubmitSuccess(true)
       form.reset(defaultFormValues)
+      autoSave.clearDraft() // Clear draft after successful submission
+      setLastSaved(undefined)
       onSuccess?.()
 
       // Auto-hide success message after 5 seconds
@@ -181,6 +216,26 @@ export const MessageForm: React.FC<MessageFormProps> = ({
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Draft Indicator */}
+          <DraftIndicator
+            hasDraft={autoSave.hasDraft()}
+            draftTimestamp={autoSave.getDraftInfo()?.timestamp}
+            onRestoreDraft={() => {
+              const draftData = autoSave.restoreDraft()
+              if (draftData) {
+                // Form data is already restored in the onRestore callback
+                setLastSaved(undefined) // Clear last saved indicator since we're restoring
+              }
+            }}
+            onClearDraft={() => {
+              autoSave.clearDraft()
+              setLastSaved(undefined)
+            }}
+            isAutoSaving={isAutoSaving}
+            lastSaved={lastSaved}
+            className="mb-6"
+          />
 
           {/* Form */}
           <Form {...form}>
