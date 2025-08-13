@@ -13,6 +13,7 @@ import { BirthdayTextarea } from '@/design-system/components/forms/birthday-text
 import { LocationPicker } from './location-picker'
 import { DraftIndicator } from './draft-indicator'
 import { FileUpload } from '@/components/upload'
+import { finalizeUploads } from '@/lib/fileUpload'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
@@ -57,9 +58,10 @@ export const MessageForm: React.FC<MessageFormProps> = ({
   const [isAutoSaving, setIsAutoSaving] = useState(false)
   const [lastSaved, setLastSaved] = useState<number | undefined>()
   const [uploadedFiles, setUploadedFiles] = useState<Array<{ url: string; thumbnailUrl?: string }>>([])
+  const [tempFiles, setTempFiles] = useState<Array<{ tempPath: string; fileInfo: any; thumbnailUrl?: string }>>([])
 
-  // Generate a temporary message ID for file uploads (will be replaced with actual message ID after submission)
-  const tempMessageId = useMemo(() => `temp-${Date.now()}-${Math.random().toString(36).substring(2)}`, [])
+  // Generate a temporary ID for file uploads (will be replaced with actual message ID after submission)
+  const tempUploadId = useMemo(() => `${Date.now()}-${Math.random().toString(36).substring(2)}`, [])
 
   // Initialize form with React Hook Form and Zod validation
   const form = useForm<MessageFormData>({
@@ -105,9 +107,13 @@ export const MessageForm: React.FC<MessageFormProps> = ({
     setSubmitError(null)
 
     try {
+      let messageId: string | undefined
+
       // Call the provided onSubmit handler or default API call
       if (onSubmit) {
         await onSubmit(data)
+        // For custom onSubmit, we'll need the message ID to be returned
+        // For now, we'll skip file finalization for custom handlers
       } else {
         // Default submission to API route
         const response = await fetch('/api/messages', {
@@ -122,6 +128,20 @@ export const MessageForm: React.FC<MessageFormProps> = ({
           const errorData = await response.json()
           throw new Error(errorData.message || 'Failed to submit message')
         }
+
+        const result = await response.json()
+        messageId = result.id || result.messageId
+      }
+
+      // Finalize file uploads if we have a message ID and temp files
+      if (messageId && tempFiles.length > 0) {
+        try {
+          await finalizeUploads(tempFiles, messageId)
+          console.log(`Finalized ${tempFiles.length} file uploads for message ${messageId}`)
+        } catch (fileError) {
+          console.error('Failed to finalize file uploads:', fileError)
+          // Don't fail the entire submission for file errors
+        }
       }
 
       // Success handling
@@ -129,6 +149,8 @@ export const MessageForm: React.FC<MessageFormProps> = ({
       form.reset(defaultFormValues)
       autoSave.clearDraft() // Clear draft after successful submission
       setLastSaved(undefined)
+      setUploadedFiles([])
+      setTempFiles([])
       onSuccess?.()
 
       // Auto-hide success message after 5 seconds
@@ -376,10 +398,14 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                 <FileUpload
                   variant="compact"
                   disabled={disabled || isSubmitting}
-                  messageId={tempMessageId}
+                  messageId={tempUploadId}
                   onFilesUploaded={(files) => {
-                    console.log('Files uploaded:', files)
+                    console.log('Files uploaded to temporary storage:', files)
                     setUploadedFiles(files)
+                  }}
+                  onTempFilesReady={(tempFileData) => {
+                    console.log('Temporary files ready for finalization:', tempFileData)
+                    setTempFiles(tempFileData)
                   }}
                 />
                 <p className="text-xs text-muted-foreground">

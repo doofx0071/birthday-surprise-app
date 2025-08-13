@@ -9,6 +9,8 @@ export interface UploadFile {
   error?: string
   uploadedUrl?: string
   thumbnailUrl?: string
+  tempPath?: string
+  fileInfo?: any
 }
 
 export type UploadStatus = 
@@ -62,7 +64,9 @@ export interface FileUploadHookReturn {
   addFiles: (files: File[]) => void
   removeFile: (id: string) => void
   clearFiles: () => void
-  uploadFiles: (messageId: string) => Promise<void>
+  uploadFiles: (tempId: string) => Promise<void>
+  finalizeFileUploads: (realMessageId: string) => Promise<void>
+  cancelUploads: (tempId: string) => Promise<void>
   isUploading: boolean
   uploadProgress: number
 }

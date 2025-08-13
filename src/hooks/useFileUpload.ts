@@ -3,13 +3,13 @@
 import { useState, useCallback, useRef } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { UploadFile, FileUploadHookReturn } from '@/types/upload'
-import { 
-  validateFiles, 
-  getAcceptedFileTypes, 
+import {
+  validateFiles,
+  getAcceptedFileTypes,
   createFileValidator,
-  generatePreviewUrl 
+  generatePreviewUrl
 } from '@/lib/fileValidation'
-import { uploadFileToStorage } from '@/lib/fileUpload'
+import { uploadFileToStorage, finalizeUploads, cancelTempUploads } from '@/lib/fileUpload'
 
 export function useFileUpload(): FileUploadHookReturn {
   const [files, setFiles] = useState<UploadFile[]>([])
@@ -134,33 +134,35 @@ export function useFileUpload(): FileUploadHookReturn {
             : f
         ))
 
-        // Upload file
+        // Upload file to temporary storage
         const result = await uploadFileToStorage(uploadFile.file, messageId, {
           onProgress: (progress) => {
-            setFiles(prev => prev.map(f => 
-              f.id === uploadFile.id 
+            setFiles(prev => prev.map(f =>
+              f.id === uploadFile.id
                 ? { ...f, progress: progress.percentage }
                 : f
             ))
           },
           onError: (error) => {
-            setFiles(prev => prev.map(f => 
-              f.id === uploadFile.id 
+            setFiles(prev => prev.map(f =>
+              f.id === uploadFile.id
                 ? { ...f, status: 'error' as const, error }
                 : f
             ))
           }
         })
 
-        // Update file status to complete
-        setFiles(prev => prev.map(f => 
-          f.id === uploadFile.id 
-            ? { 
-                ...f, 
-                status: 'complete' as const, 
+        // Update file status to complete with temporary info
+        setFiles(prev => prev.map(f =>
+          f.id === uploadFile.id
+            ? {
+                ...f,
+                status: 'complete' as const,
                 progress: 100,
                 uploadedUrl: result.url,
-                thumbnailUrl: result.thumbnailUrl
+                thumbnailUrl: result.thumbnailUrl,
+                tempPath: result.tempPath,
+                fileInfo: result.fileInfo
               }
             : f
         ))
@@ -188,6 +190,37 @@ export function useFileUpload(): FileUploadHookReturn {
     }
   }, [files])
 
+  // Finalize uploads when message is submitted
+  const finalizeFileUploads = useCallback(async (realMessageId: string) => {
+    const completedFiles = files.filter(f => f.status === 'complete' && f.tempPath && f.fileInfo)
+
+    if (completedFiles.length === 0) return
+
+    try {
+      const tempFiles = completedFiles.map(f => ({
+        tempPath: f.tempPath!,
+        fileInfo: f.fileInfo!,
+        thumbnailUrl: f.thumbnailUrl
+      }))
+
+      await finalizeUploads(tempFiles, realMessageId)
+      console.log(`Finalized ${completedFiles.length} file uploads for message ${realMessageId}`)
+    } catch (error) {
+      console.error('Failed to finalize uploads:', error)
+      throw error
+    }
+  }, [files])
+
+  // Cancel uploads (cleanup temp files)
+  const cancelUploads = useCallback(async (tempId: string) => {
+    try {
+      await cancelTempUploads(tempId)
+      clearFiles()
+    } catch (error) {
+      console.error('Failed to cancel uploads:', error)
+    }
+  }, [clearFiles])
+
   return {
     files,
     isDragActive,
@@ -199,6 +232,8 @@ export function useFileUpload(): FileUploadHookReturn {
     removeFile,
     clearFiles,
     uploadFiles,
+    finalizeFileUploads,
+    cancelUploads,
     isUploading,
     uploadProgress
   }

@@ -1,18 +1,18 @@
 import { supabase } from './supabase'
 import { UploadOptions, UploadProgress, MediaFileRecord } from '@/types/upload'
 
-// Upload a file to Supabase Storage
+// Upload a file to Supabase Storage (Temporary - Phase 1)
 export async function uploadFileToStorage(
   file: File,
-  messageId: string,
+  tempId: string,
   options: UploadOptions = {}
-): Promise<{ url: string; thumbnailUrl?: string }> {
+): Promise<{ url: string; thumbnailUrl?: string; tempPath: string; fileInfo: any }> {
   const { onProgress, onError } = options
 
   try {
-    // Generate unique file name
+    // Generate unique file name in temporary folder
     const fileExt = file.name.split('.').pop()
-    const fileName = `${messageId}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
+    const fileName = `temp/${tempId}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
 
     // Upload file to Supabase Storage
     const { data, error } = await supabase.storage
@@ -47,25 +47,27 @@ export async function uploadFileToStorage(
 
     const publicUrl = urlData.publicUrl
 
-    // Generate thumbnail for images
+    // Generate thumbnail for images (also in temp folder)
     let thumbnailUrl: string | undefined
     if (file.type.startsWith('image/')) {
-      thumbnailUrl = await generateImageThumbnail(file, messageId)
-    } else if (file.type.startsWith('video/')) {
-      thumbnailUrl = await generateVideoThumbnail(file, messageId)
+      thumbnailUrl = await generateImageThumbnail(file, tempId, true) // true = temporary
     }
 
-    // Save file record to database
-    await saveFileRecord({
-      message_id: messageId,
+    // Return file info without saving to database yet
+    const fileInfo = {
       file_name: file.name,
       file_type: file.type.startsWith('image/') ? 'image' : 'video',
       file_size: file.size,
       storage_path: data.path,
       thumbnail_path: thumbnailUrl
-    })
+    }
 
-    return { url: publicUrl, thumbnailUrl }
+    return {
+      url: publicUrl,
+      thumbnailUrl,
+      tempPath: data.path,
+      fileInfo
+    }
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Upload failed'
@@ -76,8 +78,60 @@ export async function uploadFileToStorage(
   }
 }
 
+// Finalize uploads when message is submitted (Phase 2)
+export async function finalizeUploads(
+  tempFiles: Array<{ tempPath: string; fileInfo: any; thumbnailUrl?: string }>,
+  realMessageId: string
+): Promise<void> {
+  try {
+    for (const tempFile of tempFiles) {
+      // Move file from temp to permanent location
+      const fileExt = tempFile.fileInfo.file_name.split('.').pop()
+      const newPath = `${realMessageId}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
+
+      // Move the file
+      const { error: moveError } = await supabase.storage
+        .from('birthday-media')
+        .move(tempFile.tempPath, newPath)
+
+      if (moveError) {
+        console.error('Failed to move file:', moveError)
+        continue // Skip this file but continue with others
+      }
+
+      // Move thumbnail if exists
+      let newThumbnailPath: string | undefined
+      if (tempFile.thumbnailUrl && tempFile.fileInfo.thumbnail_path) {
+        const thumbExt = 'jpg'
+        newThumbnailPath = `${realMessageId}/thumbnails/${Date.now()}_thumb.${thumbExt}`
+
+        const { error: thumbMoveError } = await supabase.storage
+          .from('birthday-media')
+          .move(tempFile.fileInfo.thumbnail_path, newThumbnailPath)
+
+        if (!thumbMoveError) {
+          tempFile.fileInfo.thumbnail_path = newThumbnailPath
+        }
+      }
+
+      // Save to database with real message ID
+      await saveFileRecord({
+        message_id: realMessageId,
+        file_name: tempFile.fileInfo.file_name,
+        file_type: tempFile.fileInfo.file_type,
+        file_size: tempFile.fileInfo.file_size,
+        storage_path: newPath,
+        thumbnail_path: newThumbnailPath
+      })
+    }
+  } catch (error) {
+    console.error('Failed to finalize uploads:', error)
+    throw error
+  }
+}
+
 // Generate thumbnail for images
-async function generateImageThumbnail(file: File, messageId: string): Promise<string | undefined> {
+async function generateImageThumbnail(file: File, messageId: string, isTemporary: boolean = false): Promise<string | undefined> {
   try {
     // Create canvas for thumbnail generation
     const canvas = document.createElement('canvas')
@@ -111,8 +165,10 @@ async function generateImageThumbnail(file: File, messageId: string): Promise<st
         canvas.toBlob(async (blob) => {
           if (blob) {
             try {
-              // Upload thumbnail
-              const thumbFileName = `${messageId}/thumbnails/${Date.now()}_thumb.jpg`
+              // Upload thumbnail (to temp or permanent location)
+              const thumbFileName = isTemporary
+                ? `temp/${messageId}/thumbnails/${Date.now()}_thumb.jpg`
+                : `${messageId}/thumbnails/${Date.now()}_thumb.jpg`
               const { data, error } = await supabase.storage
                 .from('birthday-media')
                 .upload(thumbFileName, blob, {
@@ -208,4 +264,69 @@ export async function getMessageFiles(messageId: string): Promise<MediaFileRecor
   }
 
   return data || []
+}
+
+// Clean up temporary files older than 24 hours
+export async function cleanupTempFiles(): Promise<void> {
+  try {
+    const { data: files, error } = await supabase.storage
+      .from('birthday-media')
+      .list('temp', {
+        limit: 1000,
+        sortBy: { column: 'created_at', order: 'asc' }
+      })
+
+    if (error || !files) {
+      console.error('Failed to list temp files:', error)
+      return
+    }
+
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
+    const filesToDelete: string[] = []
+
+    files.forEach(file => {
+      if (file.created_at && new Date(file.created_at) < oneDayAgo) {
+        filesToDelete.push(`temp/${file.name}`)
+      }
+    })
+
+    if (filesToDelete.length > 0) {
+      const { error: deleteError } = await supabase.storage
+        .from('birthday-media')
+        .remove(filesToDelete)
+
+      if (deleteError) {
+        console.error('Failed to delete temp files:', deleteError)
+      } else {
+        console.log(`Cleaned up ${filesToDelete.length} temporary files`)
+      }
+    }
+  } catch (error) {
+    console.error('Cleanup failed:', error)
+  }
+}
+
+// Cancel temporary uploads (when user navigates away without submitting)
+export async function cancelTempUploads(tempId: string): Promise<void> {
+  try {
+    const { data: files, error } = await supabase.storage
+      .from('birthday-media')
+      .list(`temp/${tempId}`, {
+        limit: 100
+      })
+
+    if (error || !files) {
+      return
+    }
+
+    const filesToDelete = files.map(file => `temp/${tempId}/${file.name}`)
+
+    if (filesToDelete.length > 0) {
+      await supabase.storage
+        .from('birthday-media')
+        .remove(filesToDelete)
+    }
+  } catch (error) {
+    console.error('Failed to cancel temp uploads:', error)
+  }
 }
