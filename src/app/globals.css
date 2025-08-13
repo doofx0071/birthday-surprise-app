@@ -28,6 +28,16 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Smooth scrolling for all elements */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Ensure sections have proper spacing for navigation */
+section {
+  scroll-margin-top: 5rem; /* Account for fixed header */
+}
+
 body {
   font-family: 'Inter', sans-serif;
   background-color: var(--color-pure-white);
