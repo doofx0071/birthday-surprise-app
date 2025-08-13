@@ -49,7 +49,7 @@ export const useAutoSave = ({
   // Save draft to localStorage
   const saveDraft = useCallback((data: Partial<MessageFormData>) => {
     // Triple check for client-side environment
-    if (!enabled || !isClientSide || !isClient() || typeof window === 'undefined' || typeof localStorage === 'undefined') {
+    if (!enabled || typeof window === 'undefined' || typeof localStorage === 'undefined') {
       return
     }
 
@@ -70,12 +70,12 @@ export const useAutoSave = ({
     } catch (error) {
       console.error('Failed to save draft:', error)
     }
-  }, [enabled, isClientSide, onSave, generateDraftId])
+  }, [enabled, onSave, generateDraftId])
 
   // Load draft from localStorage
   const loadDraft = useCallback((): DraftData | null => {
     // Triple check for client-side environment
-    if (!isClientSide || !isClient() || typeof window === 'undefined' || typeof localStorage === 'undefined') {
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
       return null
     }
 
@@ -97,12 +97,12 @@ export const useAutoSave = ({
       console.error('Failed to load draft:', error)
       return null
     }
-  }, [isClientSide])
+  }, [])
 
   // Clear draft from localStorage
   const clearDraft = useCallback(() => {
     // Triple check for client-side environment
-    if (!isClientSide || !isClient() || typeof window === 'undefined' || typeof localStorage === 'undefined') {
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
       return
     }
 
@@ -114,7 +114,7 @@ export const useAutoSave = ({
     } catch (error) {
       console.error('Failed to clear draft:', error)
     }
-  }, [isClientSide])
+  }, [])
 
   // Check if there's a draft available
   const hasDraft = useCallback((): boolean => {
@@ -141,7 +141,7 @@ export const useAutoSave = ({
 
   // Watch form data and auto-save
   useEffect(() => {
-    if (!enabled || !isClientSide) return
+    if (!enabled || typeof window === 'undefined') return
 
     const subscription = watch((data) => {
       // Clear existing timeout
@@ -173,7 +173,7 @@ export const useAutoSave = ({
         clearTimeout(timeoutRef.current)
       }
     }
-  }, [watch, enabled, isClientSide, delay, saveDraft])
+  }, [watch, enabled, delay, saveDraft])
 
   // Cleanup on unmount
   useEffect(() => {
