@@ -2,7 +2,6 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables')
@@ -12,12 +11,21 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Admin client for server-side operations (with service role key)
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false
+// Only create this on the server side where the service role key is available
+export const getSupabaseAdmin = () => {
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseServiceKey) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY is required for admin operations')
   }
-})
+
+  return createClient(supabaseUrl, supabaseServiceKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  })
+}
 
 // Database types
 export interface Message {
@@ -48,6 +56,7 @@ export interface MessageInsert {
 export const messageOperations = {
   // Insert a new message
   async create(data: MessageInsert): Promise<Message> {
+    const supabaseAdmin = getSupabaseAdmin()
     const { data: message, error } = await supabaseAdmin
       .from('messages')
       .insert([data])
@@ -99,6 +108,7 @@ export const messageOperations = {
 
   // Update message status (admin only)
   async updateStatus(id: string, status: 'pending' | 'approved' | 'rejected'): Promise<Message> {
+    const supabaseAdmin = getSupabaseAdmin()
     const { data: message, error } = await supabaseAdmin
       .from('messages')
       .update({ status })
@@ -116,6 +126,7 @@ export const messageOperations = {
 
   // Delete message (admin only)
   async delete(id: string): Promise<void> {
+    const supabaseAdmin = getSupabaseAdmin()
     const { error } = await supabaseAdmin
       .from('messages')
       .delete()
@@ -134,6 +145,7 @@ export const messageOperations = {
     approved: number
     rejected: number
   }> {
+    const supabaseAdmin = getSupabaseAdmin()
     const { data, error } = await supabaseAdmin
       .from('messages')
       .select('status')
@@ -145,9 +157,9 @@ export const messageOperations = {
 
     const stats = {
       total: data.length,
-      pending: data.filter(m => m.status === 'pending').length,
-      approved: data.filter(m => m.status === 'approved').length,
-      rejected: data.filter(m => m.status === 'rejected').length
+      pending: data.filter((m: { status: string }) => m.status === 'pending').length,
+      approved: data.filter((m: { status: string }) => m.status === 'approved').length,
+      rejected: data.filter((m: { status: string }) => m.status === 'rejected').length
     }
 
     return stats
