@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -56,6 +56,10 @@ export const MessageForm: React.FC<MessageFormProps> = ({
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [isAutoSaving, setIsAutoSaving] = useState(false)
   const [lastSaved, setLastSaved] = useState<number | undefined>()
+  const [uploadedFiles, setUploadedFiles] = useState<Array<{ url: string; thumbnailUrl?: string }>>([])
+
+  // Generate a temporary message ID for file uploads (will be replaced with actual message ID after submission)
+  const tempMessageId = useMemo(() => `temp-${Date.now()}-${Math.random().toString(36).substring(2)}`, [])
 
   // Initialize form with React Hook Form and Zod validation
   const form = useForm<MessageFormData>({
@@ -372,9 +376,10 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                 <FileUpload
                   variant="compact"
                   disabled={disabled || isSubmitting}
+                  messageId={tempMessageId}
                   onFilesUploaded={(files) => {
                     console.log('Files uploaded:', files)
-                    // TODO: Store uploaded file URLs with the message
+                    setUploadedFiles(files)
                   }}
                 />
                 <p className="text-xs text-muted-foreground">
