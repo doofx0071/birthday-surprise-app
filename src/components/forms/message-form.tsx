@@ -59,6 +59,7 @@ export const MessageForm: React.FC<MessageFormProps> = ({
   const [lastSaved, setLastSaved] = useState<number | undefined>()
   const [uploadedFiles, setUploadedFiles] = useState<Array<{ url: string; thumbnailUrl?: string }>>([])
   const [tempFiles, setTempFiles] = useState<Array<{ tempPath: string; fileInfo: any; thumbnailUrl?: string }>>([])
+  const [clearFilesTrigger, setClearFilesTrigger] = useState(0)
 
   // Generate a temporary ID for file uploads (will be replaced with actual message ID after submission)
   const tempUploadId = useMemo(() => `${Date.now()}-${Math.random().toString(36).substring(2)}`, [])
@@ -151,6 +152,7 @@ export const MessageForm: React.FC<MessageFormProps> = ({
       setLastSaved(undefined)
       setUploadedFiles([])
       setTempFiles([])
+      setClearFilesTrigger(prev => prev + 1) // Trigger file upload component to clear
       onSuccess?.()
 
       // Auto-hide success message after 5 seconds
@@ -399,6 +401,7 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                   variant="compact"
                   disabled={disabled || isSubmitting}
                   messageId={tempUploadId}
+                  clearTrigger={clearFilesTrigger}
                   onFilesUploaded={(files) => {
                     console.log('Files uploaded to temporary storage:', files)
                     setUploadedFiles(files)
@@ -445,7 +448,7 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                 <Button
                   type="submit"
                   disabled={disabled || isSubmitting || !form.formState.isValid}
-                  className="flex-1 h-12 text-base font-semibold bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 transition-all duration-300"
+                  className="flex-1 h-12 text-base font-semibold bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white shadow-lg hover:shadow-xl transition-all duration-300"
                 >
                   {isSubmitting ? (
                     <div className="flex items-center space-x-2">
@@ -468,7 +471,14 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => form.reset(defaultFormValues)}
+                  onClick={() => {
+                    form.reset(defaultFormValues)
+                    autoSave.clearDraft()
+                    setUploadedFiles([])
+                    setTempFiles([])
+                    setClearFilesTrigger(prev => prev + 1)
+                    setLastSaved(undefined)
+                  }}
                   disabled={disabled || isSubmitting}
                   className="h-12 px-6 border-primary/30 hover:bg-primary/5"
                 >

@@ -22,7 +22,7 @@ const BirthdayButton = React.forwardRef<HTMLButtonElement, BirthdayButtonProps>(
     const getVariantStyles = () => {
       switch (variant) {
         case 'primary':
-          return 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg'
+          return 'bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white shadow-md hover:shadow-lg'
         case 'secondary':
           return 'bg-secondary hover:bg-secondary/90 text-secondary-foreground'
         case 'ghost':

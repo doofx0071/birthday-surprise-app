@@ -112,7 +112,7 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
           {/* CTA Button */}
           <div className="hidden md:block">
             <BirthdayButton
-              onClick={() => handleNavClick('#contribute')}
+              onClick={() => handleNavClick('#messages')}
               variant="primary"
               size="sm"
             >
@@ -172,7 +172,7 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
               {/* Mobile CTA */}
               <div className="px-4 pt-4">
                 <BirthdayButton
-                  onClick={() => handleNavClick('#contribute')}
+                  onClick={() => handleNavClick('#messages')}
                   variant="primary"
                   size="sm"
                   className="w-full"

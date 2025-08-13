@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useImperativeHandle, forwardRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Upload, FileText, Image as ImageIcon, Film, Plus } from 'lucide-react'
 import { useFileUpload } from '@/hooks/useFileUpload'
@@ -16,16 +16,22 @@ interface FileUploadProps {
   disabled?: boolean
   variant?: 'compact' | 'full'
   className?: string
+  clearTrigger?: number // When this changes, clear the files
 }
 
-export const FileUpload: React.FC<FileUploadProps> = ({
+export interface FileUploadRef {
+  clearFiles: () => void
+}
+
+export const FileUpload = forwardRef<FileUploadRef, FileUploadProps>(({
   onFilesUploaded,
   onTempFilesReady,
   messageId,
   disabled = false,
   variant = 'full',
-  className
-}) => {
+  className,
+  clearTrigger
+}, ref) => {
   const {
     files,
     isDragActive,
@@ -41,6 +47,18 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     isUploading,
     uploadProgress
   } = useFileUpload()
+
+  // Expose clearFiles method to parent via ref
+  useImperativeHandle(ref, () => ({
+    clearFiles
+  }), [clearFiles])
+
+  // Clear files when clearTrigger changes
+  useEffect(() => {
+    if (clearTrigger !== undefined && clearTrigger > 0) {
+      clearFiles()
+    }
+  }, [clearTrigger]) // Remove clearFiles from dependencies to avoid infinite loop
 
   const handleUpload = async () => {
     if (!messageId) {
@@ -138,7 +156,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
               onClick={handleUpload}
               disabled={isUploading || !messageId}
               size="sm"
-              className="flex-1"
+              className="flex-1 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white shadow-lg hover:shadow-xl"
             >
               {isUploading ? 'Uploading...' : `Upload ${pendingFiles.length} file${pendingFiles.length !== 1 ? 's' : ''}`}
             </Button>
@@ -285,7 +303,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
           <Button
             onClick={handleUpload}
             disabled={isUploading || !messageId}
-            className="flex-1"
+            className="flex-1 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white shadow-lg hover:shadow-xl"
             size="lg"
           >
             {isUploading 
@@ -311,4 +329,6 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       )}
     </div>
   )
-}
+})
+
+FileUpload.displayName = 'FileUpload'
