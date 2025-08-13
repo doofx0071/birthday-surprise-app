@@ -210,7 +210,7 @@ Creates an unforgettable, personalized birthday experience that connects your gi
 ### Technology Stack
 - **Frontend**: Next.js 14 with TypeScript, Tailwind CSS, Framer Motion
 - **Backend**: Supabase (PostgreSQL + Auth + Storage + Real-time)
-- **Email Service**: Resend with React Email templates
+- **Email Service**: Mailtrap.io with Nodemailer and React Email templates
 - **Maps**: Mapbox GL JS for interactive mapping
 - **File Storage**: Supabase Storage with Cloudinary optimization
 - **Hosting**: Vercel with automatic deployments

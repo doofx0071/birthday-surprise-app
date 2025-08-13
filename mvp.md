@@ -80,7 +80,7 @@
 #### 🛠 **Technical Implementation:**
 - **File Storage**: Supabase Storage + Cloudinary
 - **Maps**: Mapbox GL JS
-- **Email**: Resend + React Email
+- **Email**: Mailtrap.io + Nodemailer + React Email
 - **Animations**: Framer Motion
 
 #### 📋 **Week 3-4 Tasks:**
@@ -146,7 +146,8 @@
 ### **Backend & Services:**
 ```javascript
 - Supabase (Database + Auth + Storage)
-- Resend (Email service)
+- Mailtrap.io (Email service)
+- Nodemailer (SMTP client)
 - React Email (Email templates)
 - Cloudinary (Image optimization)
 ```
@@ -387,8 +388,9 @@
 ### **Day 15-21: Polish & Deploy**
 1. **Email System**
    ```bash
-   # Use Context7 MCP for Resend documentation
-   # Create email templates
+   # Use Context7 MCP for Mailtrap documentation
+   # Create email templates with Nodemailer
+   # Set up SMTP configuration
    # Set up scheduling
    ```
 
@@ -512,7 +514,13 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
 NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=your-mapbox-token
 
-RESEND_API_KEY=your-resend-api-key
+# Mailtrap Email Configuration
+MAILTRAP_HOST=live.smtp.mailtrap.io
+MAILTRAP_PORT=587
+MAILTRAP_USERNAME=your-mailtrap-username
+MAILTRAP_PASSWORD=your-mailtrap-password
+EMAIL_FROM=noreply@yourdomain.com
+MAILTRAP_API_TOKEN=your-mailtrap-api-token
 
 # Birthday Configuration
 NEXT_PUBLIC_BIRTHDAY_DATE=2024-12-25T00:00:00Z

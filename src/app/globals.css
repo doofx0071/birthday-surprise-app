@@ -1,0 +1,523 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
+/* Custom CSS Variables for Birthday Theme */
+:root {
+  --color-pure-white: #ffffff;
+  --color-soft-pink: #ffb6c1;
+  --color-rose-gold: #e8b4b8;
+  --color-charcoal-black: #2d2d2d;
+  --color-light-gray: #f8f9fa;
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, var(--color-pure-white) 0%, var(--color-soft-pink) 100%);
+  --gradient-accent: linear-gradient(135deg, var(--color-soft-pink) 0%, var(--color-rose-gold) 100%);
+  
+  /* Shadows */
+  --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-large: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Base Styles */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Smooth scrolling for all elements */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Ensure sections have proper spacing for navigation */
+section {
+  scroll-margin-top: 5rem; /* Account for fixed header */
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--color-pure-white);
+  color: var(--color-charcoal-black);
+  line-height: 1.6;
+}
+
+/* Typography Classes */
+.font-display {
+  font-family: 'Playfair Display', serif;
+}
+
+.font-body {
+  font-family: 'Inter', sans-serif;
+}
+
+.font-countdown {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Custom Utility Classes */
+.gradient-primary {
+  background: var(--gradient-primary);
+}
+
+.gradient-accent {
+  background: var(--gradient-accent);
+}
+
+.shadow-soft {
+  box-shadow: var(--shadow-soft);
+}
+
+.shadow-medium {
+  box-shadow: var(--shadow-medium);
+}
+
+.shadow-large {
+  box-shadow: var(--shadow-large);
+}
+
+/* Floating Hearts Animation */
+.floating-hearts {
+  position: relative;
+  overflow: hidden;
+}
+
+.floating-hearts::before {
+  content: '♥';
+  position: absolute;
+  top: -10px;
+  left: 10%;
+  font-size: 1.5rem;
+  color: var(--color-soft-pink);
+  animation: float 3s ease-in-out infinite;
+  opacity: 0.7;
+}
+
+.floating-hearts::after {
+  content: '♥';
+  position: absolute;
+  top: -15px;
+  right: 15%;
+  font-size: 1.2rem;
+  color: var(--color-rose-gold);
+  animation: float 4s ease-in-out infinite reverse;
+  opacity: 0.6;
+}
+
+/* Sparkle Effect */
+.sparkle-effect {
+  position: relative;
+}
+
+.sparkle-effect::before {
+  content: '✨';
+  position: absolute;
+  top: 10%;
+  left: 20%;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+.sparkle-effect::after {
+  content: '✨';
+  position: absolute;
+  bottom: 10%;
+  right: 20%;
+  animation: sparkle 2.5s ease-in-out infinite 0.5s;
+}
+
+/* Heart Beat Effect */
+.heart-beat {
+  animation: heart-beat 1.2s ease-in-out infinite;
+}
+
+/* Smooth Transitions */
+.transition-all {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Focus States */
+.focus-ring:focus {
+  outline: 2px solid var(--color-soft-pink);
+  outline-offset: 2px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-light-gray);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-rose-gold);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-soft-pink);
+}
+
+/* Loading Animation */
+.loading-spinner {
+  border: 3px solid var(--color-light-gray);
+  border-top: 3px solid var(--color-soft-pink);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Countdown Timer Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes heart-beat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% { transform: translate3d(0,0,0); }
+  40%, 43% { transform: translate3d(0, -30px, 0); }
+  70% { transform: translate3d(0, -15px, 0); }
+  90% { transform: translate3d(0, -4px, 0); }
+}
+
+@keyframes scale-in {
+  0% { opacity: 0; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes confetti {
+  0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+@keyframes float-up {
+  0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+}
+
+@keyframes flip-in {
+  0% { transform: rotateX(-90deg); }
+  100% { transform: rotateX(0deg); }
+}
+
+@keyframes flip-out {
+  0% { transform: rotateX(0deg); }
+  100% { transform: rotateX(90deg); }
+}
+
+/* Animation Classes */
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-heart-beat {
+  animation: heart-beat 1.2s ease-in-out infinite;
+}
+
+.animate-sparkle {
+  animation: sparkle 1.5s ease-in-out infinite;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+.animate-bounce {
+  animation: bounce 2s ease-in-out infinite;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out;
+}
+
+.animate-confetti {
+  animation: confetti 3s linear;
+}
+
+.animate-float-up {
+  animation: float-up 4s linear;
+}
+
+.animate-flip-in {
+  animation: flip-in 0.6s ease-out;
+}
+
+.animate-flip-out {
+  animation: flip-out 0.6s ease-in;
+}
+
+/* Perspective for 3D effects */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+/* Responsive Typography */
+@media (max-width: 640px) {
+  .text-responsive-xl {
+    font-size: 2rem;
+    line-height: 2.5rem;
+  }
+  
+  .text-responsive-2xl {
+    font-size: 2.5rem;
+    line-height: 3rem;
+  }
+  
+  .text-responsive-3xl {
+    font-size: 3rem;
+    line-height: 3.5rem;
+  }
+}
+
+@media (min-width: 641px) {
+  .text-responsive-xl {
+    font-size: 3rem;
+    line-height: 3.5rem;
+  }
+  
+  .text-responsive-2xl {
+    font-size: 4rem;
+    line-height: 4.5rem;
+  }
+  
+  .text-responsive-3xl {
+    font-size: 5rem;
+    line-height: 5.5rem;
+  }
+}
+
+
+
+@layer base {
+  :root {
+    /* Birthday Theme Colors - White/Pink/Black */
+    --background: 0 0% 100%; /* Pure white */
+    --foreground: 210 11% 18%; /* Charcoal black */
+    --card: 0 0% 100%; /* Pure white */
+    --card-foreground: 210 11% 18%; /* Charcoal black */
+    --popover: 0 0% 100%; /* Pure white */
+    --popover-foreground: 210 11% 18%; /* Charcoal black */
+    --primary: 351 100% 86%; /* Soft pink */
+    --primary-foreground: 0 0% 100%; /* Pure white */
+    --secondary: 351 25% 91%; /* Rose gold */
+    --secondary-foreground: 210 11% 18%; /* Charcoal black */
+    --muted: 0 0% 97%; /* Light gray */
+    --muted-foreground: 0 0% 45%; /* Medium gray */
+    --accent: 351 100% 86%; /* Soft pink */
+    --accent-foreground: 210 11% 18%; /* Charcoal black */
+    --destructive: 0 84% 60%; /* Red for errors */
+    --destructive-foreground: 0 0% 98%; /* White */
+    --border: 0 0% 90%; /* Light border */
+    --input: 0 0% 97%; /* Light input background */
+    --ring: 351 100% 86%; /* Soft pink focus ring */
+    --chart-1: 351 100% 86%; /* Soft pink */
+    --chart-2: 351 25% 91%; /* Rose gold */
+    --chart-3: 210 11% 18%; /* Charcoal black */
+    --chart-4: 0 0% 100%; /* Pure white */
+    --chart-5: 0 0% 97%; /* Light gray */
+    --radius: 0.75rem; /* Slightly more rounded for birthday theme */
+  }
+  .dark {
+    /* Dark mode for birthday theme - elegant dark with pink accents */
+    --background: 210 11% 18%; /* Charcoal black */
+    --foreground: 0 0% 98%; /* Pure white */
+    --card: 210 11% 22%; /* Slightly lighter charcoal */
+    --card-foreground: 0 0% 98%; /* Pure white */
+    --popover: 210 11% 18%; /* Charcoal black */
+    --popover-foreground: 0 0% 98%; /* Pure white */
+    --primary: 351 100% 86%; /* Soft pink */
+    --primary-foreground: 210 11% 18%; /* Charcoal black */
+    --secondary: 210 11% 25%; /* Dark gray */
+    --secondary-foreground: 0 0% 98%; /* Pure white */
+    --muted: 210 11% 25%; /* Dark gray */
+    --muted-foreground: 0 0% 65%; /* Light gray */
+    --accent: 351 100% 86%; /* Soft pink */
+    --accent-foreground: 210 11% 18%; /* Charcoal black */
+    --destructive: 0 62% 50%; /* Dark red */
+    --destructive-foreground: 0 0% 98%; /* Pure white */
+    --border: 210 11% 25%; /* Dark border */
+    --input: 210 11% 25%; /* Dark input background */
+    --ring: 351 100% 86%; /* Soft pink focus ring */
+    --chart-1: 351 100% 86%; /* Soft pink */
+    --chart-2: 351 25% 91%; /* Rose gold */
+    --chart-3: 0 0% 98%; /* Pure white */
+    --chart-4: 210 11% 35%; /* Medium gray */
+    --chart-5: 210 11% 45%; /* Lighter gray */
+  }
+}
+
+
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Enhanced Celebration Animations */
+@keyframes firework-burst {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5) rotate(180deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0.5) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes firework-particle {
+  0% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(50px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes bounce-gentle {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.animate-firework-burst {
+  animation: firework-burst 1.5s ease-out forwards;
+}
+
+.animate-firework-particle {
+  animation: firework-particle 1s ease-out forwards;
+}
+
+.animate-bounce-gentle {
+  animation: bounce-gentle 2s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 1s ease-out forwards;
+  animation-delay: 0.5s;
+  opacity: 0;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+
+/* Responsive Design Utilities */
+@media (max-width: 640px) {
+  .countdown-mobile-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .countdown-mobile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .countdown-mobile-text {
+    text-align: center;
+    line-height: 1.2;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+  .countdown-tablet-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 769px) {
+  .countdown-desktop-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* Touch-friendly improvements for mobile */
+@media (hover: none) and (pointer: coarse) {
+  .countdown-container {
+    padding: 1rem;
+    margin: 0.5rem;
+  }
+
+  .countdown-time-unit {
+    min-height: 4rem;
+    touch-action: manipulation;
+  }
+}
+
+/* High DPI display optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .countdown-text {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
