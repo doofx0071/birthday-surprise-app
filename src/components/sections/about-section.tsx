@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { cn } from '@/lib/utils'
-import { HeartIcon, SparkleIcon, CakeIcon } from '@/design-system/icons/birthday-icons'
+import { AnimatedHeartIcon, AnimatedSparkleIcon, AnimatedCakeIcon } from '@/design-system/icons/animated-birthday-icons'
 import { BirthdayCard, BirthdayCardContent } from '@/components/birthday-card'
 
 interface AboutSectionProps {
@@ -24,11 +24,11 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ className }) => {
         {/* Section Header */}
         <div className="text-center mb-12 md:mb-16">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <SparkleIcon size="md" color="pink" className="animate-sparkle" />
+            <AnimatedSparkleIcon size="md" color="pink" intensity="normal" />
             <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-charcoal-black">
               About This Surprise
             </h2>
-            <SparkleIcon size="md" color="roseGold" className="animate-sparkle" style={{ animationDelay: '0.5s' }} />
+            <AnimatedSparkleIcon size="md" color="roseGold" intensity="normal" />
           </div>
           <p className="font-body text-lg md:text-xl text-charcoal-black/70 max-w-3xl mx-auto">
             A heartfelt collection of love, memories, and birthday wishes from everyone who cares about you
@@ -43,7 +43,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ className }) => {
               <BirthdayCardContent>
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0">
-                    <HeartIcon size="lg" color="pink" className="animate-pulse-soft" />
+                    <AnimatedHeartIcon size="lg" color="pink" intensity="normal" />
                   </div>
                   <div>
                     <h3 className="font-display text-xl md:text-2xl font-bold text-charcoal-black mb-3">
@@ -63,7 +63,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ className }) => {
               <BirthdayCardContent>
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0">
-                    <CakeIcon size="lg" color="roseGold" />
+                    <AnimatedCakeIcon size="lg" color="roseGold" intensity="normal" />
                   </div>
                   <div>
                     <h3 className="font-display text-xl md:text-2xl font-bold text-charcoal-black mb-3">
@@ -89,22 +89,22 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ className }) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
               {[
                 {
-                  icon: <HeartIcon size="md" color="pink" />,
+                  icon: <AnimatedHeartIcon size="md" color="pink" intensity="normal" />,
                   title: "Heartfelt Messages",
                   description: "Personal notes and wishes from loved ones"
                 },
                 {
-                  icon: <SparkleIcon size="md" color="roseGold" />,
+                  icon: <AnimatedSparkleIcon size="md" color="roseGold" intensity="normal" />,
                   title: "Memory Map",
                   description: "Interactive map of special places and moments"
                 },
                 {
-                  icon: <CakeIcon size="md" color="pink" />,
+                  icon: <AnimatedCakeIcon size="md" color="pink" intensity="normal" />,
                   title: "Photo Gallery",
                   description: "Beautiful collection of memories and moments"
                 },
                 {
-                  icon: <HeartIcon size="md" color="roseGold" />,
+                  icon: <AnimatedHeartIcon size="md" color="roseGold" intensity="normal" />,
                   title: "Countdown Timer",
                   description: "Building excitement for the big day"
                 }
@@ -133,11 +133,11 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ className }) => {
         {/* Bottom CTA */}
         <div className="text-center mt-12 md:mt-16">
           <div className="inline-flex items-center space-x-2 px-6 py-3 bg-primary/10 rounded-full">
-            <SparkleIcon size="sm" color="pink" className="animate-sparkle" />
+            <AnimatedSparkleIcon size="sm" color="pink" intensity="normal" />
             <p className="font-body text-sm md:text-base text-charcoal-black/80">
               Ready to add your own special message?
             </p>
-            <SparkleIcon size="sm" color="roseGold" className="animate-sparkle" style={{ animationDelay: '0.3s' }} />
+            <AnimatedSparkleIcon size="sm" color="roseGold" intensity="normal" />
           </div>
         </div>
       </div>

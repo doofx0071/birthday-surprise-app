@@ -521,3 +521,98 @@ body {
     -moz-osx-font-smoothing: grayscale;
   }
 }
+
+/* Enhanced Animated Icon Styles */
+.animated-icon {
+  transform-origin: center;
+  will-change: transform;
+}
+
+/* Respect user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .animated-icon,
+  .animated-icon * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Enhanced sparkle animation */
+@keyframes enhanced-sparkle {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(0.8) rotate(0deg);
+  }
+  25% {
+    opacity: 0.8;
+    transform: scale(1.1) rotate(90deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2) rotate(180deg);
+  }
+  75% {
+    opacity: 0.8;
+    transform: scale(1.1) rotate(270deg);
+  }
+}
+
+/* Enhanced heart beat animation */
+@keyframes enhanced-heart-beat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.05);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  75% {
+    transform: scale(1.05);
+  }
+}
+
+/* Floating animation for balloons */
+@keyframes enhanced-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* Celebration bounce */
+@keyframes celebration-bounce {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-4px) rotate(2deg);
+  }
+  50% {
+    transform: translateY(-2px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-4px) rotate(-2deg);
+  }
+}
+
+/* Animation utility classes */
+.animate-enhanced-sparkle {
+  animation: enhanced-sparkle 3s ease-in-out infinite;
+}
+
+.animate-enhanced-heart-beat {
+  animation: enhanced-heart-beat 1.5s ease-in-out infinite;
+}
+
+.animate-enhanced-float {
+  animation: enhanced-float 2.5s ease-in-out infinite;
+}
+
+.animate-celebration-bounce {
+  animation: celebration-bounce 2s ease-in-out infinite;
+}

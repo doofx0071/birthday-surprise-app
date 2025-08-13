@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
-import { HeartIcon } from '@/design-system/icons/birthday-icons'
+import { AnimatedHeartIcon, AnimatedSparkleIcon } from '@/design-system/icons/animated-birthday-icons'
 import { BirthdayButton } from '@/components/birthday-button'
 
 interface HeaderProps {
@@ -82,7 +82,7 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <div className="flex items-center space-x-2">
-            <HeartIcon size="md" color="pink" className="animate-pulse-soft" />
+            <AnimatedHeartIcon size="md" color="pink" intensity="subtle" />
             <h1 className="font-display text-xl md:text-2xl font-bold text-charcoal-black">
               Birthday Surprise
             </h1>

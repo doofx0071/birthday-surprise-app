@@ -4,7 +4,7 @@ import React from 'react'
 import { cn } from '@/lib/utils'
 import { TimeUnit, FlipTimeUnit } from './time-unit'
 import { CelebrationAnimation, PulseCelebration } from './celebration-animation'
-import { HeartIcon, SparkleIcon } from '@/design-system/icons/birthday-icons'
+import { AnimatedHeartIcon, AnimatedSparkleIcon } from '@/design-system/icons/animated-birthday-icons'
 import {
   useCountdown,
   useCountdownAnimations,
@@ -128,16 +128,16 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
         {showSparkles && (
           <>
             <div className="absolute top-4 left-4">
-              <SparkleIcon size="sm" color="pink" className="animate-sparkle opacity-30" />
+              <AnimatedSparkleIcon size="sm" color="pink" intensity="subtle" className="opacity-30" />
             </div>
             <div className="absolute top-8 right-8">
-              <HeartIcon size="sm" color="pink" className="animate-float opacity-20" />
+              <AnimatedHeartIcon size="sm" color="pink" intensity="subtle" className="opacity-20" />
             </div>
             <div className="absolute bottom-4 left-8">
-              <HeartIcon size="xs" color="roseGold" className="animate-pulse-soft opacity-25" />
+              <AnimatedHeartIcon size="xs" color="roseGold" intensity="subtle" className="opacity-25" />
             </div>
             <div className="absolute bottom-8 right-4">
-              <SparkleIcon size="xs" color="roseGold" className="animate-sparkle opacity-30" style={{ animationDelay: '1s' }} />
+              <AnimatedSparkleIcon size="xs" color="roseGold" intensity="subtle" className="opacity-30" />
             </div>
           </>
         )}
@@ -274,12 +274,13 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
         {showSparkles && !timeRemaining.isComplete && (
           <div className="flex justify-center items-center mt-4 sm:mt-6 space-x-1 sm:space-x-2 px-4">
             {Array.from({ length: 7 }).map((_, i) => (
-              <HeartIcon
+              <AnimatedHeartIcon
                 key={i}
                 size="xs"
                 color="pink"
+                intensity="subtle"
                 className={cn(
-                  'animate-pulse-soft opacity-60 transition-all duration-300',
+                  'opacity-60 transition-all duration-300',
                   i % 2 === 0 && 'animate-float',
                   'hover:scale-110 hover:opacity-80'
                 )}

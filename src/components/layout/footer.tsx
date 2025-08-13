@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { cn } from '@/lib/utils'
-import { HeartIcon, SparkleIcon } from '@/design-system/icons/birthday-icons'
+import { AnimatedHeartIcon, AnimatedSparkleIcon } from '@/design-system/icons/animated-birthday-icons'
 
 interface FooterProps {
   className?: string
@@ -24,7 +24,7 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
           {/* Brand Section */}
           <div className="text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start space-x-2 mb-4">
-              <HeartIcon size="md" color="pink" className="animate-pulse-soft" />
+              <AnimatedHeartIcon size="md" color="pink" intensity="subtle" />
               <h3 className="font-display text-xl font-bold text-charcoal-black">
                 Birthday Surprise
               </h3>
@@ -74,9 +74,9 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
                 for the most amazing person ✨
               </p>
               <div className="flex items-center justify-center md:justify-end space-x-1 mt-4">
-                <SparkleIcon size="xs" color="pink" className="animate-sparkle" />
-                <HeartIcon size="xs" color="roseGold" className="animate-pulse-soft" />
-                <SparkleIcon size="xs" color="pink" className="animate-sparkle" style={{ animationDelay: '0.5s' }} />
+                <AnimatedSparkleIcon size="xs" color="pink" intensity="subtle" />
+                <AnimatedHeartIcon size="xs" color="roseGold" intensity="subtle" />
+                <AnimatedSparkleIcon size="xs" color="pink" intensity="subtle" />
               </div>
             </div>
           </div>
@@ -95,12 +95,12 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
               </p>
               <div className="flex space-x-1">
                 {Array.from({ length: 3 }).map((_, i) => (
-                  <HeartIcon
+                  <AnimatedHeartIcon
                     key={i}
                     size="xs"
                     color="pink"
-                    className="animate-pulse-soft opacity-60"
-                    style={{ animationDelay: `${i * 0.3}s` }}
+                    intensity="subtle"
+                    className="opacity-60"
                   />
                 ))}
               </div>

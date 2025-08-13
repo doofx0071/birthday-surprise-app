@@ -93,7 +93,16 @@ module.exports = {
   			float: 'float 3s ease-in-out infinite',
   			'pulse-soft': 'pulse-soft 2s ease-in-out infinite',
   			sparkle: 'sparkle 1.5s ease-in-out infinite',
-  			'heart-beat': 'heart-beat 1.2s ease-in-out infinite'
+  			'heart-beat': 'heart-beat 1.2s ease-in-out infinite',
+  			// Enhanced animated icon animations
+  			'enhanced-sparkle': 'enhanced-sparkle 3s ease-in-out infinite',
+  			'enhanced-heart-beat': 'enhanced-heart-beat 1.5s ease-in-out infinite',
+  			'enhanced-float': 'enhanced-float 2.5s ease-in-out infinite',
+  			'celebration-bounce': 'celebration-bounce 2s ease-in-out infinite',
+  			// Additional smooth animations
+  			'icon-pulse': 'icon-pulse 2s ease-in-out infinite',
+  			'icon-rotate': 'icon-rotate 3s linear infinite',
+  			'icon-float': 'icon-float 2.5s ease-in-out infinite'
   		},
   		keyframes: {
   			float: {
