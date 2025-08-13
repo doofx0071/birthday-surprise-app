@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { messageFormSchema, type MessageFormData } from '@/lib/validations/message-schema'
+import { messageOperations, type MessageInsert } from '@/lib/supabase'
 import { z } from 'zod'
-
-// In-memory storage for demo purposes
-// In production, this would be replaced with a database
-let messages: Array<MessageFormData & { id: string; submittedAt: string; isApproved: boolean }> = []
 
 /**
  * POST /api/messages
@@ -34,30 +31,37 @@ export async function POST(request: NextRequest) {
 
     const messageData = validationResult.data
 
-    // Generate unique ID and timestamp
-    const id = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-    const submittedAt = new Date().toISOString()
+    // Get client IP and user agent for security/analytics
+    const ip = request.ip ||
+               request.headers.get('x-forwarded-for') ||
+               request.headers.get('x-real-ip') ||
+               'unknown'
+    const userAgent = request.headers.get('user-agent') || 'unknown'
 
-    // Create message object
-    const newMessage = {
-      ...messageData,
-      id,
-      submittedAt,
-      isApproved: true, // Auto-approve for demo purposes
-    }
-
-    // Store message (in production, save to database)
-    messages.push(newMessage)
-
-    // Log for development
-    console.log('New birthday message submitted:', {
-      id,
+    // Prepare data for database insertion
+    const insertData: MessageInsert = {
       name: messageData.name,
       email: messageData.email,
       location: messageData.location,
-      messageLength: messageData.message.length,
-      wantsReminders: messageData.wantsReminders,
-      submittedAt,
+      message: messageData.message,
+      wants_reminders: messageData.wantsReminders || false,
+      ip_address: ip,
+      user_agent: userAgent,
+    }
+
+    // Save to database
+    const savedMessage = await messageOperations.create(insertData)
+
+    // Log for development
+    console.log('New birthday message submitted:', {
+      id: savedMessage.id,
+      name: savedMessage.name,
+      email: savedMessage.email,
+      location: savedMessage.location,
+      messageLength: savedMessage.message.length,
+      wantsReminders: savedMessage.wants_reminders,
+      status: savedMessage.status,
+      createdAt: savedMessage.created_at,
     })
 
     // Send success response
@@ -66,8 +70,9 @@ export async function POST(request: NextRequest) {
         success: true,
         message: 'Birthday message submitted successfully!',
         data: {
-          id,
-          submittedAt,
+          id: savedMessage.id,
+          status: savedMessage.status,
+          submittedAt: savedMessage.created_at,
         },
       },
       { status: 201 }
@@ -93,27 +98,22 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const includeUnapproved = searchParams.get('includeUnapproved') === 'true'
+    const includeAll = searchParams.get('includeAll') === 'true'
 
-    // Filter messages based on approval status
-    const filteredMessages = includeUnapproved 
-      ? messages 
-      : messages.filter(msg => msg.isApproved)
-
-    // Sort by submission date (newest first)
-    const sortedMessages = filteredMessages.sort(
-      (a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
-    )
+    // Get messages from database
+    const messages = includeAll
+      ? await messageOperations.getApproved() // For now, only return approved messages
+      : await messageOperations.getApproved()
 
     // Remove sensitive information for public API
-    const publicMessages = sortedMessages.map(msg => ({
+    const publicMessages = messages.map(msg => ({
       id: msg.id,
       name: msg.name,
       message: msg.message,
       location: msg.location,
-      detectedLocation: msg.detectedLocation,
-      submittedAt: msg.submittedAt,
-      // Don't expose email addresses publicly
+      status: msg.status,
+      submittedAt: msg.created_at,
+      // Don't expose email addresses, IP addresses, or user agents publicly
     }))
 
     return NextResponse.json(
@@ -121,6 +121,7 @@ export async function GET(request: NextRequest) {
         success: true,
         data: publicMessages,
         count: publicMessages.length,
+        total: messages.length,
       },
       { status: 200 }
     )
