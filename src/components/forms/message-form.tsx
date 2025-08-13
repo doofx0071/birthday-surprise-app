@@ -12,6 +12,7 @@ import { BirthdayInput } from '@/design-system/components/forms/birthday-input'
 import { BirthdayTextarea } from '@/design-system/components/forms/birthday-textarea'
 import { LocationPicker } from './location-picker'
 import { DraftIndicator } from './draft-indicator'
+import { FileUpload } from '@/components/upload'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
@@ -361,6 +362,26 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                   </FormItem>
                 )}
               />
+
+              {/* File Upload Section */}
+              <div className="space-y-3">
+                <Label className="flex items-center gap-2">
+                  <span>📎</span>
+                  Photos & Videos (Optional)
+                </Label>
+                <FileUpload
+                  variant="compact"
+                  disabled={disabled || isSubmitting}
+                  onFilesUploaded={(files) => {
+                    console.log('Files uploaded:', files)
+                    // TODO: Store uploaded file URLs with the message
+                  }}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Add photos or videos to make your birthday message extra special!
+                  Supports images (JPG, PNG, WebP, GIF) up to 5MB and videos (MP4, WebM, MOV) up to 50MB.
+                </p>
+              </div>
 
               {/* Notifications Checkbox */}
               <FormField
