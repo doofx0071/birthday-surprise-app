@@ -4,7 +4,7 @@ import * as React from 'react'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
-import { HeartIcon, SparkleIcon } from '@/design-system/icons/birthday-icons'
+import { AnimatedHeartIcon, AnimatedSparkleIcon } from '@/design-system/icons/animated-birthday-icons'
 
 interface BirthdayTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string
@@ -77,21 +77,18 @@ const BirthdayTextarea = React.forwardRef<HTMLTextAreaElement, BirthdayTextareaP
             )}
           >
             {withIcon && (
-              <HeartIcon 
-                size="xs" 
-                color="pink" 
-                className={cn(
-                  'transition-all duration-200',
-                  isFocused && 'animate-heart-beat'
-                )}
+              <AnimatedHeartIcon
+                size="xs"
+                color="pink"
+                intensity={isFocused ? "normal" : "subtle"}
               />
             )}
             {label}
             {sparkle && isFocused && (
-              <SparkleIcon 
-                size="xs" 
-                color="pink" 
-                className="animate-sparkle"
+              <AnimatedSparkleIcon
+                size="xs"
+                color="pink"
+                intensity="normal"
               />
             )}
           </Label>
@@ -124,15 +121,17 @@ const BirthdayTextarea = React.forwardRef<HTMLTextAreaElement, BirthdayTextareaP
           {sparkle && isFocused && charCount > 0 && (
             <div className="absolute top-2 right-2 pointer-events-none">
               <div className="relative">
-                <HeartIcon 
-                  size="xs" 
-                  color="pink" 
-                  className="animate-float opacity-60"
+                <AnimatedHeartIcon
+                  size="xs"
+                  color="pink"
+                  intensity="subtle"
+                  className="opacity-60"
                 />
-                <SparkleIcon 
-                  size="xs" 
-                  color="pink" 
-                  className="absolute -top-1 -right-1 animate-sparkle"
+                <AnimatedSparkleIcon
+                  size="xs"
+                  color="pink"
+                  intensity="normal"
+                  className="absolute -top-1 -right-1"
                 />
               </div>
             </div>
@@ -157,7 +156,7 @@ const BirthdayTextarea = React.forwardRef<HTMLTextAreaElement, BirthdayTextareaP
         {hint && !error && (
           <p className="text-xs text-muted-foreground flex items-center gap-1">
             {sparkle && (
-              <SparkleIcon size="xs" className="opacity-50" />
+              <AnimatedSparkleIcon size="xs" intensity="subtle" className="opacity-50" />
             )}
             {hint}
           </p>

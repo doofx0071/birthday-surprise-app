@@ -4,7 +4,7 @@ import * as React from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
-import { HeartIcon, SparkleIcon } from '@/design-system/icons/birthday-icons'
+import { AnimatedHeartIcon, AnimatedSparkleIcon } from '@/design-system/icons/animated-birthday-icons'
 
 interface BirthdayInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string
@@ -62,22 +62,12 @@ const BirthdayInput = React.forwardRef<HTMLInputElement, BirthdayInputProps>(
               required && 'after:content-["*"] after:text-destructive'
             )}
           >
-            {withIcon && (
-              <HeartIcon 
-                size="xs" 
-                color="pink" 
-                className={cn(
-                  'transition-all duration-200',
-                  isFocused && 'animate-heart-beat'
-                )}
-              />
-            )}
             {label}
             {sparkle && isFocused && (
-              <SparkleIcon 
-                size="xs" 
-                color="pink" 
-                className="animate-sparkle"
+              <AnimatedSparkleIcon
+                size="xs"
+                color="pink"
+                intensity="normal"
               />
             )}
           </Label>
@@ -94,7 +84,6 @@ const BirthdayInput = React.forwardRef<HTMLInputElement, BirthdayInputProps>(
               'hover:border-primary/50',
               getVariantStyles(),
               error && 'border-destructive focus:border-destructive focus:ring-destructive/20',
-              withIcon && 'pl-10',
               sparkle && hasValue && 'shadow-md shadow-primary/10',
               className
             )}
@@ -104,27 +93,15 @@ const BirthdayInput = React.forwardRef<HTMLInputElement, BirthdayInputProps>(
             {...props}
           />
 
-          {/* Icon inside input */}
-          {withIcon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2">
-              <HeartIcon 
-                size="sm" 
-                color={isFocused ? 'pink' : 'current'} 
-                className={cn(
-                  'transition-all duration-200 opacity-60',
-                  isFocused && 'opacity-100 animate-pulse-soft'
-                )}
-              />
-            </div>
-          )}
+          {/* Icon inside input - removed per user request */}
 
           {/* Sparkle effect on focus */}
           {sparkle && isFocused && (
             <div className="absolute -top-1 -right-1">
-              <SparkleIcon 
-                size="xs" 
-                color="pink" 
-                className="animate-sparkle"
+              <AnimatedSparkleIcon
+                size="xs"
+                color="pink"
+                intensity="normal"
               />
             </div>
           )}
@@ -134,7 +111,7 @@ const BirthdayInput = React.forwardRef<HTMLInputElement, BirthdayInputProps>(
         {hint && !error && (
           <p className="text-xs text-muted-foreground flex items-center gap-1">
             {sparkle && (
-              <SparkleIcon size="xs" className="opacity-50" />
+              <AnimatedSparkleIcon size="xs" intensity="subtle" className="opacity-50" />
             )}
             {hint}
           </p>

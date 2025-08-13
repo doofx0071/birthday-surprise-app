@@ -12,6 +12,7 @@ interface HeaderProps {
 const navigationItems = [
   { id: 'home', label: 'Home', href: '#home' },
   { id: 'about', label: 'About', href: '#about' },
+  { id: 'messages', label: 'Add Message', href: '#messages' },
   { id: 'contribute', label: 'Contribute', href: '#contribute' },
   { id: 'memory-map', label: 'Memory Map', href: '#memory-map' },
   { id: 'gallery', label: 'Gallery', href: '#gallery' },
@@ -55,16 +56,17 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
   }, [])
 
   const handleNavClick = (href: string) => {
+    // Scroll to section on current page
     const targetId = href.replace('#', '')
     const element = document.getElementById(targetId)
-    
+
     if (element) {
       element.scrollIntoView({
         behavior: 'smooth',
         block: 'start',
       })
     }
-    
+
     setIsMobileMenuOpen(false)
   }
 

@@ -16,8 +16,7 @@ import {
   FaHeart,
   FaBirthdayCake,
   FaGift,
-  FaStar,
-  FaSparkles
+  FaStar
 } from 'react-icons/fa'
 import {
   FaHeartPulse,
@@ -302,7 +301,7 @@ export const AnimatedConfettiIcon: React.FC<AnimatedIconProps> = ({
       transition: { duration: 3, repeat: Infinity, ease: "easeInOut" }
     } : undefined}
   >
-    <FaSparkles className="w-full h-full" />
+    <FaStar className="w-full h-full" />
   </motion.div>
 )
 

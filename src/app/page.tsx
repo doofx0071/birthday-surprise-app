@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Header, Footer } from '@/components/layout'
-import { AboutSection, ContributeSection, MemoryMapSection, GallerySection } from '@/components/sections'
+import { AboutSection, ContributeSection, MessageSection, MemoryMapSection, GallerySection } from '@/components/sections'
 import CountdownTimer from '@/components/countdown/countdown-timer'
 
 export const metadata: Metadata = {
@@ -57,6 +57,9 @@ export default function HomePage() {
 
         {/* About Section */}
         <AboutSection />
+
+        {/* Message Section */}
+        <MessageSection />
 
         {/* Contribute Section */}
         <ContributeSection />
