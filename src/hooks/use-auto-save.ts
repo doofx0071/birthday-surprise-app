@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 import { UseFormWatch } from 'react-hook-form'
 import { MessageFormData } from '@/lib/validations/message-schema'
 
@@ -21,6 +21,9 @@ interface DraftData {
 const STORAGE_KEY = 'birthday-message-draft'
 const AUTO_SAVE_DELAY = 2000 // 2 seconds
 
+// Helper function to check if we're in the browser
+const isClient = () => typeof window !== 'undefined'
+
 export const useAutoSave = ({
   watch,
   delay = AUTO_SAVE_DELAY,
@@ -31,6 +34,12 @@ export const useAutoSave = ({
   const timeoutRef = useRef<NodeJS.Timeout>()
   const lastSavedRef = useRef<string>('')
   const draftIdRef = useRef<string>('')
+  const [isClientSide, setIsClientSide] = useState(false)
+
+  // Set client-side flag after component mounts
+  useEffect(() => {
+    setIsClientSide(true)
+  }, [])
 
   // Generate unique draft ID
   const generateDraftId = useCallback(() => {
@@ -39,7 +48,10 @@ export const useAutoSave = ({
 
   // Save draft to localStorage
   const saveDraft = useCallback((data: Partial<MessageFormData>) => {
-    if (!enabled) return
+    // Triple check for client-side environment
+    if (!enabled || !isClientSide || !isClient() || typeof window === 'undefined' || typeof localStorage === 'undefined') {
+      return
+    }
 
     try {
       const draftData: DraftData = {
@@ -51,23 +63,28 @@ export const useAutoSave = ({
       localStorage.setItem(STORAGE_KEY, JSON.stringify(draftData))
       draftIdRef.current = draftData.id
       lastSavedRef.current = JSON.stringify(data)
-      
+
       onSave?.(data)
-      
+
       console.log('Draft saved:', draftData.id)
     } catch (error) {
       console.error('Failed to save draft:', error)
     }
-  }, [enabled, onSave, generateDraftId])
+  }, [enabled, isClientSide, onSave, generateDraftId])
 
   // Load draft from localStorage
   const loadDraft = useCallback((): DraftData | null => {
+    // Triple check for client-side environment
+    if (!isClientSide || !isClient() || typeof window === 'undefined' || typeof localStorage === 'undefined') {
+      return null
+    }
+
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
       if (!stored) return null
 
       const draftData: DraftData = JSON.parse(stored)
-      
+
       // Check if draft is not too old (24 hours)
       const maxAge = 24 * 60 * 60 * 1000 // 24 hours
       if (Date.now() - draftData.timestamp > maxAge) {
@@ -80,10 +97,15 @@ export const useAutoSave = ({
       console.error('Failed to load draft:', error)
       return null
     }
-  }, [])
+  }, [isClientSide])
 
   // Clear draft from localStorage
   const clearDraft = useCallback(() => {
+    // Triple check for client-side environment
+    if (!isClientSide || !isClient() || typeof window === 'undefined' || typeof localStorage === 'undefined') {
+      return
+    }
+
     try {
       localStorage.removeItem(STORAGE_KEY)
       draftIdRef.current = ''
@@ -92,7 +114,7 @@ export const useAutoSave = ({
     } catch (error) {
       console.error('Failed to clear draft:', error)
     }
-  }, [])
+  }, [isClientSide])
 
   // Check if there's a draft available
   const hasDraft = useCallback((): boolean => {
@@ -119,7 +141,7 @@ export const useAutoSave = ({
 
   // Watch form data and auto-save
   useEffect(() => {
-    if (!enabled) return
+    if (!enabled || !isClientSide) return
 
     const subscription = watch((data) => {
       // Clear existing timeout
@@ -151,7 +173,7 @@ export const useAutoSave = ({
         clearTimeout(timeoutRef.current)
       }
     }
-  }, [watch, enabled, delay, saveDraft])
+  }, [watch, enabled, isClientSide, delay, saveDraft])
 
   // Cleanup on unmount
   useEffect(() => {

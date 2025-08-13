@@ -43,8 +43,8 @@ export const useGeolocation = () => {
     setState(prev => ({ ...prev, loading: true, error: null }))
 
     const options: PositionOptions = {
-      enableHighAccuracy: true,
-      timeout: 10000,
+      enableHighAccuracy: false, // Use false for faster response
+      timeout: 5000, // Reduce timeout to 5 seconds
       maximumAge: 300000, // 5 minutes
     }
 
@@ -65,19 +65,22 @@ export const useGeolocation = () => {
       },
       (error) => {
         let errorMessage = 'Unable to retrieve your location'
-        
+
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            errorMessage = 'Location access denied by user'
+            errorMessage = 'Location access denied. Please enable location permissions and try again.'
             break
           case error.POSITION_UNAVAILABLE:
-            errorMessage = 'Location information is unavailable'
+            errorMessage = 'Location information is unavailable. Please enter your location manually.'
             break
           case error.TIMEOUT:
-            errorMessage = 'Location request timed out'
+            errorMessage = 'Location request timed out. Please try again or enter your location manually.'
             break
+          default:
+            errorMessage = 'Location detection failed. Please enter your location manually.'
         }
 
+        console.warn('Geolocation error:', error)
         setState(prev => ({
           ...prev,
           loading: false,
