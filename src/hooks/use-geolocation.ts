@@ -30,7 +30,7 @@ export const useGeolocation = () => {
 
   const [locationData, setLocationData] = useState<LocationData | null>(null)
 
-  // Get current position
+  // Get current position with multiple fallback strategies
   const getCurrentPosition = useCallback(() => {
     if (!state.supported) {
       setState(prev => ({
@@ -40,56 +40,136 @@ export const useGeolocation = () => {
       return
     }
 
-    setState(prev => ({ ...prev, loading: true, error: null }))
+    // Check if we're on HTTPS or localhost (required for geolocation in many browsers)
+    const isSecureContext = window.location.protocol === 'https:' ||
+                           window.location.hostname === 'localhost' ||
+                           window.location.hostname === '127.0.0.1'
 
-    const options: PositionOptions = {
-      enableHighAccuracy: false, // Use false for faster response
-      timeout: 5000, // Reduce timeout to 5 seconds
-      maximumAge: 300000, // 5 minutes
+    if (!isSecureContext) {
+      setState(prev => ({
+        ...prev,
+        error: 'Location detection requires a secure connection (HTTPS). Please enter your location manually.',
+      }))
+      return
     }
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude, accuracy } = position.coords
-        setState(prev => ({
-          ...prev,
-          latitude,
-          longitude,
-          accuracy,
-          loading: false,
-          error: null,
-        }))
+    setState(prev => ({ ...prev, loading: true, error: null }))
 
-        // Reverse geocoding to get city and country
-        reverseGeocode(latitude, longitude)
-      },
-      (error) => {
-        let errorMessage = 'Unable to retrieve your location'
+    // Try with high accuracy first, then fallback to low accuracy
+    const tryGeolocation = (highAccuracy: boolean, timeout: number) => {
+      const options: PositionOptions = {
+        enableHighAccuracy: highAccuracy,
+        timeout: timeout,
+        maximumAge: 60000, // 1 minute cache
+      }
 
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage = 'Location access denied. Please enable location permissions and try again.'
-            break
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = 'Location information is unavailable. Please enter your location manually.'
-            break
-          case error.TIMEOUT:
-            errorMessage = 'Location request timed out. Please try again or enter your location manually.'
-            break
-          default:
-            errorMessage = 'Location detection failed. Please enter your location manually.'
-        }
+      console.log(`Attempting geolocation with high accuracy: ${highAccuracy}, timeout: ${timeout}ms`)
 
-        console.warn('Geolocation error:', error)
-        setState(prev => ({
-          ...prev,
-          loading: false,
-          error: errorMessage,
-        }))
-      },
-      options
-    )
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          console.log('Geolocation success:', position)
+          const { latitude, longitude, accuracy } = position.coords
+          setState(prev => ({
+            ...prev,
+            latitude,
+            longitude,
+            accuracy,
+            loading: false,
+            error: null,
+          }))
+
+          // Reverse geocoding to get city and country
+          reverseGeocode(latitude, longitude)
+        },
+        (error) => {
+          console.warn(`Geolocation failed (high accuracy: ${highAccuracy}):`, error)
+
+          // If high accuracy failed, try with low accuracy
+          if (highAccuracy) {
+            console.log('Retrying with low accuracy...')
+            tryGeolocation(false, 10000) // 10 second timeout for low accuracy
+            return
+          }
+
+          // If both attempts failed, try IP-based location as last resort
+          console.log('Trying IP-based location detection as fallback...')
+          tryIPLocation().catch(() => {
+            let errorMessage = 'Unable to retrieve your location'
+
+            switch (error.code) {
+              case error.PERMISSION_DENIED:
+                errorMessage = 'Location access denied. Please enable location permissions in your browser and try again.'
+                break
+              case error.POSITION_UNAVAILABLE:
+                errorMessage = 'Location information is unavailable. Please check your device location settings and try again, or enter your location manually.'
+                break
+              case error.TIMEOUT:
+                errorMessage = 'Location request timed out. Please check your internet connection and try again, or enter your location manually.'
+                break
+              default:
+                errorMessage = 'Location detection failed. Please enter your location manually.'
+            }
+
+            setState(prev => ({
+              ...prev,
+              loading: false,
+              error: errorMessage,
+            }))
+          })
+        },
+        options
+      )
+    }
+
+    // Start with high accuracy and short timeout
+    tryGeolocation(true, 5000)
   }, [state.supported])
+
+  // IP-based location detection as fallback
+  const tryIPLocation = async () => {
+    try {
+      console.log('Attempting IP-based location detection...')
+
+      // Using ipapi.co for IP-based location (free, no API key required)
+      const response = await fetch('https://ipapi.co/json/', {
+        headers: {
+          'User-Agent': 'Birthday-Surprise-App/1.0',
+        },
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log('IP location data:', data)
+
+        if (data.latitude && data.longitude) {
+          setState(prev => ({
+            ...prev,
+            latitude: data.latitude,
+            longitude: data.longitude,
+            accuracy: null, // IP-based location doesn't have accuracy
+            loading: false,
+            error: null,
+          }))
+
+          // Set location data directly from IP service
+          setLocationData({
+            city: data.city || 'Unknown City',
+            country: data.country_name || 'Unknown Country',
+            latitude: data.latitude,
+            longitude: data.longitude,
+          })
+
+          console.log('IP-based location detection successful')
+          return
+        }
+      }
+
+      throw new Error('IP location service failed')
+    } catch (error) {
+      console.warn('IP-based location detection failed:', error)
+      throw error
+    }
+  }
 
   // Reverse geocoding using a free service
   const reverseGeocode = async (lat: number, lng: number) => {

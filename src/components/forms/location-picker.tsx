@@ -71,6 +71,8 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
 
   // Handle location detection
   const handleDetectLocation = () => {
+    // Clear any previous errors
+    clearLocation()
     getCurrentPosition()
   }
 
@@ -213,15 +215,28 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
         )}
 
         {geoError && (
-          <motion.p
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="text-xs text-destructive flex items-center gap-1"
+            className="space-y-2"
           >
-            <span>⚠️</span>
-            {geoError}
-          </motion.p>
+            <p className="text-xs text-destructive flex items-center gap-1">
+              <span>⚠️</span>
+              {geoError}
+            </p>
+
+            {/* Troubleshooting tips */}
+            <div className="text-xs text-muted-foreground space-y-1 pl-4 border-l-2 border-muted">
+              <p className="font-medium">Troubleshooting tips:</p>
+              <ul className="space-y-1 list-disc list-inside">
+                <li>Make sure location services are enabled on your device</li>
+                <li>Allow location access when prompted by your browser</li>
+                <li>Check that you have a stable internet connection</li>
+                <li>Try refreshing the page and clicking "Detect" again</li>
+              </ul>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
 
