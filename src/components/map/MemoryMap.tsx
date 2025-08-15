@@ -110,8 +110,9 @@ export const MemoryMap: React.FC<MemoryMapProps> = ({
         pin.messageCount > 1 ? pin.messageCount : undefined
       )
 
-      // Add pulse animation (now stable after fixing re-render issues)
-      addPulseAnimation(pinElement)
+      // Disable pulse animation to ensure click stability
+      // TODO: Implement non-interfering animation in future iteration
+      // addPulseAnimation(pinElement)
 
       // Create marker
       const marker = new mapboxgl.Marker(pinElement)

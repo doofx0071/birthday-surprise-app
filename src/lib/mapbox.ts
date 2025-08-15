@@ -182,107 +182,98 @@ export const createHeartPinElement = (
 ): HTMLElement => {
   const el = document.createElement('div')
   el.className = 'map-pin'
+
+  // Use a simpler, more stable design that works better with Mapbox positioning
   el.style.cssText = `
     width: ${size}px;
     height: ${size}px;
     position: relative;
     cursor: pointer;
-    transition: transform 0.2s ease;
-  `
-
-  // Create heart shape using CSS
-  const heart = document.createElement('div')
-  heart.style.cssText = `
-    width: ${size}px;
-    height: ${size}px;
-    position: relative;
-    transform: rotate(-45deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: ${color};
-    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
     box-shadow: 0 2px 8px ${PIN_STYLES.default.shadowColor};
+    transition: all 0.2s ease;
+    border: 2px solid rgba(255, 255, 255, 0.8);
   `
-
-  // Add pseudo-elements for heart shape
-  const before = document.createElement('div')
-  before.style.cssText = `
-    content: '';
-    width: ${size}px;
-    height: ${size}px;
-    position: absolute;
-    left: ${size / 2}px;
-    top: -${size / 2}px;
-    background: ${color};
-    border-radius: 50%;
-    transform: rotate(-45deg);
-    transform-origin: 0 100%;
-  `
-
-  const after = document.createElement('div')
-  after.style.cssText = `
-    content: '';
-    width: ${size}px;
-    height: ${size}px;
-    position: absolute;
-    left: -${size / 2}px;
-    top: 0;
-    background: ${color};
-    border-radius: 50%;
-    transform: rotate(-45deg);
-    transform-origin: 100% 100%;
-  `
-
-  heart.appendChild(before)
-  heart.appendChild(after)
 
   // Add count for clusters
   if (count && count > 1) {
     const countEl = document.createElement('div')
     countEl.textContent = count.toString()
     countEl.style.cssText = `
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) rotate(45deg);
       color: white;
-      font-size: ${size * 0.4}px;
+      font-size: ${Math.max(10, size * 0.4)}px;
       font-weight: bold;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-      z-index: 1;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      transform: rotate(45deg);
+      line-height: 1;
+      user-select: none;
+      pointer-events: none;
     `
-    heart.appendChild(countEl)
+    el.appendChild(countEl)
+  } else {
+    // Add a heart symbol for single pins
+    const heartSymbol = document.createElement('div')
+    heartSymbol.textContent = '♥'
+    heartSymbol.style.cssText = `
+      color: white;
+      font-size: ${Math.max(12, size * 0.5)}px;
+      font-weight: bold;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      transform: rotate(45deg);
+      line-height: 1;
+      user-select: none;
+      pointer-events: none;
+    `
+    el.appendChild(heartSymbol)
   }
 
-  el.appendChild(heart)
-
-  // Add hover effects
+  // Add hover effects that don't interfere with positioning
   el.addEventListener('mouseenter', () => {
-    el.style.transform = 'scale(1.1)'
+    el.style.transform = 'rotate(-45deg) scale(1.1)'
+    el.style.zIndex = '1000'
   })
 
   el.addEventListener('mouseleave', () => {
-    el.style.transform = 'scale(1)'
+    el.style.transform = 'rotate(-45deg) scale(1)'
+    el.style.zIndex = '1'
   })
 
   return el
 }
 
 export const addPulseAnimation = (element: HTMLElement): void => {
-  element.style.animation = 'pulse 2s infinite'
-  
+  // Use a more stable animation that doesn't interfere with click events
+  element.style.animation = 'gentle-pulse 3s ease-in-out infinite'
+
   // Add CSS keyframes if not already added
   if (!document.querySelector('#map-pin-styles')) {
     const style = document.createElement('style')
     style.id = 'map-pin-styles'
     style.textContent = `
-      @keyframes pulse {
-        0% { transform: scale(1); opacity: 1; }
-        50% { transform: scale(1.1); opacity: 0.8; }
-        100% { transform: scale(1); opacity: 1; }
+      @keyframes gentle-pulse {
+        0%, 100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.05);
+          opacity: 0.9;
+        }
       }
-      
+
+      .map-pin {
+        transition: transform 0.2s ease;
+        will-change: transform;
+      }
+
       .map-pin:hover {
         transform: scale(1.1) !important;
-        transition: transform 0.2s ease;
+        animation-play-state: paused;
       }
     `
     document.head.appendChild(style)
