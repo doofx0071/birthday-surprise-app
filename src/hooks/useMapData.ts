@@ -171,9 +171,9 @@ export const useMapData = (): UseMapDataReturn => {
           if (newPins.length > 0) {
             setPins(prevPins => {
               const updatedPins = [...prevPins]
-              
+
               // Check if we need to merge with existing pin at same location
-              const existingPinIndex = updatedPins.findIndex(pin => 
+              const existingPinIndex = updatedPins.findIndex(pin =>
                 Math.abs(pin.latitude - newPins[0].latitude) < 0.001 &&
                 Math.abs(pin.longitude - newPins[0].longitude) < 0.001
               )
@@ -193,11 +193,11 @@ export const useMapData = (): UseMapDataReturn => {
                 updatedPins.push(newPins[0])
               }
 
+              // Update clusters with the new pins
+              setClusters(generateClusters(updatedPins))
+
               return updatedPins
             })
-
-            // Update clusters
-            setClusters(prevClusters => generateClusters(pins))
           }
         }
       )

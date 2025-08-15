@@ -45,23 +45,14 @@ export const MemoryMap: React.FC<MemoryMapProps> = ({
 
     try {
       map.current = createMapInstance(mapContainer.current)
-      
+
       map.current.on('load', () => {
         setIsMapLoaded(true)
         onLoad?.({ map: map.current! })
       })
 
-      map.current.on('move', () => {
-        if (map.current) {
-          const center = map.current.getCenter()
-          const zoom = map.current.getZoom()
-          setViewState({
-            longitude: center.lng,
-            latitude: center.lat,
-            zoom
-          })
-        }
-      })
+      // Remove the problematic move event listener that causes infinite loop
+      // We'll handle view state updates differently
 
     } catch (err) {
       console.error('Error initializing map:', err)
@@ -73,16 +64,26 @@ export const MemoryMap: React.FC<MemoryMapProps> = ({
         map.current = null
       }
     }
-  }, [onLoad, setViewState])
+  }, [onLoad]) // Removed setViewState from dependencies
 
-  // Update map view when viewState changes
+  // Update map view when viewState changes (but prevent infinite loop)
   useEffect(() => {
     if (map.current && isMapLoaded) {
-      map.current.flyTo({
-        center: [viewState.longitude, viewState.latitude],
-        zoom: viewState.zoom,
-        duration: 1000
-      })
+      // Only update if the viewState is significantly different to prevent loops
+      const currentCenter = map.current.getCenter()
+      const currentZoom = map.current.getZoom()
+
+      const centerDiff = Math.abs(currentCenter.lng - viewState.longitude) + Math.abs(currentCenter.lat - viewState.latitude)
+      const zoomDiff = Math.abs(currentZoom - viewState.zoom)
+
+      // Only update if there's a significant difference (threshold to prevent micro-movements)
+      if (centerDiff > 0.01 || zoomDiff > 0.1) {
+        map.current.flyTo({
+          center: [viewState.longitude, viewState.latitude],
+          zoom: viewState.zoom,
+          duration: 1000
+        })
+      }
     }
   }, [viewState, isMapLoaded])
 
@@ -109,7 +110,7 @@ export const MemoryMap: React.FC<MemoryMapProps> = ({
         pin.messageCount > 1 ? pin.messageCount : undefined
       )
 
-      // Add pulse animation
+      // Add pulse animation (now stable after fixing re-render issues)
       addPulseAnimation(pinElement)
 
       // Create marker
@@ -120,7 +121,7 @@ export const MemoryMap: React.FC<MemoryMapProps> = ({
       // Add click handler
       pinElement.addEventListener('click', (e) => {
         e.stopPropagation()
-        
+
         const clickEvent: MapPinClickEvent = {
           pin,
           coordinates: [pin.longitude, pin.latitude],
@@ -137,21 +138,27 @@ export const MemoryMap: React.FC<MemoryMapProps> = ({
         // Call external handler
         onPinClick?.(clickEvent)
 
-        // Fly to pin location
-        flyToLocation([pin.longitude, pin.latitude], 8)
+        // Fly to pin location using direct map method to avoid dependency issues
+        if (map.current) {
+          map.current.flyTo({
+            center: [pin.longitude, pin.latitude],
+            zoom: 8,
+            duration: 1000
+          })
+        }
       })
 
       markers.current.push(marker)
     })
 
-  }, [pins, filters, isMapLoaded, loading, showPopup, onPinClick, flyToLocation])
+  }, [pins, filters, isMapLoaded, loading, showPopup, onPinClick]) // Removed flyToLocation dependency
 
-  // Apply initial filters
+  // Apply initial filters (only once on mount)
   useEffect(() => {
     if (initialFilters) {
-      setFilters({ ...filters, ...initialFilters })
+      setFilters(prevFilters => ({ ...prevFilters, ...initialFilters }))
     }
-  }, [initialFilters]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [initialFilters, setFilters])
 
   // Handle map click to hide popup
   useEffect(() => {
