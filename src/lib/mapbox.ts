@@ -232,16 +232,8 @@ export const createHeartPinElement = (
     el.appendChild(heartSymbol)
   }
 
-  // Add hover effects that don't interfere with positioning
-  el.addEventListener('mouseenter', () => {
-    el.style.transform = 'rotate(-45deg) scale(1.1)'
-    el.style.zIndex = '1000'
-  })
-
-  el.addEventListener('mouseleave', () => {
-    el.style.transform = 'rotate(-45deg) scale(1)'
-    el.style.zIndex = '1'
-  })
+  // Remove hover effects that cause positioning issues
+  // Mapbox handles marker positioning, so we shouldn't modify transforms on hover
 
   return el
 }

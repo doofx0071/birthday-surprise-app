@@ -194,7 +194,6 @@ export interface MemoryMapProps {
   onClusterClick?: (event: MapClusterClickEvent) => void
   onLoad?: (event: MapLoadEvent) => void
   initialFilters?: Partial<MapFilters>
-  showControls?: boolean
   showFilters?: boolean
 }
 

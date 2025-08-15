@@ -5,7 +5,6 @@ import mapboxgl from 'mapbox-gl'
 import { useMapData, useMapControls } from '@/hooks/useMapData'
 import { createMapInstance, createHeartPinElement, addPulseAnimation } from '@/lib/mapbox'
 import { LocationPopup } from './LocationPopup'
-import { MapControls } from './MapControls'
 import type { MemoryMapProps, LocationPin, MapPinClickEvent } from '@/types/map'
 
 // Import Mapbox CSS
@@ -16,7 +15,6 @@ export const MemoryMap: React.FC<MemoryMapProps> = ({
   height = '500px',
   onPinClick,
   onLoad,
-  showControls = true,
   showFilters = true,
   initialFilters
 }) => {
@@ -216,25 +214,7 @@ export const MemoryMap: React.FC<MemoryMapProps> = ({
         </div>
       )}
 
-      {/* Map controls */}
-      {showControls && isMapLoaded && (
-        <MapControls
-          onZoomIn={() => map.current?.zoomIn()}
-          onZoomOut={() => map.current?.zoomOut()}
-          onResetView={resetView}
-          onToggleFullscreen={() => {
-            if (map.current) {
-              const fullscreenControl = map.current._controls.find(
-                (control: any) => control instanceof mapboxgl.FullscreenControl
-              )
-              if (fullscreenControl) {
-                fullscreenControl._onClickFullscreen()
-              }
-            }
-          }}
-          className="absolute top-4 right-4 z-20"
-        />
-      )}
+      {/* Removed duplicate map controls - using Mapbox's built-in controls instead */}
 
       {/* Filters */}
       {showFilters && isMapLoaded && (

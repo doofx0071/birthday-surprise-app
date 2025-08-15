@@ -55,7 +55,6 @@ export default function MemoryMapPage() {
           <MemoryMap
             height="600px"
             className="w-full"
-            showControls={true}
             showFilters={true}
             onPinClick={(event) => {
               console.log('Pin clicked:', event.pin)
