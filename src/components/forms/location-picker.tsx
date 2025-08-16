@@ -44,6 +44,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
     locationString,
     hasLocation,
     getCurrentPosition,
+    forceRefreshLocation,
     clearLocation
   } = useGeolocation()
 
@@ -120,8 +121,28 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
           className="pr-24"
         />
         
-        {/* Location Detection Button */}
-        <div className="absolute right-2 top-1/2 -translate-y-1/2">
+        {/* Location Detection Buttons */}
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
+          {/* Refresh Location Button (only show if we have a location) */}
+          {hasLocation && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => forceRefreshLocation()}
+              disabled={disabled || loading}
+              className={cn(
+                'h-7 px-2 text-xs',
+                'hover:bg-primary/10 hover:text-primary',
+                'transition-colors duration-200'
+              )}
+              title="Refresh current location"
+            >
+              🔄
+            </Button>
+          )}
+
+          {/* Detect Location Button */}
           <Button
             type="button"
             variant="ghost"
@@ -172,6 +193,11 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
                   <p className="text-xs text-charcoal-black/70">
                     {locationString}
                   </p>
+                  {locationData?.latitude && locationData?.longitude && (
+                    <p className="text-xs text-charcoal-black/50 mt-1">
+                      Coordinates: {locationData.latitude.toFixed(6)}, {locationData.longitude.toFixed(6)}
+                    </p>
+                  )}
                 </div>
               </div>
               
