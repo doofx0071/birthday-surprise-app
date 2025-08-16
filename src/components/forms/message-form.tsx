@@ -17,6 +17,7 @@ import { finalizeUploads } from '@/lib/fileUpload'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
+import { useToast } from '@/hooks/use-toast'
 import {
   Form,
   FormControl,
@@ -53,9 +54,9 @@ export const MessageForm: React.FC<MessageFormProps> = ({
   disabled = false
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [isAutoSaving, setIsAutoSaving] = useState(false)
+  const { toast } = useToast()
   const [lastSaved, setLastSaved] = useState<number | undefined>()
   const [uploadedFiles, setUploadedFiles] = useState<Array<{ url: string; thumbnailUrl?: string }>>([])
   const [tempFiles, setTempFiles] = useState<Array<{ tempPath: string; fileInfo: any; thumbnailUrl?: string }>>([])
@@ -110,6 +111,19 @@ export const MessageForm: React.FC<MessageFormProps> = ({
     try {
       let messageId: string | undefined
 
+      // Process detected location data into individual fields
+      if (data.detectedLocation) {
+        data.locationCity = data.detectedLocation.city || ''
+        data.locationCountry = data.detectedLocation.country || ''
+        data.latitude = data.detectedLocation.latitude
+        data.longitude = data.detectedLocation.longitude
+
+        // Also update the legacy location field for backward compatibility
+        if (data.detectedLocation.city && data.detectedLocation.country) {
+          data.location = `${data.detectedLocation.city}, ${data.detectedLocation.country}`
+        }
+      }
+
       // Call the provided onSubmit handler or default API call
       if (onSubmit) {
         await onSubmit(data)
@@ -146,7 +160,6 @@ export const MessageForm: React.FC<MessageFormProps> = ({
       }
 
       // Success handling
-      setSubmitSuccess(true)
       form.reset(defaultFormValues)
       autoSave.clearDraft() // Clear draft after successful submission
       setLastSaved(undefined)
@@ -155,10 +168,13 @@ export const MessageForm: React.FC<MessageFormProps> = ({
       setClearFilesTrigger(prev => prev + 1) // Trigger file upload component to clear
       onSuccess?.()
 
-      // Auto-hide success message after 5 seconds
-      setTimeout(() => {
-        setSubmitSuccess(false)
-      }, 5000)
+      // Show success toast
+      toast({
+        title: "🎉 Message Submitted Successfully!",
+        description: "Thank you for your birthday wish. It will be displayed on the special day!",
+        variant: "default",
+        duration: 5000,
+      })
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to submit message'
@@ -196,27 +212,7 @@ export const MessageForm: React.FC<MessageFormProps> = ({
         </BirthdayCardHeader>
 
         <BirthdayCardContent>
-          {/* Success Message */}
-          <AnimatePresence>
-            {submitSuccess && (
-              <motion.div
-                initial={{ opacity: 0, y: -20, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                className="mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg"
-              >
-                <div className="flex items-center space-x-2">
-                  <AnimatedCelebrationIcon size="md" color="current" className="text-green-600" />
-                  <div>
-                    <h3 className="font-semibold text-green-800">Message Submitted Successfully!</h3>
-                    <p className="text-sm text-green-700">
-                      Thank you for your birthday wish. It will be displayed on the special day!
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* Success messages now handled by toast notifications */}
 
           {/* Error Message */}
           <AnimatePresence>

@@ -14,7 +14,7 @@ const navigationItems = [
   { id: 'about', label: 'About', href: '#about' },
   { id: 'messages', label: 'Add Message', href: '#messages' },
   { id: 'contribute', label: 'Contribute', href: '#contribute' },
-  { id: 'memory-map', label: 'Memory Map', href: '#memory-map' },
+  { id: 'memory-map', label: 'Memory Map', href: '/memory-map', external: true },
   { id: 'gallery', label: 'Gallery', href: '#gallery' },
 ]
 
@@ -55,16 +55,21 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const handleNavClick = (href: string) => {
-    // Scroll to section on current page
-    const targetId = href.replace('#', '')
-    const element = document.getElementById(targetId)
+  const handleNavClick = (href: string, external?: boolean) => {
+    if (external) {
+      // Navigate to external page
+      window.location.href = href
+    } else {
+      // Scroll to section on current page
+      const targetId = href.replace('#', '')
+      const element = document.getElementById(targetId)
 
-    if (element) {
-      element.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      })
+      if (element) {
+        element.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        })
+      }
     }
 
     setIsMobileMenuOpen(false)
@@ -95,7 +100,7 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
             {navigationItems.map((item) => (
               <button
                 key={item.id}
-                onClick={() => handleNavClick(item.href)}
+                onClick={() => handleNavClick(item.href, (item as any).external)}
                 className={cn(
                   'font-body text-sm lg:text-base font-medium transition-all duration-200',
                   'hover:text-primary hover:scale-105',
@@ -156,7 +161,7 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
               {navigationItems.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => handleNavClick(item.href)}
+                  onClick={() => handleNavClick(item.href, (item as any).external)}
                   className={cn(
                     'block w-full text-left px-4 py-3 font-body text-base font-medium',
                     'transition-all duration-200 hover:bg-primary/10 hover:text-primary',
