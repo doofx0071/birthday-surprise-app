@@ -3,6 +3,34 @@ import { messageFormSchema, type MessageFormData } from '@/lib/validations/messa
 import { messageOperations, type MessageInsert } from '@/lib/supabase'
 import { z } from 'zod'
 
+// Helper function to send thank you email
+async function sendThankYouEmail(message: any) {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/emails/thank-you`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contributorName: message.name,
+        contributorEmail: message.email,
+        messagePreview: message.message,
+        girlfriendName: process.env.NEXT_PUBLIC_GIRLFRIEND_NAME,
+        websiteUrl: process.env.NEXT_PUBLIC_SITE_URL,
+      }),
+    })
+
+    if (response.ok) {
+      console.log(`✅ Thank you email sent to ${message.email}`)
+    } else {
+      const error = await response.text()
+      console.error(`❌ Thank you email failed for ${message.email}:`, error)
+    }
+  } catch (error) {
+    console.error('Thank you email request failed:', error)
+  }
+}
+
 /**
  * POST /api/messages
  * Submit a new birthday message
@@ -69,6 +97,12 @@ export async function POST(request: NextRequest) {
       isApproved: savedMessage.is_approved,
       isVisible: savedMessage.is_visible,
       createdAt: savedMessage.created_at,
+    })
+
+    // Send thank you email (async, don't wait for completion)
+    sendThankYouEmail(savedMessage).catch(error => {
+      console.error('Failed to send thank you email:', error)
+      // Don't fail the request if email fails
     })
 
     // Send success response
