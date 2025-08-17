@@ -184,7 +184,7 @@ export function ThankYouEmail({
 
 // Styles
 const bodyStyle = {
-  backgroundColor: '#f0fdf4',
+  backgroundColor: '#fdf2f8',
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
   margin: 0,
   padding: '20px',
@@ -201,12 +201,12 @@ const containerStyle = {
   width: '100%',
   borderRadius: '16px',
   overflow: 'hidden',
-  boxShadow: '0 20px 40px rgba(16, 185, 129, 0.1)',
-  border: '1px solid #d1fae5',
+  boxShadow: '0 20px 40px rgba(236, 72, 153, 0.1)',
+  border: '1px solid #fce7f3',
 }
 
 const headerStyle = {
-  background: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
+  background: 'linear-gradient(135deg, #ec4899 0%, #f472b6 100%)',
   padding: '60px 40px',
   textAlign: 'center' as const,
 }
@@ -217,24 +217,26 @@ const dividerSectionStyle = {
 
 const elegantDividerStyle = {
   height: '2px',
-  background: 'linear-gradient(90deg, transparent 0%, #10b981 50%, transparent 100%)',
+  background: 'linear-gradient(90deg, transparent 0%, #ec4899 50%, transparent 100%)',
   border: 'none',
   margin: '0',
 }
 
 const mainHeadingStyle = {
   color: '#ffffff',
-  fontSize: '32px',
-  fontWeight: 'bold',
-  margin: '0 0 10px 0',
-  textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)',
+  fontSize: '36px',
+  fontWeight: '700',
+  margin: '0 0 16px 0',
+  letterSpacing: '-0.5px',
+  lineHeight: '1.2',
 }
 
 const subHeadingStyle = {
-  color: '#ffffff',
+  color: '#fce7f3',
   fontSize: '18px',
   margin: '0',
-  fontWeight: '500',
+  fontWeight: '400',
+  opacity: '0.95',
 }
 
 const bannerStyle = {
@@ -331,15 +333,17 @@ const ctaTextStyle = {
 }
 
 const buttonStyle = {
-  backgroundColor: '#10b981',
-  borderRadius: '8px',
+  backgroundColor: '#ec4899',
+  borderRadius: '12px',
   color: '#ffffff',
   fontSize: '18px',
-  fontWeight: 'bold',
-  padding: '16px 32px',
+  fontWeight: '600',
+  padding: '18px 36px',
   textDecoration: 'none',
   display: 'inline-block',
-  boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+  boxShadow: '0 8px 20px rgba(236, 72, 153, 0.3)',
+  border: 'none',
+  transition: 'all 0.3s ease',
 }
 
 const reminderStyle = {
@@ -368,22 +372,23 @@ const footerStyle = {
 }
 
 const footerTextStyle = {
-  color: '#10b981',
-  fontSize: '16px',
-  fontWeight: 'bold',
-  margin: '0 0 10px 0',
+  color: '#ec4899',
+  fontSize: '18px',
+  fontWeight: '600',
+  margin: '0 0 12px 0',
 }
 
 const footerSubTextStyle = {
   color: '#6b7280',
-  fontSize: '14px',
-  margin: '0 0 15px 0',
+  fontSize: '15px',
+  margin: '0 0 20px 0',
+  lineHeight: '1.5',
 }
 
 const linkStyle = {
-  color: '#10b981',
+  color: '#ec4899',
   textDecoration: 'none',
-  fontSize: '14px',
+  fontSize: '15px',
   fontWeight: '500',
 }
 

@@ -19,6 +19,26 @@ const BIRTHDAY_CONFIG = {
 export class EmailScheduler {
   private batches: Map<string, EmailBatch> = new Map()
 
+  // Utility methods for Philippine timezone handling
+  private getPhilippineTime(): Date {
+    const now = new Date()
+    const phTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Manila' }))
+    return phTime
+  }
+
+  private formatPhilippineTime(date: Date): string {
+    return date.toLocaleString('en-PH', {
+      timeZone: 'Asia/Manila',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false, // Use 24-hour format
+    })
+  }
+
   // Calculate email schedule based on birthday date
   calculateEmailSchedule(): EmailSchedule {
     const birthdayDate = new Date(BIRTHDAY_CONFIG.date)
@@ -43,34 +63,38 @@ export class EmailScheduler {
     }
   }
 
-  // Check if it's time to send birthday emails
+  // Check if it's time to send birthday emails (Philippine timezone)
   isBirthdayTime(): boolean {
-    const now = new Date()
+    const phNow = this.getPhilippineTime()
     const birthday = new Date(BIRTHDAY_CONFIG.date)
-    
-    // Check if it's the birthday date
-    const isSameDate = 
-      now.getFullYear() === birthday.getFullYear() &&
-      now.getMonth() === birthday.getMonth() &&
-      now.getDate() === birthday.getDate()
-    
-    // Check if it's around midnight (within 1 hour window)
-    const currentHour = now.getHours()
+
+    // Check if it's the birthday date in Philippine timezone
+    const isSameDate =
+      phNow.getFullYear() === birthday.getFullYear() &&
+      phNow.getMonth() === birthday.getMonth() &&
+      phNow.getDate() === birthday.getDate()
+
+    // Check if it's around midnight Philippine time (within 1 hour window)
+    const currentHour = phNow.getHours()
     const isAroundMidnight = currentHour === 0 || currentHour === 23
-    
+
+    console.log(`Birthday check - PH Time: ${this.formatPhilippineTime(phNow)}, Same date: ${isSameDate}, Around midnight: ${isAroundMidnight}`)
+
     return isSameDate && isAroundMidnight
   }
 
-  // Check if it's time for reminder emails
+  // Check if it's time for reminder emails (Philippine timezone)
   isReminderTime(type: 'week' | 'day' | 'hour'): boolean {
-    const now = new Date()
+    const phNow = this.getPhilippineTime()
     const schedule = this.calculateEmailSchedule()
     const targetDate = schedule.reminderSchedule[type]
-    
-    // Check if it's within 1 hour of the reminder time
-    const timeDiff = Math.abs(now.getTime() - targetDate.getTime())
+
+    // Check if it's within 1 hour of the reminder time in Philippine timezone
+    const timeDiff = Math.abs(phNow.getTime() - targetDate.getTime())
     const oneHour = 60 * 60 * 1000
-    
+
+    console.log(`Reminder check (${type}) - PH Time: ${this.formatPhilippineTime(phNow)}, Target: ${this.formatPhilippineTime(targetDate)}, Within window: ${timeDiff <= oneHour}`)
+
     return timeDiff <= oneHour
   }
 
@@ -296,7 +320,7 @@ export class EmailScheduler {
 // Export singleton instance
 export const emailScheduler = new EmailScheduler()
 
-// Utility functions
+// Utility functions for Philippine timezone handling
 export const formatBirthdayDate = (date: Date): string => {
   return date.toLocaleDateString('en-US', {
     weekday: 'long',
@@ -307,8 +331,28 @@ export const formatBirthdayDate = (date: Date): string => {
   })
 }
 
-export const getDaysUntilBirthday = (): number => {
+export const formatPhilippineTime = (date: Date): string => {
+  return date.toLocaleString('en-PH', {
+    timeZone: 'Asia/Manila',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false, // Use 24-hour format
+  })
+}
+
+export const getPhilippineTime = (): Date => {
+  // Get current time in Philippine timezone
   const now = new Date()
+  const phTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Manila' }))
+  return phTime
+}
+
+export const getDaysUntilBirthday = (): number => {
+  const now = getPhilippineTime()
   const birthday = new Date(BIRTHDAY_CONFIG.date)
   const diffTime = birthday.getTime() - now.getTime()
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
