@@ -119,7 +119,7 @@ export class EmailService {
         const emailData: MailtrapEmailData = {
           from: {
             email: emailConfig.from,
-            name: 'Birthday Surprise Team',
+            name: 'Cela\'s Birthday',
           },
           to: recipients.map(email => ({
             email,
@@ -147,7 +147,7 @@ export class EmailService {
       // Fallback to SMTP if API fails or is not available
       if (this.transporter) {
         const info = await this.transporter.sendMail({
-          from: `Birthday Surprise Team <${emailConfig.from}>`,
+          from: `Cela's Birthday <${emailConfig.from}>`,
           to: recipients.join(', '),
           subject,
           html,
