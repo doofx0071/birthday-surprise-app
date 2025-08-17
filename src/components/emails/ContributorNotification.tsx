@@ -40,7 +40,7 @@ export function ContributorNotificationEmail({
             <Row>
               <Column align="center">
                 <Heading style={mainHeadingStyle}>
-                  🎉 Today is the Big Day! 🎉
+                  Today is the Big Day!
                 </Heading>
                 <Heading style={nameHeadingStyle}>
                   {girlfriendName}'s Birthday
@@ -49,13 +49,11 @@ export function ContributorNotificationEmail({
             </Row>
           </Section>
 
-          {/* Celebration banner */}
-          <Section style={bannerStyle}>
+          {/* Elegant divider */}
+          <Section style={dividerSectionStyle}>
             <Row>
               <Column align="center">
-                <Text style={bannerTextStyle}>
-                  🎂 🎈 ✨ 💖 🎁 ✨ 🎈 🎂
-                </Text>
+                <div style={elegantDividerStyle}></div>
               </Column>
             </Row>
           </Section>

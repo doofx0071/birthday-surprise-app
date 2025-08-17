@@ -39,7 +39,7 @@ export function ThankYouEmail({
             <Row>
               <Column align="center">
                 <Heading style={mainHeadingStyle}>
-                  🙏 Thank You! 🙏
+                  Thank You!
                 </Heading>
                 <Text style={subHeadingStyle}>
                   Your message has been received
@@ -48,13 +48,11 @@ export function ThankYouEmail({
             </Row>
           </Section>
 
-          {/* Celebration banner */}
-          <Section style={bannerStyle}>
+          {/* Elegant divider */}
+          <Section style={dividerSectionStyle}>
             <Row>
               <Column align="center">
-                <Text style={bannerTextStyle}>
-                  ✨ 💖 🎉 ✨ 💖 🎉 ✨
-                </Text>
+                <div style={elegantDividerStyle}></div>
               </Column>
             </Row>
           </Section>
@@ -187,9 +185,12 @@ export function ThankYouEmail({
 // Styles
 const bodyStyle = {
   backgroundColor: '#f0fdf4',
-  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
   margin: 0,
-  padding: 0,
+  padding: '20px',
+  lineHeight: '1.6',
+  WebkitTextSizeAdjust: '100%',
+  msTextSizeAdjust: '100%',
 }
 
 const containerStyle = {
@@ -197,15 +198,28 @@ const containerStyle = {
   margin: '0 auto',
   padding: '0',
   maxWidth: '600px',
-  borderRadius: '12px',
+  width: '100%',
+  borderRadius: '16px',
   overflow: 'hidden',
-  boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+  boxShadow: '0 20px 40px rgba(16, 185, 129, 0.1)',
+  border: '1px solid #d1fae5',
 }
 
 const headerStyle = {
-  background: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%)',
-  padding: '40px 20px',
+  background: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
+  padding: '60px 40px',
   textAlign: 'center' as const,
+}
+
+const dividerSectionStyle = {
+  padding: '0 40px',
+}
+
+const elegantDividerStyle = {
+  height: '2px',
+  background: 'linear-gradient(90deg, transparent 0%, #10b981 50%, transparent 100%)',
+  border: 'none',
+  margin: '0',
 }
 
 const mainHeadingStyle = {

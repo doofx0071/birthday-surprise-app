@@ -30,8 +30,9 @@ export function BirthdayNotificationEmail({
   return (
     <Html>
       <Head>
-        <title>🎂 Happy Birthday {girlfriendName}!</title>
+        <title>Happy Birthday {girlfriendName}!</title>
         <meta name="description" content={previewText} />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
       <Body style={bodyStyle}>
         <Container style={containerStyle}>
@@ -40,25 +41,23 @@ export function BirthdayNotificationEmail({
             <Row>
               <Column align="center">
                 <Heading style={mainHeadingStyle}>
-                  🎉 HAPPY BIRTHDAY 🎉
+                  Happy Birthday
                 </Heading>
                 <Heading style={nameHeadingStyle}>
-                  {girlfriendName}!
+                  {girlfriendName}
                 </Heading>
                 <Text style={subHeadingStyle}>
-                  The day has finally arrived!
+                  Your special day has finally arrived
                 </Text>
               </Column>
             </Row>
           </Section>
 
-          {/* Celebration banner */}
-          <Section style={bannerStyle}>
+          {/* Elegant divider */}
+          <Section style={dividerSectionStyle}>
             <Row>
               <Column align="center">
-                <Text style={bannerTextStyle}>
-                  🎂 ✨ 🎈 💖 🎁 ✨ 🎂
-                </Text>
+                <div style={elegantDividerStyle}></div>
               </Column>
             </Row>
           </Section>
@@ -68,12 +67,12 @@ export function BirthdayNotificationEmail({
             <Row>
               <Column>
                 <Text style={messageStyle}>
-                  Your family and friends have been secretly preparing something very special for you...
+                  Your family and friends have been secretly preparing something very special for you.
                 </Text>
-                
+
                 <Text style={messageStyle}>
-                  We've collected heartfelt messages, beautiful memories, and love from around the world, 
-                  all waiting to make your birthday absolutely magical! ✨
+                  We've collected heartfelt messages, beautiful memories, and love from around the world,
+                  all waiting to make your birthday absolutely magical.
                 </Text>
               </Column>
             </Row>
@@ -101,8 +100,11 @@ export function BirthdayNotificationEmail({
           <Section style={ctaStyle}>
             <Row>
               <Column align="center">
+                <Text style={ctaTextStyle}>
+                  Ready to see your surprise?
+                </Text>
                 <Button style={buttonStyle} href={websiteUrl}>
-                  🎁 View Your Birthday Surprise 🎁
+                  View Your Birthday Surprise
                 </Button>
               </Column>
             </Row>
@@ -132,13 +134,13 @@ export function BirthdayNotificationEmail({
             <Row>
               <Column align="center">
                 <Text style={footerTextStyle}>
-                  ❤️ From everyone who loves you ❤️
+                  With love from everyone who cares about you
                 </Text>
                 <Text style={footerSubTextStyle}>
                   Made with endless love and care for the most amazing person
                 </Text>
                 <Link href={websiteUrl} style={linkStyle}>
-                  Visit Birthday Surprise
+                  Birthday Surprise Team
                 </Link>
               </Column>
             </Row>
@@ -152,9 +154,12 @@ export function BirthdayNotificationEmail({
 // Styles
 const bodyStyle = {
   backgroundColor: '#fdf2f8',
-  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
   margin: 0,
-  padding: 0,
+  padding: '20px',
+  lineHeight: '1.6',
+  WebkitTextSizeAdjust: '100%',
+  msTextSizeAdjust: '100%',
 }
 
 const containerStyle = {
@@ -162,148 +167,171 @@ const containerStyle = {
   margin: '0 auto',
   padding: '0',
   maxWidth: '600px',
-  borderRadius: '12px',
+  width: '100%',
+  borderRadius: '16px',
   overflow: 'hidden',
-  boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+  boxShadow: '0 20px 40px rgba(236, 72, 153, 0.1)',
+  border: '1px solid #fce7f3',
 }
 
 const headerStyle = {
-  background: 'linear-gradient(135deg, #ec4899 0%, #f97316 50%, #eab308 100%)',
-  padding: '40px 20px',
+  background: 'linear-gradient(135deg, #ec4899 0%, #f472b6 100%)',
+  padding: '60px 40px',
   textAlign: 'center' as const,
 }
 
 const mainHeadingStyle = {
   color: '#ffffff',
-  fontSize: '32px',
-  fontWeight: 'bold',
-  margin: '0 0 10px 0',
-  textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)',
+  fontSize: '36px',
+  fontWeight: '700',
+  margin: '0 0 16px 0',
+  letterSpacing: '-0.5px',
+  lineHeight: '1.2',
 }
 
 const nameHeadingStyle = {
   color: '#ffffff',
-  fontSize: '28px',
-  fontWeight: 'bold',
-  margin: '0 0 15px 0',
-  textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)',
+  fontSize: '32px',
+  fontWeight: '600',
+  margin: '0 0 20px 0',
+  letterSpacing: '-0.3px',
+  lineHeight: '1.3',
 }
 
 const subHeadingStyle = {
-  color: '#ffffff',
+  color: '#fce7f3',
   fontSize: '18px',
   margin: '0',
-  fontWeight: '500',
+  fontWeight: '400',
+  opacity: '0.95',
 }
 
-const bannerStyle = {
-  backgroundColor: '#fef3c7',
-  padding: '20px',
-  textAlign: 'center' as const,
+const dividerSectionStyle = {
+  padding: '0 40px',
 }
 
-const bannerTextStyle = {
-  fontSize: '24px',
+const elegantDividerStyle = {
+  height: '2px',
+  background: 'linear-gradient(90deg, transparent 0%, #ec4899 50%, transparent 100%)',
+  border: 'none',
   margin: '0',
-  letterSpacing: '2px',
 }
 
 const contentStyle = {
-  padding: '30px 20px',
+  padding: '40px 40px 20px 40px',
 }
 
 const messageStyle = {
   color: '#374151',
-  fontSize: '16px',
-  lineHeight: '1.6',
-  margin: '0 0 20px 0',
+  fontSize: '18px',
+  lineHeight: '1.7',
+  margin: '0 0 24px 0',
+  textAlign: 'center' as const,
 }
 
 const statsStyle = {
-  backgroundColor: '#f9fafb',
-  padding: '30px 20px',
-  borderRadius: '8px',
-  margin: '0 20px',
+  backgroundColor: '#fdf2f8',
+  padding: '40px 30px',
+  borderRadius: '16px',
+  margin: '20px 40px',
+  border: '1px solid #fce7f3',
 }
 
 const statColumnStyle = {
-  padding: '0 10px',
+  padding: '0 15px',
+  textAlign: 'center' as const,
 }
 
 const statNumberStyle = {
   color: '#ec4899',
-  fontSize: '36px',
-  fontWeight: 'bold',
-  margin: '0 0 5px 0',
+  fontSize: '42px',
+  fontWeight: '700',
+  margin: '0 0 8px 0',
+  lineHeight: '1',
 }
 
 const statLabelStyle = {
   color: '#6b7280',
-  fontSize: '14px',
+  fontSize: '15px',
   margin: '0',
   fontWeight: '500',
+  textTransform: 'uppercase' as const,
+  letterSpacing: '0.5px',
 }
 
 const ctaStyle = {
-  padding: '40px 20px',
+  padding: '50px 40px',
   textAlign: 'center' as const,
+}
+
+const ctaTextStyle = {
+  color: '#6b7280',
+  fontSize: '18px',
+  margin: '0 0 24px 0',
+  fontWeight: '500',
 }
 
 const buttonStyle = {
   backgroundColor: '#ec4899',
-  borderRadius: '8px',
+  borderRadius: '12px',
   color: '#ffffff',
   fontSize: '18px',
-  fontWeight: 'bold',
-  padding: '16px 32px',
+  fontWeight: '600',
+  padding: '18px 36px',
   textDecoration: 'none',
   display: 'inline-block',
-  boxShadow: '0 4px 12px rgba(236, 72, 153, 0.3)',
+  boxShadow: '0 8px 20px rgba(236, 72, 153, 0.3)',
+  border: 'none',
+  transition: 'all 0.3s ease',
 }
 
 const personalStyle = {
   backgroundColor: '#fef7ff',
-  padding: '30px 20px',
-  margin: '0 20px',
-  borderRadius: '8px',
+  padding: '40px 30px',
+  margin: '20px 40px',
+  borderRadius: '16px',
   borderLeft: '4px solid #ec4899',
 }
 
 const personalTextStyle = {
   color: '#374151',
-  fontSize: '16px',
-  lineHeight: '1.6',
-  margin: '0 0 15px 0',
+  fontSize: '17px',
+  lineHeight: '1.7',
+  margin: '0 0 20px 0',
   fontStyle: 'italic',
+  textAlign: 'center' as const,
 }
 
 const dividerStyle = {
-  borderColor: '#e5e7eb',
-  margin: '30px 0',
+  borderColor: '#fce7f3',
+  margin: '40px 0',
+  borderWidth: '1px',
 }
 
 const footerStyle = {
-  padding: '30px 20px',
+  padding: '40px 40px 50px 40px',
   textAlign: 'center' as const,
+  backgroundColor: '#fdf2f8',
 }
 
 const footerTextStyle = {
   color: '#ec4899',
   fontSize: '18px',
-  fontWeight: 'bold',
-  margin: '0 0 10px 0',
+  fontWeight: '600',
+  margin: '0 0 12px 0',
 }
 
 const footerSubTextStyle = {
   color: '#6b7280',
-  fontSize: '14px',
-  margin: '0 0 15px 0',
+  fontSize: '15px',
+  margin: '0 0 20px 0',
+  lineHeight: '1.5',
 }
 
 const linkStyle = {
   color: '#ec4899',
   textDecoration: 'none',
-  fontSize: '14px',
+  fontSize: '15px',
   fontWeight: '500',
 }
 
