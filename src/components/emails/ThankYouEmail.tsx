@@ -7,7 +7,6 @@ import {
   Body,
   Text,
   Button,
-  Link,
   Preview,
 } from '@react-email/components'
 
@@ -101,33 +100,11 @@ export function ThankYouEmail({
                       <Text style={paragraphStyle}>
                         Thank you for making this birthday extra special with your love and kindness!
                       </Text>
-                      
-                      <Text style={signatureStyle}>
-                        With gratitude,<br />
-                        Cela's Birthday Team
-                      </Text>
-                      
+
                     </td>
                   </tr>
                 </table>
                 {/* END MAIN CONTENT */}
-
-                {/* START FOOTER */}
-                <div style={footerStyle}>
-                  <table role="presentation" border={0} cellPadding={0} cellSpacing={0}>
-                    <tr>
-                      <td style={footerContentStyle}>
-                        <Text style={footerTextStyle}>
-                          Made with 💕 for {girlfriendName}'s special day
-                        </Text>
-                        <Text style={footerSubTextStyle}>
-                          <Link href={websiteUrl} style={footerLinkStyle}>Visit Birthday Surprise</Link>
-                        </Text>
-                      </td>
-                    </tr>
-                  </table>
-                </div>
-                {/* END FOOTER */}
 
               </div>
             </td>
@@ -270,43 +247,4 @@ const sectionHeadingStyle = {
   color: '#ec4899',
 }
 
-const signatureStyle = {
-  fontFamily: 'Helvetica, sans-serif',
-  fontSize: '16px',
-  fontWeight: 'normal',
-  margin: '32px 0 0 0',
-  color: '#6b7280',
-  lineHeight: '1.5',
-}
 
-const footerStyle = {
-  clear: 'both',
-  paddingTop: '24px',
-  textAlign: 'center' as const,
-  width: '100%',
-}
-
-const footerContentStyle = {
-  color: '#9a9ea6',
-  fontSize: '16px',
-  textAlign: 'center' as const,
-}
-
-const footerTextStyle = {
-  fontFamily: 'Helvetica, sans-serif',
-  fontSize: '14px',
-  color: '#9a9ea6',
-  margin: '0 0 8px 0',
-}
-
-const footerSubTextStyle = {
-  fontFamily: 'Helvetica, sans-serif',
-  fontSize: '14px',
-  color: '#9a9ea6',
-  margin: 0,
-}
-
-const footerLinkStyle = {
-  color: '#ec4899',
-  textDecoration: 'underline',
-}
