@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
     const testType = url.searchParams.get('type') || 'all'
     const sendEmail = url.searchParams.get('send') === 'true'
     const testEmail = url.searchParams.get('email') || 'test@example.com'
+    const emailType = url.searchParams.get('emailType') || 'thank_you'
 
     const results: any = {
       timestamp: new Date().toISOString(),
@@ -170,23 +171,65 @@ export async function GET(request: NextRequest) {
     // Test 6: Send Test Email (if requested)
     if (sendEmail && (testType === 'all' || testType === 'send')) {
       try {
-        const testTemplate = ThankYouEmail({
-          contributorName: 'Test User',
-          contributorEmail: testEmail,
-          girlfriendName: 'Gracela Elmera C. Betarmos',
-          messagePreview: 'This is a test email from the birthday surprise system!',
-          websiteUrl: 'https://birthday-surprise-app.vercel.app',
-        })
+        let testTemplate: any
+        let emailSubject: string
+
+        // Choose template based on emailType parameter
+        switch (emailType) {
+          case 'birthday':
+          case 'birthday_notification':
+            testTemplate = BirthdayNotificationEmail({
+              recipientName: 'Gracela Elmera C. Betarmos',
+              recipientEmail: testEmail,
+              girlfriendName: 'Gracela Elmera C. Betarmos',
+              messageCount: 25,
+              contributorCount: 12,
+              locationCount: 8,
+              websiteUrl: 'https://birthday-surprise-app.vercel.app',
+              previewText: 'Your special day has arrived! See all the love waiting for you...',
+            })
+            emailSubject = '🎂 Happy Birthday Gracela! Your Surprise Awaits'
+            break
+
+          case 'contributor':
+          case 'contributor_notification':
+            testTemplate = ContributorNotificationEmail({
+              recipientName: 'Cris',
+              recipientEmail: testEmail,
+              contributorName: 'Cris',
+              girlfriendName: 'Gracela Elmera C. Betarmos',
+              messageCount: 25,
+              contributorCount: 12,
+              locationCount: 8,
+              websiteUrl: 'https://birthday-surprise-app.vercel.app',
+              previewText: 'Today is Gracela Elmera C. Betarmos\'s birthday! See all the love you helped create...',
+            })
+            emailSubject = '🎉 Gracela\'s Birthday is Today! See All the Love'
+            break
+
+          case 'thank_you':
+          default:
+            testTemplate = ThankYouEmail({
+              contributorName: 'Test User',
+              contributorEmail: testEmail,
+              girlfriendName: 'Gracela Elmera C. Betarmos',
+              messagePreview: 'This is a test email from the birthday surprise system!',
+              websiteUrl: 'https://birthday-surprise-app.vercel.app',
+            })
+            emailSubject = '🧪 Test Email from Birthday Surprise System'
+            break
+        }
 
         const result = await emailService.sendTemplateEmail(
           testEmail,
-          '🧪 Test Email from Birthday Surprise System',
+          emailSubject,
           testTemplate,
           {
             recipientName: 'Test User',
             category: 'test',
             customVariables: {
               test_type: 'system_test',
+              email_type: emailType,
               timestamp: new Date().toISOString(),
             },
           }
