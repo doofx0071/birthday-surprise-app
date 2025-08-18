@@ -1,19 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { BirthdayNotificationEmail } from '@/components/emails/BirthdayNotification'
+import { ContributorNotificationEmail } from '@/components/emails/ContributorNotification'
 
 export async function GET(request: NextRequest) {
   try {
     const { render } = await import('@react-email/render')
     
-    const emailTemplate = BirthdayNotificationEmail({
-      recipientName: 'Gracela Elmera C. Betarmos',
-      recipientEmail: 'cela@veenusra.com',
+    const emailTemplate = ContributorNotificationEmail({
+      recipientName: 'Cris',
+      recipientEmail: 'cris@snoorlaxx.com',
+      contributorName: 'Cris',
       girlfriendName: 'Gracela Elmera C. Betarmos',
       messageCount: 25,
       contributorCount: 12,
       locationCount: 8,
       websiteUrl: 'https://birthday-surprise-app.vercel.app',
-      previewText: 'Your special day has arrived! See all the love waiting for you...',
+      previewText: 'Today is Gracela Elmera C. Betarmos\'s birthday! See all the love you helped create...',
     })
 
     const html = await render(emailTemplate)
@@ -24,9 +25,9 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (error) {
-    console.error('Birthday email preview error:', error)
+    console.error('Contributor email preview error:', error)
     return NextResponse.json(
-      { error: 'Failed to generate birthday email preview', details: String(error) },
+      { error: 'Failed to generate contributor email preview', details: String(error) },
       { status: 500 }
     )
   }

@@ -1,19 +1,12 @@
 // Email scheduling system for birthday notifications
 import { emailService } from './mailtrap'
-import type { 
-  EmailBatch, 
-  EmailType, 
-  EmailSchedule, 
-  EmailDeliveryResult 
+import { getBirthdayConfig } from '../config/birthday'
+import type {
+  EmailBatch,
+  EmailType,
+  EmailSchedule,
+  EmailDeliveryResult
 } from '@/types/email'
-
-// Birthday configuration from environment
-const BIRTHDAY_CONFIG = {
-  date: new Date(process.env.NEXT_PUBLIC_BIRTHDAY_DATE || '2025-09-08T00:00:00+08:00'),
-  timezone: process.env.NEXT_PUBLIC_TIMEZONE || 'Asia/Manila',
-  girlfriendName: process.env.NEXT_PUBLIC_GIRLFRIEND_NAME || 'Gracela Elmera C. Betarmos',
-  websiteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://birthday-surprise-app.vercel.app',
-}
 
 // Email scheduling service
 export class EmailScheduler {
@@ -41,8 +34,9 @@ export class EmailScheduler {
 
   // Calculate email schedule based on birthday date
   calculateEmailSchedule(): EmailSchedule {
-    const birthdayDate = new Date(BIRTHDAY_CONFIG.date)
-    
+    const config = getBirthdayConfig()
+    const birthdayDate = config.birthday.date
+
     // Calculate reminder dates
     const weekBefore = new Date(birthdayDate.getTime() - 7 * 24 * 60 * 60 * 1000)
     const dayBefore = new Date(birthdayDate.getTime() - 24 * 60 * 60 * 1000)
@@ -50,7 +44,7 @@ export class EmailScheduler {
 
     return {
       birthdayDate,
-      timezone: BIRTHDAY_CONFIG.timezone,
+      timezone: config.birthday.timezone,
       reminderSchedule: {
         week: weekBefore,
         day: dayBefore,
@@ -65,8 +59,9 @@ export class EmailScheduler {
 
   // Check if it's time to send birthday emails (Philippine timezone)
   isBirthdayTime(): boolean {
+    const config = getBirthdayConfig()
     const phNow = this.getPhilippineTime()
-    const birthday = new Date(BIRTHDAY_CONFIG.date)
+    const birthday = config.birthday.date
 
     // Check if it's the birthday date in Philippine timezone
     const isSameDate =
@@ -107,8 +102,9 @@ export class EmailScheduler {
 
       switch (type) {
         case 'birthday_notification':
-          // Send to the girlfriend (main recipient)
-          return [BIRTHDAY_CONFIG.girlfriendName.toLowerCase().replace(/\s+/g, '.') + '@gmail.com']
+          // Send to the birthday celebrant (main recipient)
+          const config = getBirthdayConfig()
+          return [config.celebrant.email]
         
         case 'contributor_notification':
         case 'reminder_week':
@@ -198,32 +194,34 @@ export class EmailScheduler {
         let template: React.ReactElement
         let subject: string
 
+        const config = getBirthdayConfig()
+
         switch (batch.type) {
           case 'birthday_notification':
             template = BirthdayNotificationEmail({
-              recipientName: BIRTHDAY_CONFIG.girlfriendName,
+              recipientName: config.celebrant.name,
               recipientEmail: recipient,
-              girlfriendName: BIRTHDAY_CONFIG.girlfriendName,
+              girlfriendName: config.celebrant.name,
               messageCount: stats.messageCount,
               contributorCount: stats.contributorCount,
               locationCount: stats.locationCount,
-              websiteUrl: BIRTHDAY_CONFIG.websiteUrl,
+              websiteUrl: config.website.url,
             })
-            subject = `🎂 Happy Birthday ${BIRTHDAY_CONFIG.girlfriendName}! Your Surprise Awaits`
+            subject = `🎂 Happy Birthday ${config.celebrant.name}! Your Surprise Awaits`
             break
 
           case 'contributor_notification':
             template = ContributorNotificationEmail({
               recipientName: recipient.split('@')[0],
               recipientEmail: recipient,
-              girlfriendName: BIRTHDAY_CONFIG.girlfriendName,
+              girlfriendName: config.celebrant.name,
               contributorName: recipient.split('@')[0],
               messageCount: stats.messageCount,
               contributorCount: stats.contributorCount,
               locationCount: stats.locationCount,
-              websiteUrl: BIRTHDAY_CONFIG.websiteUrl,
+              websiteUrl: config.website.url,
             })
-            subject = `🎉 ${BIRTHDAY_CONFIG.girlfriendName}'s Birthday is Today! See All the Love`
+            subject = `🎉 ${config.celebrant.name}'s Birthday is Today! See All the Love`
             break
 
           default:
@@ -240,7 +238,7 @@ export class EmailScheduler {
             customVariables: {
               batch_id: batchId,
               email_type: batch.type,
-              girlfriend_name: BIRTHDAY_CONFIG.girlfriendName,
+              girlfriend_name: config.celebrant.name,
             },
           },
         })
@@ -322,12 +320,13 @@ export const emailScheduler = new EmailScheduler()
 
 // Utility functions for Philippine timezone handling
 export const formatBirthdayDate = (date: Date): string => {
+  const config = getBirthdayConfig()
   return date.toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-    timeZone: BIRTHDAY_CONFIG.timezone,
+    timeZone: config.birthday.timezone,
   })
 }
 
@@ -352,8 +351,9 @@ export const getPhilippineTime = (): Date => {
 }
 
 export const getDaysUntilBirthday = (): number => {
+  const config = getBirthdayConfig()
   const now = getPhilippineTime()
-  const birthday = new Date(BIRTHDAY_CONFIG.date)
+  const birthday = config.birthday.date
   const diffTime = birthday.getTime() - now.getTime()
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 }

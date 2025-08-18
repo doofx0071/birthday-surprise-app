@@ -1,17 +1,13 @@
-// Contributor notification email template
+// Professional Contributor Notification Email Template - Based on Lee Munroe's responsive template
+// Adapted for birthday surprise with pink/white theme
+import React from 'react'
 import {
   Html,
   Head,
   Body,
-  Container,
-  Section,
-  Row,
-  Column,
-  Heading,
   Text,
   Button,
-  Hr,
-  Link,
+  Preview,
 } from '@react-email/components'
 import type { ContributorNotificationProps } from '@/types/email'
 
@@ -28,364 +24,220 @@ export function ContributorNotificationEmail({
   previewText = `Today is ${girlfriendName}'s birthday! See all the love you helped create...`,
 }: ContributorNotificationProps) {
   return (
-    <Html>
+    <Html lang="en">
       <Head>
-        <title>🎂 {girlfriendName}'s Birthday is Today!</title>
-        <meta name="description" content={previewText} />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta httpEquiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>{`🎂 ${girlfriendName}'s Birthday is Today!`}</title>
       </Head>
+      <Preview>{previewText}</Preview>
       <Body style={bodyStyle}>
-        <Container style={containerStyle}>
-          {/* Header */}
-          <Section style={headerStyle}>
-            <Row>
-              <Column align="center">
-                <Heading style={mainHeadingStyle}>
-                  Today is the Big Day!
-                </Heading>
-                <Heading style={nameHeadingStyle}>
-                  {girlfriendName}'s Birthday
-                </Heading>
-              </Column>
-            </Row>
-          </Section>
+        <table role="presentation" border={0} cellPadding={0} cellSpacing={0} style={tableResetStyle}>
+          <tr>
+            <td>&nbsp;</td>
+            <td style={containerStyle}>
+              <div style={contentStyle}>
 
-          {/* Elegant divider */}
-          <Section style={dividerSectionStyle}>
-            <Row>
-              <Column align="center">
-                <div style={elegantDividerStyle}></div>
-              </Column>
-            </Row>
-          </Section>
+                {/* START MAIN CONTENT */}
+                <table role="presentation" border={0} cellPadding={0} cellSpacing={0} style={mainStyle}>
+                  <tr>
+                    <td style={wrapperStyle}>
 
-          {/* Personal greeting */}
-          <Section style={greetingStyle}>
-            <Row>
-              <Column>
-                <Text style={greetingTextStyle}>
-                  Hi {contributorName}! 👋
-                </Text>
-                <Text style={messageStyle}>
-                  The moment we've all been waiting for has finally arrived! 
-                  {girlfriendName}'s birthday surprise is now live, and your beautiful 
-                  message is part of something truly magical.
-                </Text>
-              </Column>
-            </Row>
-          </Section>
+                      {/* Header */}
+                      <h1 style={headingStyle}>🎉 Today is the Big Day! 🎉</h1>
 
-          {/* Impact section */}
-          <Section style={impactStyle}>
-            <Row>
-              <Column>
-                <Heading style={sectionHeadingStyle}>
-                  🌟 Look What We Created Together! 🌟
-                </Heading>
-                <Text style={messageStyle}>
-                  Thanks to amazing people like you, we've created an incredible 
-                  birthday celebration that spans the globe:
-                </Text>
-              </Column>
-            </Row>
-          </Section>
+                      <Text style={greetingStyle}>Hi {contributorName}! 👋</Text>
 
-          {/* Statistics */}
-          <Section style={statsStyle}>
-            <Row>
-              <Column style={statColumnStyle} align="center">
-                <Text style={statNumberStyle}>{messageCount}</Text>
-                <Text style={statLabelStyle}>Heartfelt Messages</Text>
-              </Column>
-              <Column style={statColumnStyle} align="center">
-                <Text style={statNumberStyle}>{contributorCount}</Text>
-                <Text style={statLabelStyle}>Amazing Contributors</Text>
-              </Column>
-              <Column style={statColumnStyle} align="center">
-                <Text style={statNumberStyle}>{locationCount}</Text>
-                <Text style={statLabelStyle}>Countries Worldwide</Text>
-              </Column>
-            </Row>
-          </Section>
+                      <Text style={paragraphStyle}>
+                        The moment we've all been waiting for has finally arrived!
+                        <strong>{girlfriendName}'s birthday surprise is now live</strong>, and your beautiful
+                        message is part of something truly magical.
+                      </Text>
 
-          {/* Thank you message */}
-          <Section style={thankYouStyle}>
-            <Row>
-              <Column>
-                <Text style={thankYouTextStyle}>
-                  Your contribution helped make this birthday absolutely unforgettable! 
-                  Every message, every memory, and every moment of love you shared 
-                  is now part of a beautiful celebration that {girlfriendName} will 
-                  treasure forever.
-                </Text>
-              </Column>
-            </Row>
-          </Section>
+                      <Text style={paragraphStyle}>
+                        Thanks to amazing people like you, we've created an incredible
+                        birthday celebration that spans the globe. Your contribution has helped
+                        make this day extra special for her!
+                      </Text>
 
-          {/* Call to action */}
-          <Section style={ctaStyle}>
-            <Row>
-              <Column align="center">
-                <Text style={ctaTextStyle}>
-                  Want to see the amazing surprise you helped create?
-                </Text>
-                <Button style={buttonStyle} href={websiteUrl}>
-                  🎁 View the Birthday Surprise 🎁
-                </Button>
-              </Column>
-            </Row>
-          </Section>
+                      {/* Impact Statistics */}
+                      <div style={statsPreviewStyle}>
+                        <Text style={statsLabelStyle}>🌟 Look What We Created Together! 🌟</Text>
+                        <Text style={statsTextStyle}>
+                          🎂 <strong>{messageCount}</strong> heartfelt birthday messages collected
+                        </Text>
+                        <Text style={statsTextStyle}>
+                          💕 <strong>{contributorCount}</strong> friends and family participated
+                        </Text>
+                        <Text style={statsTextStyle}>
+                          🌍 <strong>{locationCount}</strong> countries represented in this celebration
+                        </Text>
+                      </div>
 
-          {/* Memory map callout */}
-          <Section style={featureStyle}>
-            <Row>
-              <Column>
-                <Heading style={featureHeadingStyle}>
-                  🗺️ Explore the Memory Map
-                </Heading>
-                <Text style={messageStyle}>
-                  Check out the interactive memory map to see messages from around 
-                  the world, including yours! It's incredible to see how love travels 
-                  across continents to celebrate someone special.
-                </Text>
-              </Column>
-            </Row>
-          </Section>
+                      {/* Call to Action Button */}
+                      <table role="presentation" border={0} cellPadding={0} cellSpacing={0} style={buttonTableStyle}>
+                        <tbody>
+                          <tr>
+                            <td align="center">
+                              <table role="presentation" border={0} cellPadding={0} cellSpacing={0}>
+                                <tbody>
+                                  <tr>
+                                    <td>
+                                      <Button href={websiteUrl} style={buttonStyle}>
+                                        🎂 See the Birthday Surprise Live! 🎂
+                                      </Button>
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
 
-          <Hr style={dividerStyle} />
+                      <Text style={paragraphStyle}>
+                        Your message is now part of {girlfriendName}'s special day! Click the button above
+                        to see the complete birthday surprise and witness the joy you helped create.
+                      </Text>
 
-          {/* Footer */}
-          <Section style={footerStyle}>
-            <Row>
-              <Column align="center">
-                <Text style={footerTextStyle}>
-                  Thank you for being part of this special celebration! ❤️
-                </Text>
-                <Text style={footerSubTextStyle}>
-                  Your kindness and love made this birthday surprise possible
-                </Text>
-                <Link href={websiteUrl} style={linkStyle}>
-                  Visit Birthday Surprise
-                </Link>
-              </Column>
-            </Row>
-          </Section>
-        </Container>
+                      <Text style={paragraphStyle}>
+                        Thank you for being such an important part of this celebration.
+                        Your thoughtfulness and love have made this birthday truly unforgettable! 💕
+                      </Text>
+
+                    </td>
+                  </tr>
+                </table>
+                {/* END MAIN CONTENT */}
+
+              </div>
+            </td>
+            <td>&nbsp;</td>
+          </tr>
+        </table>
       </Body>
     </Html>
   )
 }
 
-// Styles
+// Professional email styles based on Lee Munroe template with pink/white theme
 const bodyStyle = {
-  backgroundColor: '#fdf2f8',
-  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-  margin: 0,
-  padding: '20px',
-  lineHeight: '1.6',
-  WebkitTextSizeAdjust: '100%',
+  fontFamily: 'Helvetica, sans-serif',
+  WebkitFontSmoothing: 'antialiased',
+  fontSize: '16px',
+  lineHeight: '1.3',
   msTextSizeAdjust: '100%',
+  WebkitTextSizeAdjust: '100%',
+  backgroundColor: '#fdf2f8',
+  margin: 0,
+  padding: 0,
+}
+
+const tableResetStyle = {
+  borderCollapse: 'separate' as const,
+  msoTableLspace: '0pt',
+  msoTableRspace: '0pt',
+  width: '100%',
 }
 
 const containerStyle = {
-  backgroundColor: '#ffffff',
-  margin: '0 auto',
-  padding: '0',
+  margin: '0 auto !important',
   maxWidth: '600px',
-  width: '100%',
-  borderRadius: '16px',
-  overflow: 'hidden',
-  boxShadow: '0 20px 40px rgba(236, 72, 153, 0.1)',
+  padding: 0,
+  paddingTop: '24px',
+  width: '600px',
+}
+
+const contentStyle = {
+  boxSizing: 'border-box' as const,
+  display: 'block',
+  margin: '0 auto',
+  maxWidth: '600px',
+  padding: 0,
+}
+
+const mainStyle = {
+  background: '#ffffff',
   border: '1px solid #fce7f3',
+  borderRadius: '16px',
+  width: '100%',
 }
 
-const headerStyle = {
-  background: 'linear-gradient(135deg, #ec4899 0%, #f472b6 100%)',
-  padding: '60px 40px',
-  textAlign: 'center' as const,
+const wrapperStyle = {
+  boxSizing: 'border-box' as const,
+  padding: '32px',
 }
 
-const dividerSectionStyle = {
-  padding: '0 40px',
-}
-
-const elegantDividerStyle = {
-  height: '2px',
-  background: 'linear-gradient(90deg, transparent 0%, #ec4899 50%, transparent 100%)',
-  border: 'none',
-  margin: '0',
-}
-
-const mainHeadingStyle = {
-  color: '#ffffff',
-  fontSize: '32px',
-  fontWeight: '700',
-  margin: '0 0 16px 0',
-  letterSpacing: '-0.5px',
-  lineHeight: '1.2',
-}
-
-const nameHeadingStyle = {
-  color: '#ffffff',
+const headingStyle = {
+  fontFamily: 'Helvetica, sans-serif',
   fontSize: '28px',
-  fontWeight: '600',
-  margin: '0',
-  letterSpacing: '-0.3px',
-  lineHeight: '1.3',
-}
-
-const bannerStyle = {
-  backgroundColor: '#dbeafe',
-  padding: '20px',
+  fontWeight: 'bold',
+  margin: '0 0 24px 0',
+  color: '#ec4899',
   textAlign: 'center' as const,
-}
-
-const bannerTextStyle = {
-  fontSize: '24px',
-  margin: '0',
-  letterSpacing: '2px',
 }
 
 const greetingStyle = {
-  padding: '30px 20px 20px 20px',
-}
-
-const greetingTextStyle = {
-  color: '#1f2937',
-  fontSize: '20px',
-  fontWeight: 'bold',
-  margin: '0 0 15px 0',
-}
-
-const messageStyle = {
-  color: '#374151',
+  fontFamily: 'Helvetica, sans-serif',
   fontSize: '16px',
-  lineHeight: '1.6',
-  margin: '0 0 20px 0',
+  fontWeight: 'normal',
+  margin: '0 0 16px 0',
+  color: '#374151',
 }
 
-const impactStyle = {
+const paragraphStyle = {
+  fontFamily: 'Helvetica, sans-serif',
+  fontSize: '16px',
+  fontWeight: 'normal',
+  margin: '0 0 16px 0',
+  color: '#374151',
+  lineHeight: '1.5',
+}
+
+const statsPreviewStyle = {
+  backgroundColor: '#fdf2f8',
+  border: '1px solid #fce7f3',
+  borderRadius: '8px',
   padding: '20px',
+  margin: '24px 0',
 }
 
-const sectionHeadingStyle = {
-  color: '#1f2937',
-  fontSize: '20px',
-  fontWeight: 'bold',
-  margin: '0 0 15px 0',
-  textAlign: 'center' as const,
-}
-
-const statsStyle = {
-  backgroundColor: '#f8fafc',
-  padding: '30px 20px',
-  borderRadius: '8px',
-  margin: '0 20px',
-}
-
-const statColumnStyle = {
-  padding: '0 10px',
-}
-
-const statNumberStyle = {
-  color: '#ec4899',
-  fontSize: '42px',
-  fontWeight: '700',
-  margin: '0 0 8px 0',
-  lineHeight: '1',
-}
-
-const statLabelStyle = {
-  color: '#6b7280',
+const statsLabelStyle = {
+  fontFamily: 'Helvetica, sans-serif',
   fontSize: '14px',
-  margin: '0',
-  fontWeight: '500',
+  fontWeight: 'bold',
+  margin: '0 0 12px 0',
+  color: '#ec4899',
 }
 
-const thankYouStyle = {
-  backgroundColor: '#fef7ff',
-  padding: '30px 20px',
-  margin: '20px',
-  borderRadius: '8px',
-  borderLeft: '4px solid #8b5cf6',
-}
-
-const thankYouTextStyle = {
-  color: '#374151',
+const statsTextStyle = {
+  fontFamily: 'Helvetica, sans-serif',
   fontSize: '16px',
-  lineHeight: '1.6',
-  margin: '0',
-  fontStyle: 'italic',
-}
-
-const ctaStyle = {
-  padding: '40px 20px',
-  textAlign: 'center' as const,
-}
-
-const ctaTextStyle = {
+  fontWeight: 'normal',
+  margin: '0 0 8px 0',
   color: '#374151',
-  fontSize: '16px',
-  margin: '0 0 20px 0',
+  lineHeight: '1.5',
+}
+
+const buttonTableStyle = {
+  boxSizing: 'border-box' as const,
+  minWidth: '100% !important',
+  width: '100%',
+  marginBottom: '16px',
 }
 
 const buttonStyle = {
   backgroundColor: '#ec4899',
-  borderRadius: '12px',
-  color: '#ffffff',
-  fontSize: '18px',
-  fontWeight: '600',
-  padding: '18px 36px',
-  textDecoration: 'none',
-  display: 'inline-block',
-  boxShadow: '0 8px 20px rgba(236, 72, 153, 0.3)',
-  border: 'none',
-  transition: 'all 0.3s ease',
-}
-
-const featureStyle = {
-  backgroundColor: '#f0fdf4',
-  padding: '30px 20px',
-  margin: '0 20px',
+  border: 'solid 2px #ec4899',
   borderRadius: '8px',
-  borderLeft: '4px solid #10b981',
-}
-
-const featureHeadingStyle = {
-  color: '#1f2937',
-  fontSize: '18px',
+  boxSizing: 'border-box' as const,
+  color: '#ffffff',
+  cursor: 'pointer',
+  display: 'inline-block',
+  fontSize: '16px',
   fontWeight: 'bold',
-  margin: '0 0 15px 0',
-}
-
-const dividerStyle = {
-  borderColor: '#e5e7eb',
-  margin: '30px 0',
-}
-
-const footerStyle = {
-  padding: '30px 20px',
-  textAlign: 'center' as const,
-}
-
-const footerTextStyle = {
-  color: '#ec4899',
-  fontSize: '18px',
-  fontWeight: '600',
-  margin: '0 0 12px 0',
-}
-
-const footerSubTextStyle = {
-  color: '#6b7280',
-  fontSize: '15px',
-  margin: '0 0 20px 0',
-  lineHeight: '1.5',
-}
-
-const linkStyle = {
-  color: '#ec4899',
+  margin: 0,
+  padding: '16px 32px',
   textDecoration: 'none',
-  fontSize: '15px',
-  fontWeight: '500',
+  textTransform: 'capitalize' as const,
 }
-
-export default ContributorNotificationEmail

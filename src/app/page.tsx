@@ -48,6 +48,21 @@ export default function HomePage() {
                 showSparkles={true}
                 enableFlipAnimation={true}
                 enableCelebration={true}
+                onComplete={async () => {
+                  // Trigger birthday emails when countdown reaches zero
+                  try {
+                    console.log('🎂 Countdown complete! Triggering birthday emails...')
+                    const response = await fetch('/api/countdown/trigger?action=start')
+                    const result = await response.json()
+                    if (result.success) {
+                      console.log('✅ Birthday email trigger started successfully')
+                    } else {
+                      console.error('❌ Failed to start birthday email trigger:', result.error)
+                    }
+                  } catch (error) {
+                    console.error('❌ Error triggering birthday emails:', error)
+                  }
+                }}
                 showTargetDate={true}
                 dateFormat="long"
               />
