@@ -148,23 +148,39 @@ export const MessageForm: React.FC<MessageFormProps> = ({
         messageId = result.data?.id || result.id || result.messageId
       }
 
+      // Debug logging
+      console.log('Form submission debug:', {
+        messageId,
+        tempFilesLength: tempFiles.length,
+        tempFiles: tempFiles
+      })
+
       // Finalize file uploads if we have a message ID and temp files
       if (messageId && tempFiles.length > 0) {
         try {
+          console.log('Starting file finalization...')
           await finalizeUploads(tempFiles, messageId)
-          console.log(`Finalized ${tempFiles.length} file uploads for message ${messageId}`)
+          console.log(`✅ Finalized ${tempFiles.length} file uploads for message ${messageId}`)
         } catch (fileError) {
-          console.error('Failed to finalize file uploads:', fileError)
+          console.error('❌ Failed to finalize file uploads:', fileError)
           // Don't fail the entire submission for file errors
         }
+      } else {
+        console.log('⚠️ Skipping file finalization:', {
+          hasMessageId: !!messageId,
+          tempFilesCount: tempFiles.length
+        })
       }
+
+      // Clear temp files after finalization (or after skipping)
+      setTempFiles([])
 
       // Success handling
       form.reset(defaultFormValues)
       autoSave.clearDraft() // Clear draft after successful submission
       setLastSaved(undefined)
       setUploadedFiles([])
-      setTempFiles([])
+      // Note: setTempFiles([]) is called after file finalization
       setClearFilesTrigger(prev => prev + 1) // Trigger file upload component to clear
       onSuccess?.()
 
