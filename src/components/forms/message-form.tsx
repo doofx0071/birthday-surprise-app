@@ -145,7 +145,7 @@ export const MessageForm: React.FC<MessageFormProps> = ({
         }
 
         const result = await response.json()
-        messageId = result.id || result.messageId
+        messageId = result.data?.id || result.id || result.messageId
       }
 
       // Finalize file uploads if we have a message ID and temp files
