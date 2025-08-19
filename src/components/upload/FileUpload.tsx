@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useImperativeHandle, forwardRef } from 'react'
+import React, { useEffect, useImperativeHandle, forwardRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Upload, FileText, Image as ImageIcon, Film, Plus } from 'lucide-react'
 import { useFileUpload } from '@/hooks/useFileUpload'
