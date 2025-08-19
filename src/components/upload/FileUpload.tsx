@@ -21,6 +21,8 @@ interface FileUploadProps {
 
 export interface FileUploadRef {
   clearFiles: () => void
+  uploadPendingFiles: () => Promise<Array<{ tempPath: string; fileInfo: any; thumbnailUrl?: string }>>
+  hasPendingFiles: () => boolean
 }
 
 export const FileUpload = forwardRef<FileUploadRef, FileUploadProps>(({
@@ -48,10 +50,53 @@ export const FileUpload = forwardRef<FileUploadRef, FileUploadProps>(({
     uploadProgress
   } = useFileUpload()
 
-  // Expose clearFiles method to parent via ref
+  // Upload pending files and return temp file data
+  const uploadPendingFiles = useCallback(async (): Promise<Array<{ tempPath: string; fileInfo: any; thumbnailUrl?: string }>> => {
+    if (!messageId) {
+      throw new Error('Temporary ID is required for file upload')
+    }
+
+    const pendingFiles = files.filter(f => f.status === 'pending')
+    if (pendingFiles.length === 0) {
+      return []
+    }
+
+    try {
+      // Upload to temporary storage
+      await uploadFiles(messageId)
+
+      // Return temp file data for finalization
+      const tempFileData = files
+        .filter(f => f.status === 'complete' && f.tempPath && f.fileInfo)
+        .map(f => ({
+          tempPath: f.tempPath!,
+          fileInfo: f.fileInfo!,
+          thumbnailUrl: f.thumbnailUrl
+        }))
+
+      // Also call the callback for backward compatibility
+      if (tempFileData.length > 0) {
+        onTempFilesReady?.(tempFileData)
+      }
+
+      return tempFileData
+    } catch (error) {
+      console.error('Upload failed:', error)
+      throw error
+    }
+  }, [messageId, files, uploadFiles, onTempFilesReady])
+
+  // Check if there are pending files
+  const hasPendingFiles = useCallback((): boolean => {
+    return files.some(f => f.status === 'pending')
+  }, [files])
+
+  // Expose methods to parent via ref
   useImperativeHandle(ref, () => ({
-    clearFiles
-  }), [clearFiles])
+    clearFiles,
+    uploadPendingFiles,
+    hasPendingFiles
+  }), [clearFiles, uploadPendingFiles, hasPendingFiles])
 
   // Clear files when clearTrigger changes
   useEffect(() => {

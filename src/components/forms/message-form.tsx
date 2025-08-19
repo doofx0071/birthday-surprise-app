@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -12,7 +12,7 @@ import { BirthdayInput } from '@/design-system/components/forms/birthday-input'
 import { BirthdayTextarea } from '@/design-system/components/forms/birthday-textarea'
 import { LocationPicker } from './location-picker'
 import { DraftIndicator } from './draft-indicator'
-import { FileUpload } from '@/components/upload'
+import { FileUpload, FileUploadRef } from '@/components/upload'
 import { finalizeUploads } from '@/lib/fileUpload'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -61,6 +61,7 @@ export const MessageForm: React.FC<MessageFormProps> = ({
   const [uploadedFiles, setUploadedFiles] = useState<Array<{ url: string; thumbnailUrl?: string }>>([])
   const [tempFiles, setTempFiles] = useState<Array<{ tempPath: string; fileInfo: any; thumbnailUrl?: string }>>([])
   const [clearFilesTrigger, setClearFilesTrigger] = useState(0)
+  const fileUploadRef = useRef<FileUploadRef>(null)
 
   // Generate a temporary ID for file uploads (will be replaced with actual message ID after submission)
   const tempUploadId = useMemo(() => `${Date.now()}-${Math.random().toString(36).substring(2)}`, [])
@@ -148,19 +149,34 @@ export const MessageForm: React.FC<MessageFormProps> = ({
         messageId = result.data?.id || result.id || result.messageId
       }
 
+      // Check for pending files and upload them if needed
+      let finalTempFiles = tempFiles
+      if (fileUploadRef.current?.hasPendingFiles()) {
+        try {
+          console.log('Uploading pending files before form submission...')
+          const uploadedTempFiles = await fileUploadRef.current.uploadPendingFiles()
+          finalTempFiles = [...tempFiles, ...uploadedTempFiles]
+          console.log(`✅ Uploaded ${uploadedTempFiles.length} pending files`)
+        } catch (uploadError) {
+          console.error('❌ Failed to upload pending files:', uploadError)
+          throw new Error('Failed to upload files. Please try again.')
+        }
+      }
+
       // Debug logging
       console.log('Form submission debug:', {
         messageId,
-        tempFilesLength: tempFiles.length,
-        tempFiles: tempFiles
+        originalTempFilesLength: tempFiles.length,
+        finalTempFilesLength: finalTempFiles.length,
+        finalTempFiles: finalTempFiles
       })
 
       // Finalize file uploads if we have a message ID and temp files
-      if (messageId && tempFiles.length > 0) {
+      if (messageId && finalTempFiles.length > 0) {
         try {
           console.log('Starting file finalization...')
-          await finalizeUploads(tempFiles, messageId)
-          console.log(`✅ Finalized ${tempFiles.length} file uploads for message ${messageId}`)
+          await finalizeUploads(finalTempFiles, messageId)
+          console.log(`✅ Finalized ${finalTempFiles.length} file uploads for message ${messageId}`)
         } catch (fileError) {
           console.error('❌ Failed to finalize file uploads:', fileError)
           // Don't fail the entire submission for file errors
@@ -168,7 +184,7 @@ export const MessageForm: React.FC<MessageFormProps> = ({
       } else {
         console.log('⚠️ Skipping file finalization:', {
           hasMessageId: !!messageId,
-          tempFilesCount: tempFiles.length
+          tempFilesCount: finalTempFiles.length
         })
       }
 
@@ -410,6 +426,7 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                   Photos & Videos (Optional)
                 </Label>
                 <FileUpload
+                  ref={fileUploadRef}
                   variant="compact"
                   disabled={disabled || isSubmitting}
                   messageId={tempUploadId}
