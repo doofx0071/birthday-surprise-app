@@ -62,26 +62,49 @@ export const FileUpload = forwardRef<FileUploadRef, FileUploadProps>(({
     }
 
     try {
-      // Upload to temporary storage
+      console.log('🚀 Starting upload of', pendingFiles.length, 'pending files...')
+
+      // Upload to temporary storage and wait for completion
       await uploadFiles(messageId)
 
-      // Return temp file data for finalization
-      const tempFileData = files
-        .filter(f => f.status === 'complete' && f.tempPath && f.fileInfo)
-        .map(f => ({
-          tempPath: f.tempPath!,
-          fileInfo: f.fileInfo!,
-          thumbnailUrl: f.thumbnailUrl
-        }))
+      console.log('⏳ Upload completed, checking file states...')
 
-      // Also call the callback for backward compatibility
-      if (tempFileData.length > 0) {
-        onTempFilesReady?.(tempFileData)
+      // The uploadFiles function updates the files state asynchronously
+      // We need to wait for the state to be updated with completed files
+      // Let's poll for completed files with a reasonable timeout
+      const maxAttempts = 50 // 5 seconds max wait
+      let attempts = 0
+
+      while (attempts < maxAttempts) {
+        const completedFiles = files.filter(f => f.status === 'complete' && f.tempPath && f.fileInfo)
+
+        if (completedFiles.length >= pendingFiles.length) {
+          // All files have been processed
+          const tempFileData = completedFiles.map(f => ({
+            tempPath: f.tempPath!,
+            fileInfo: f.fileInfo!,
+            thumbnailUrl: f.thumbnailUrl
+          }))
+
+          console.log('✅ All files uploaded successfully:', tempFileData.length)
+
+          // Also call the callback for backward compatibility
+          if (tempFileData.length > 0) {
+            onTempFilesReady?.(tempFileData)
+          }
+
+          return tempFileData
+        }
+
+        // Wait 100ms before checking again
+        await new Promise(resolve => setTimeout(resolve, 100))
+        attempts++
       }
 
-      return tempFileData
+      // If we get here, something went wrong
+      throw new Error('Timeout waiting for file uploads to complete')
     } catch (error) {
-      console.error('Upload failed:', error)
+      console.error('❌ Upload failed:', error)
       throw error
     }
   }, [messageId, files, uploadFiles, onTempFilesReady])
