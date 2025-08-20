@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Pipeline Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Upload Pipeline Test</h1>
+    <p>This page tests the complete file upload and display pipeline after the race condition fix.</p>
+
+    <div class="test-section info">
+        <h3>📋 Test Instructions</h3>
+        <ol>
+            <li>Click "Create Test File" to generate a test image</li>
+            <li>Go to the main application form</li>
+            <li>Fill out the form with test data</li>
+            <li>Add the test file to the upload component</li>
+            <li>Submit the form (files should auto-upload)</li>
+            <li>Come back here and click "Check Results" to verify the fix</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h3>🎨 Test File Creation</h3>
+        <button onclick="createTestFile()">Create Test File</button>
+        <div id="file-status"></div>
+        <canvas id="test-canvas" width="200" height="200" style="border: 1px solid #ccc; margin: 10px 0;"></canvas>
+    </div>
+
+    <div class="test-section">
+        <h3>📊 Pipeline Status Check</h3>
+        <button onclick="checkPipelineStatus()">Check Results</button>
+        <div id="status-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>🗄️ Database Verification</h3>
+        <button onclick="checkDatabase()">Check Database</button>
+        <div id="db-results"></div>
+    </div>
+
+    <script>
+        let testFile = null;
+
+        function createTestFile() {
+            const canvas = document.getElementById('test-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Create a colorful test image
+            const gradient = ctx.createLinearGradient(0, 0, 200, 200);
+            gradient.addColorStop(0, '#ff6b6b');
+            gradient.addColorStop(0.5, '#4ecdc4');
+            gradient.addColorStop(1, '#45b7d1');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 200, 200);
+            
+            // Add text
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('PIPELINE', 100, 80);
+            ctx.fillText('TEST', 100, 110);
+            ctx.fillText('FIXED!', 100, 140);
+            
+            // Add timestamp
+            ctx.font = '12px Arial';
+            ctx.fillText(new Date().toLocaleTimeString(), 100, 180);
+            
+            // Convert to blob and create file
+            canvas.toBlob(function(blob) {
+                testFile = new File([blob], 'pipeline-test-' + Date.now() + '.png', { type: 'image/png' });
+                document.getElementById('file-status').innerHTML = 
+                    `<div class="success">✅ Test file created: ${testFile.name} (${testFile.size} bytes)</div>`;
+                
+                // Store globally for easy access
+                window.testFile = testFile;
+                console.log('Test file created:', testFile);
+            });
+        }
+
+        async function checkPipelineStatus() {
+            const resultsDiv = document.getElementById('status-results');
+            resultsDiv.innerHTML = '<div class="info">🔍 Checking pipeline status...</div>';
+            
+            try {
+                // Check recent storage objects
+                const response = await fetch('/api/test/storage-status');
+                if (response.ok) {
+                    const data = await response.json();
+                    resultsDiv.innerHTML = `
+                        <div class="success">
+                            <h4>📁 Storage Status</h4>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = '<div class="error">❌ Failed to check storage status</div>';
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        async function checkDatabase() {
+            const resultsDiv = document.getElementById('db-results');
+            resultsDiv.innerHTML = '<div class="info">🔍 Checking database...</div>';
+            
+            try {
+                // Check media_files table
+                const response = await fetch('/api/test/database-status');
+                if (response.ok) {
+                    const data = await response.json();
+                    resultsDiv.innerHTML = `
+                        <div class="success">
+                            <h4>🗄️ Database Status</h4>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = '<div class="error">❌ Failed to check database status</div>';
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        // Auto-create test file on load
+        window.onload = function() {
+            createTestFile();
+        };
+    </script>
+</body>
+</html>

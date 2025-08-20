@@ -48,9 +48,16 @@ export async function uploadFileToStorage(
     const publicUrl = urlData.publicUrl
 
     // Generate thumbnail for images (also in temp folder)
+    let thumbnailPath: string | undefined
     let thumbnailUrl: string | undefined
     if (file.type.startsWith('image/')) {
-      thumbnailUrl = await generateImageThumbnail(file, tempId, true) // true = temporary
+      thumbnailPath = await generateImageThumbnail(file, tempId, true) // true = temporary
+      if (thumbnailPath) {
+        const { data: urlData } = supabase.storage
+          .from('birthday-media')
+          .getPublicUrl(thumbnailPath)
+        thumbnailUrl = urlData.publicUrl
+      }
     }
 
     // Return file info without saving to database yet
@@ -59,7 +66,7 @@ export async function uploadFileToStorage(
       file_type: file.type.startsWith('image/') ? 'image' : 'video',
       file_size: file.size,
       storage_path: data.path,
-      thumbnail_path: thumbnailUrl
+      thumbnail_path: thumbnailPath  // Store path, not URL
     }
 
     return {
@@ -83,11 +90,18 @@ export async function finalizeUploads(
   tempFiles: Array<{ tempPath: string; fileInfo: any; thumbnailUrl?: string }>,
   realMessageId: string
 ): Promise<void> {
+  console.log(`🔄 Starting finalization of ${tempFiles.length} files for message ${realMessageId}`)
+
   try {
-    for (const tempFile of tempFiles) {
+    for (let i = 0; i < tempFiles.length; i++) {
+      const tempFile = tempFiles[i]
+      console.log(`📁 Processing file ${i + 1}/${tempFiles.length}:`, tempFile.fileInfo.file_name)
+
       // Move file from temp to permanent location
       const fileExt = tempFile.fileInfo.file_name.split('.').pop()
       const newPath = `${realMessageId}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
+
+      console.log(`🚚 Moving file from ${tempFile.tempPath} to ${newPath}`)
 
       // Move the file
       const { error: moveError } = await supabase.storage
@@ -95,42 +109,58 @@ export async function finalizeUploads(
         .move(tempFile.tempPath, newPath)
 
       if (moveError) {
-        console.error('Failed to move file:', moveError)
+        console.error('❌ Failed to move file:', moveError)
         continue // Skip this file but continue with others
       }
 
+      console.log('✅ File moved successfully')
+
       // Move thumbnail if exists
       let newThumbnailPath: string | undefined
-      if (tempFile.thumbnailUrl && tempFile.fileInfo.thumbnail_path) {
+      if (tempFile.fileInfo.thumbnail_path) {
         const thumbExt = 'jpg'
         newThumbnailPath = `${realMessageId}/thumbnails/${Date.now()}_thumb.${thumbExt}`
+
+        console.log(`🖼️ Moving thumbnail from ${tempFile.fileInfo.thumbnail_path} to ${newThumbnailPath}`)
 
         const { error: thumbMoveError } = await supabase.storage
           .from('birthday-media')
           .move(tempFile.fileInfo.thumbnail_path, newThumbnailPath)
 
-        if (!thumbMoveError) {
-          tempFile.fileInfo.thumbnail_path = newThumbnailPath
+        if (thumbMoveError) {
+          console.error('❌ Failed to move thumbnail:', thumbMoveError)
+        } else {
+          console.log('✅ Thumbnail moved successfully')
         }
       }
 
       // Save to database with real message ID
-      await saveFileRecord({
-        message_id: realMessageId,
-        file_name: tempFile.fileInfo.file_name,
-        file_type: tempFile.fileInfo.file_type,
-        file_size: tempFile.fileInfo.file_size,
-        storage_path: newPath,
-        thumbnail_path: newThumbnailPath
-      })
+      console.log('💾 Saving file record to database...')
+
+      try {
+        await saveFileRecord({
+          message_id: realMessageId,
+          file_name: tempFile.fileInfo.file_name,
+          file_type: tempFile.fileInfo.file_type,
+          file_size: tempFile.fileInfo.file_size,
+          storage_path: newPath,
+          thumbnail_path: newThumbnailPath
+        })
+        console.log('✅ File record saved to database')
+      } catch (dbError) {
+        console.error('❌ Failed to save file record to database:', dbError)
+        throw dbError
+      }
     }
+
+    console.log(`🎉 Successfully finalized ${tempFiles.length} files!`)
   } catch (error) {
     console.error('Failed to finalize uploads:', error)
     throw error
   }
 }
 
-// Generate thumbnail for images
+// Generate thumbnail for images - returns storage path, not URL
 async function generateImageThumbnail(file: File, messageId: string, isTemporary: boolean = false): Promise<string | undefined> {
   try {
     // Create canvas for thumbnail generation
@@ -177,10 +207,9 @@ async function generateImageThumbnail(file: File, messageId: string, isTemporary
                 })
 
               if (!error && data) {
-                const { data: urlData } = supabase.storage
-                  .from('birthday-media')
-                  .getPublicUrl(data.path)
-                resolve(urlData.publicUrl)
+                // Return the storage path, not the URL
+                // The URL can be generated later when needed
+                resolve(data.path)
               } else {
                 resolve(undefined)
               }
