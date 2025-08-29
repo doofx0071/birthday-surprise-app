@@ -4,7 +4,7 @@ import * as React from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
-import { AnimatedHeartIcon, AnimatedSparkleIcon } from '@/design-system/icons/animated-birthday-icons'
+import { AnimatedHeartIcon } from '@/design-system/icons/animated-birthday-icons'
 
 interface BirthdayInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string
@@ -37,11 +37,11 @@ const BirthdayInput = React.forwardRef<HTMLInputElement, BirthdayInputProps>(
     const getVariantStyles = () => {
       switch (variant) {
         case 'birthday':
-          return 'border-primary/30 focus:border-primary focus:ring-primary/20 bg-gradient-to-r from-white to-primary/5'
+          return 'neuro-input'
         case 'celebration':
-          return 'border-accent/30 focus:border-accent focus:ring-accent/20 bg-gradient-to-r from-white to-accent/5'
+          return 'neuro-input'
         default:
-          return 'border-border focus:border-primary focus:ring-primary/20'
+          return 'neuro-input'
       }
     }
 
@@ -64,11 +64,7 @@ const BirthdayInput = React.forwardRef<HTMLInputElement, BirthdayInputProps>(
           >
             {label}
             {sparkle && isFocused && (
-              <AnimatedSparkleIcon
-                size="xs"
-                color="pink"
-                intensity="normal"
-              />
+              <span className="text-pink-500 text-xs">✨</span>
             )}
           </Label>
         )}
@@ -79,12 +75,10 @@ const BirthdayInput = React.forwardRef<HTMLInputElement, BirthdayInputProps>(
             ref={ref}
             id={inputId}
             className={cn(
-              'transition-all duration-300',
               'placeholder:text-muted-foreground/60',
-              'hover:border-primary/50',
               getVariantStyles(),
-              error && 'border-destructive focus:border-destructive focus:ring-destructive/20',
-              sparkle && hasValue && 'shadow-md shadow-primary/10',
+              error && 'border-destructive focus:border-destructive',
+              sparkle && hasValue && 'neuro-animate-pulse',
               className
             )}
             onFocus={() => setIsFocused(true)}
@@ -98,11 +92,7 @@ const BirthdayInput = React.forwardRef<HTMLInputElement, BirthdayInputProps>(
           {/* Sparkle effect on focus */}
           {sparkle && isFocused && (
             <div className="absolute -top-1 -right-1">
-              <AnimatedSparkleIcon
-                size="xs"
-                color="pink"
-                intensity="normal"
-              />
+              <span className="text-pink-500 text-xs">✨</span>
             </div>
           )}
         </div>

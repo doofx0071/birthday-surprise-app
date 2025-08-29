@@ -1,5 +1,3 @@
 export { AboutSection } from './about-section'
-export { ContributeSection } from './contribute-section'
 export { MessageSection } from './message-section'
-export { MemoryMapSection } from './memory-map-section'
 export { GallerySection } from './gallery-section'

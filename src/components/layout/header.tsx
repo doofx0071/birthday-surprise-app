@@ -1,8 +1,9 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { cn } from '@/lib/utils'
-import { AnimatedHeartIcon, AnimatedSparkleIcon } from '@/design-system/icons/animated-birthday-icons'
+
 import { BirthdayButton } from '@/components/birthday-button'
 
 interface HeaderProps {
@@ -12,10 +13,8 @@ interface HeaderProps {
 const navigationItems = [
   { id: 'home', label: 'Home', href: '#home' },
   { id: 'about', label: 'About', href: '#about' },
-  { id: 'messages', label: 'Add Message', href: '#messages' },
-  { id: 'contribute', label: 'Contribute', href: '#contribute' },
-  { id: 'memory-map', label: 'Memory Map', href: '/memory-map', external: true },
   { id: 'gallery', label: 'Gallery', href: '#gallery' },
+  { id: 'memory-map', label: 'Memory Map', href: '/memory-map', external: true },
 ]
 
 export const Header: React.FC<HeaderProps> = ({ className }) => {
@@ -80,7 +79,7 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
         isScrolled
-          ? 'bg-white/95 backdrop-blur-md shadow-lg border-b border-primary/10'
+          ? 'neuro-header-scrolled'
           : 'bg-transparent',
         className
       )}
@@ -88,11 +87,20 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
-            <AnimatedHeartIcon size="md" color="pink" intensity="subtle" />
-            <h1 className="font-display text-xl md:text-2xl font-bold text-charcoal-black">
-              Birthday Surprise
-            </h1>
+          <div className="flex items-center">
+            <div className="flex items-center space-x-3">
+              <Image
+                src="/assets/icons/svg/logo.svg"
+                alt="Birthday Surprise Logo"
+                width={40}
+                height={40}
+                className="w-8 h-8 md:w-10 md:h-10"
+                priority
+              />
+              <h1 className="font-body text-xl md:text-2xl font-bold text-primary">
+                Birthday Surprise
+              </h1>
+            </div>
           </div>
 
           {/* Desktop Navigation */}
@@ -102,11 +110,11 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
                 key={item.id}
                 onClick={() => handleNavClick(item.href, (item as any).external)}
                 className={cn(
-                  'font-body text-sm lg:text-base font-medium transition-all duration-200',
-                  'hover:text-primary hover:scale-105',
+                  'font-body text-sm lg:text-base font-medium transition-all duration-300',
+                  'px-4 py-2 rounded-lg cursor-pointer hover:cursor-pointer',
                   activeSection === item.id
-                    ? 'text-primary border-b-2 border-primary'
-                    : 'text-charcoal-black/70'
+                    ? 'neuro-button text-primary'
+                    : 'text-charcoal-black/70 hover:text-primary hover:neuro-button-hover'
                 )}
               >
                 {item.label}
@@ -128,25 +136,25 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-primary/10 transition-colors"
+            className="md:hidden p-2 neuro-button cursor-pointer hover:cursor-pointer"
             aria-label="Toggle mobile menu"
           >
             <div className="w-6 h-6 flex flex-col justify-center items-center">
               <span
                 className={cn(
-                  'block w-5 h-0.5 bg-charcoal-black transition-all duration-300',
+                  'block w-5 h-0.5 bg-primary transition-all duration-300',
                   isMobileMenuOpen ? 'rotate-45 translate-y-1' : ''
                 )}
               />
               <span
                 className={cn(
-                  'block w-5 h-0.5 bg-charcoal-black transition-all duration-300 mt-1',
+                  'block w-5 h-0.5 bg-primary transition-all duration-300 mt-1',
                   isMobileMenuOpen ? 'opacity-0' : ''
                 )}
               />
               <span
                 className={cn(
-                  'block w-5 h-0.5 bg-charcoal-black transition-all duration-300 mt-1',
+                  'block w-5 h-0.5 bg-primary transition-all duration-300 mt-1',
                   isMobileMenuOpen ? '-rotate-45 -translate-y-1' : ''
                 )}
               />
@@ -156,7 +164,7 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-primary/10 bg-white/95 backdrop-blur-md">
+          <div className="md:hidden neuro-card mt-2 mx-4 mb-4">
             <nav className="py-4 space-y-2">
               {navigationItems.map((item) => (
                 <button
@@ -164,10 +172,11 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
                   onClick={() => handleNavClick(item.href, (item as any).external)}
                   className={cn(
                     'block w-full text-left px-4 py-3 font-body text-base font-medium',
-                    'transition-all duration-200 hover:bg-primary/10 hover:text-primary',
+                    'transition-all duration-300 cursor-pointer hover:cursor-pointer',
+                    'mx-2 rounded-lg',
                     activeSection === item.id
-                      ? 'text-primary bg-primary/5 border-l-4 border-primary'
-                      : 'text-charcoal-black/70'
+                      ? 'neuro-button text-primary'
+                      : 'text-charcoal-black/70 hover:text-primary hover:neuro-button-hover'
                   )}
                 >
                   {item.label}

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, Playfair_Display, Poppins } from 'next/font/google'
 import { Toaster } from '@/components/ui/toaster'
+import { GlobalConfetti } from '@/components/ui/global-confetti'
 import './globals.css'
 
 const inter = Inter({
@@ -17,7 +18,7 @@ const playfairDisplay = Playfair_Display({
 
 const poppins = Poppins({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800', '900'],
+  weight: ['300', '400', '500', '600', '700'],
   display: 'swap',
   variable: '--font-poppins',
 })
@@ -62,6 +63,8 @@ export default function RootLayout({
     >
       <body className="min-h-screen bg-background text-foreground" suppressHydrationWarning>
         <div id="root" className="relative">
+          {/* Global continuous confetti background */}
+          <GlobalConfetti />
           {children}
           <Toaster />
         </div>

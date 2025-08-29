@@ -8,6 +8,7 @@ import { BirthdayInput } from '@/design-system/components/forms/birthday-input'
 import { Button } from '@/components/ui/button'
 import { AnimatedSparkleIcon } from '@/design-system/icons/animated-birthday-icons'
 
+
 interface LocationPickerProps {
   value?: string
   onChange?: (location: string) => void
@@ -156,16 +157,9 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
             )}
           >
             {loading ? (
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                className="w-3 h-3"
-              >
-                <AnimatedSparkleIcon size="xs" color="pink" animate={false} />
-              </motion.div>
+              <span>Detecting...</span>
             ) : (
               <span className="flex items-center gap-1">
-                📍
                 <span className="hidden sm:inline">Detect</span>
               </span>
             )}

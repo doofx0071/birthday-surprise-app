@@ -5,7 +5,6 @@ import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import {
   AnimatedHeartIcon,
-  AnimatedSparkleIcon,
   AnimatedFireworksIcon,
   AnimatedCelebrationIcon,
   AnimatedPartyPopperIcon
@@ -92,10 +91,10 @@ const EnhancedTimeUnit: React.FC<TimeUnitProps> = ({
       {showSparkles && (
         <>
           <div className="absolute top-2 right-2">
-            <AnimatedSparkleIcon size="xs" color="pink" intensity="subtle" />
+            <span className="text-pink-500 text-xs">✨</span>
           </div>
           <div className="absolute bottom-2 left-2">
-            <AnimatedSparkleIcon size="xs" color="roseGold" intensity="subtle" />
+            <span className="text-pink-500 text-xs">✨</span>
           </div>
         </>
       )}
@@ -286,7 +285,7 @@ export const EnhancedCountdownDisplay: React.FC<EnhancedCountdownDisplayProps> =
                 ease: "easeInOut"
               }}
             >
-              <AnimatedSparkleIcon size="xs" color="pink" animate={false} />
+              <span className="text-pink-500 text-xs">✨</span>
             </motion.div>
           ))}
         </div>

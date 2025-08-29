@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useImperativeHandle, forwardRef } from 'react'
+import React, { useEffect, useImperativeHandle, forwardRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Upload, FileText, Image as ImageIcon, Film, Plus } from 'lucide-react'
 import { useFileUpload } from '@/hooks/useFileUpload'
@@ -21,6 +21,8 @@ interface FileUploadProps {
 
 export interface FileUploadRef {
   clearFiles: () => void
+  uploadPendingFiles: () => Promise<Array<{ tempPath: string; fileInfo: any; thumbnailUrl?: string }>>
+  hasPendingFiles: () => boolean
 }
 
 export const FileUpload = forwardRef<FileUploadRef, FileUploadProps>(({
@@ -48,10 +50,76 @@ export const FileUpload = forwardRef<FileUploadRef, FileUploadProps>(({
     uploadProgress
   } = useFileUpload()
 
-  // Expose clearFiles method to parent via ref
+  // Upload pending files and return temp file data
+  const uploadPendingFiles = useCallback(async (): Promise<Array<{ tempPath: string; fileInfo: any; thumbnailUrl?: string }>> => {
+    if (!messageId) {
+      throw new Error('Temporary ID is required for file upload')
+    }
+
+    const pendingFiles = files.filter(f => f.status === 'pending')
+    if (pendingFiles.length === 0) {
+      return []
+    }
+
+    try {
+      console.log('🚀 Starting upload of', pendingFiles.length, 'pending files...')
+
+      // Upload to temporary storage and wait for completion
+      await uploadFiles(messageId)
+
+      console.log('⏳ Upload completed, checking file states...')
+
+      // The uploadFiles function updates the files state asynchronously
+      // We need to wait for the state to be updated with completed files
+      // Let's poll for completed files with a reasonable timeout
+      const maxAttempts = 50 // 5 seconds max wait
+      let attempts = 0
+
+      while (attempts < maxAttempts) {
+        const completedFiles = files.filter(f => f.status === 'complete' && f.tempPath && f.fileInfo)
+
+        if (completedFiles.length >= pendingFiles.length) {
+          // All files have been processed
+          const tempFileData = completedFiles.map(f => ({
+            tempPath: f.tempPath!,
+            fileInfo: f.fileInfo!,
+            thumbnailUrl: f.thumbnailUrl
+          }))
+
+          console.log('✅ All files uploaded successfully:', tempFileData.length)
+
+          // Also call the callback for backward compatibility
+          if (tempFileData.length > 0) {
+            onTempFilesReady?.(tempFileData)
+          }
+
+          return tempFileData
+        }
+
+        // Wait 100ms before checking again
+        await new Promise(resolve => setTimeout(resolve, 100))
+        attempts++
+      }
+
+      // If we get here, something went wrong
+      throw new Error('Timeout waiting for file uploads to complete')
+    } catch (error) {
+      console.error('❌ Upload failed:', error)
+      throw error
+    }
+  }, [messageId, files, uploadFiles, onTempFilesReady])
+
+  // Check if there are pending files
+  const hasPendingFiles = useCallback((): boolean => {
+    return files.some(f => f.status === 'pending')
+  }, [files])
+
+  // Expose methods to parent via ref
   useImperativeHandle(ref, () => ({
-    clearFiles
-  }), [clearFiles])
+    clearFiles,
+    uploadPendingFiles,
+    hasPendingFiles
+  }), [clearFiles, uploadPendingFiles, hasPendingFiles])
 
   // Clear files when clearTrigger changes
   useEffect(() => {
@@ -110,12 +178,12 @@ export const FileUpload = forwardRef<FileUploadRef, FileUploadProps>(({
         <div
           {...getRootProps()}
           className={cn(
-            'relative border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors',
+            'relative p-4 text-center cursor-pointer neuro-card',
             isDragActive
               ? isDragAccept
                 ? 'border-green-500 bg-green-50'
                 : 'border-red-500 bg-red-50'
-              : 'border-muted-foreground/25 hover:border-muted-foreground/50',
+              : '',
             disabled && 'opacity-50 cursor-not-allowed'
           )}
         >
@@ -190,12 +258,12 @@ export const FileUpload = forwardRef<FileUploadRef, FileUploadProps>(({
       <div
         {...getRootProps()}
         className={cn(
-          'relative border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200',
+          'relative p-8 text-center cursor-pointer neuro-card',
           isDragActive
             ? isDragAccept
               ? 'border-green-500 bg-green-50 scale-105'
               : 'border-red-500 bg-red-50'
-            : 'border-muted-foreground/25 hover:border-muted-foreground/50 hover:bg-muted/20',
+            : '',
           disabled && 'opacity-50 cursor-not-allowed'
         )}
       >
@@ -207,7 +275,7 @@ export const FileUpload = forwardRef<FileUploadRef, FileUploadProps>(({
           className="space-y-4"
         >
           {/* Upload icon */}
-          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+          <div className="mx-auto w-16 h-16 neuro-icon-container rounded-full flex items-center justify-center">
             <Upload className={cn(
               'w-8 h-8 transition-colors',
               isDragAccept ? 'text-green-600' : 

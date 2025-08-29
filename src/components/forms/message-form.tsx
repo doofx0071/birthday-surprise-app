@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -12,7 +12,7 @@ import { BirthdayInput } from '@/design-system/components/forms/birthday-input'
 import { BirthdayTextarea } from '@/design-system/components/forms/birthday-textarea'
 import { LocationPicker } from './location-picker'
 import { DraftIndicator } from './draft-indicator'
-import { FileUpload } from '@/components/upload'
+import { FileUpload, FileUploadRef } from '@/components/upload'
 import { finalizeUploads } from '@/lib/fileUpload'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -29,12 +29,7 @@ import {
 } from '@/components/ui/form'
 
 // Icons and UI
-import { 
-  AnimatedHeartIcon, 
-  AnimatedSparkleIcon, 
-  AnimatedGiftIcon,
-  AnimatedCelebrationIcon 
-} from '@/design-system/icons/animated-birthday-icons'
+
 import { BirthdayCard, BirthdayCardContent, BirthdayCardHeader } from '@/components/birthday-card'
 import { useAutoSave } from '@/hooks/use-auto-save'
 
@@ -61,6 +56,7 @@ export const MessageForm: React.FC<MessageFormProps> = ({
   const [uploadedFiles, setUploadedFiles] = useState<Array<{ url: string; thumbnailUrl?: string }>>([])
   const [tempFiles, setTempFiles] = useState<Array<{ tempPath: string; fileInfo: any; thumbnailUrl?: string }>>([])
   const [clearFilesTrigger, setClearFilesTrigger] = useState(0)
+  const fileUploadRef = useRef<FileUploadRef>(null)
 
   // Generate a temporary ID for file uploads (will be replaced with actual message ID after submission)
   const tempUploadId = useMemo(() => `${Date.now()}-${Math.random().toString(36).substring(2)}`, [])
@@ -103,7 +99,12 @@ export const MessageForm: React.FC<MessageFormProps> = ({
 
   // Handle form submission
   const handleSubmit = async (data: MessageFormData) => {
-    if (disabled || isSubmitting) return
+    console.log('🚀 Form submission started:', { disabled, isSubmitting, data: { ...data, message: data.message.substring(0, 50) + '...' } })
+
+    if (disabled || isSubmitting) {
+      console.log('⚠️ Form submission blocked:', { disabled, isSubmitting })
+      return
+    }
 
     setIsSubmitting(true)
     setSubmitError(null)
@@ -145,32 +146,63 @@ export const MessageForm: React.FC<MessageFormProps> = ({
         }
 
         const result = await response.json()
-        messageId = result.id || result.messageId
+        messageId = result.data?.id || result.id || result.messageId
       }
 
-      // Finalize file uploads if we have a message ID and temp files
-      if (messageId && tempFiles.length > 0) {
+      // Check for pending files and upload them if needed
+      let finalTempFiles = tempFiles
+      if (fileUploadRef.current?.hasPendingFiles()) {
         try {
-          await finalizeUploads(tempFiles, messageId)
-          console.log(`Finalized ${tempFiles.length} file uploads for message ${messageId}`)
-        } catch (fileError) {
-          console.error('Failed to finalize file uploads:', fileError)
-          // Don't fail the entire submission for file errors
+          console.log('Uploading pending files before form submission...')
+          const uploadedTempFiles = await fileUploadRef.current.uploadPendingFiles()
+          finalTempFiles = [...tempFiles, ...uploadedTempFiles]
+          console.log(`✅ Uploaded ${uploadedTempFiles.length} pending files`)
+        } catch (uploadError) {
+          console.error('❌ Failed to upload pending files:', uploadError)
+          throw new Error('Failed to upload files. Please try again.')
         }
       }
+
+      // Debug logging
+      console.log('Form submission debug:', {
+        messageId,
+        originalTempFilesLength: tempFiles.length,
+        finalTempFilesLength: finalTempFiles.length,
+        finalTempFiles: finalTempFiles
+      })
+
+      // Finalize file uploads if we have a message ID and temp files
+      if (messageId && finalTempFiles.length > 0) {
+        try {
+          console.log('Starting file finalization...')
+          await finalizeUploads(finalTempFiles, messageId)
+          console.log(`✅ Finalized ${finalTempFiles.length} file uploads for message ${messageId}`)
+        } catch (fileError) {
+          console.error('❌ Failed to finalize file uploads:', fileError)
+          // Don't fail the entire submission for file errors
+        }
+      } else {
+        console.log('⚠️ Skipping file finalization:', {
+          hasMessageId: !!messageId,
+          tempFilesCount: finalTempFiles.length
+        })
+      }
+
+      // Clear temp files after finalization (or after skipping)
+      setTempFiles([])
 
       // Success handling
       form.reset(defaultFormValues)
       autoSave.clearDraft() // Clear draft after successful submission
       setLastSaved(undefined)
       setUploadedFiles([])
-      setTempFiles([])
+      // Note: setTempFiles([]) is called after file finalization
       setClearFilesTrigger(prev => prev + 1) // Trigger file upload component to clear
       onSuccess?.()
 
       // Show success toast
       toast({
-        title: "🎉 Message Submitted Successfully!",
+        title: "Message Submitted Successfully!",
         description: "Thank you for your birthday wish. It will be displayed on the special day!",
         variant: "default",
         duration: 5000,
@@ -199,12 +231,10 @@ export const MessageForm: React.FC<MessageFormProps> = ({
     <div className={cn('w-full max-w-2xl mx-auto', className)}>
       <BirthdayCard className="overflow-hidden">
         <BirthdayCardHeader className="text-center pb-6">
-          <div className="flex items-center justify-center space-x-2 mb-4">
-            <AnimatedSparkleIcon size="md" color="pink" intensity="normal" />
-            <h2 className="font-display text-2xl md:text-3xl font-bold text-charcoal-black">
+          <div className="flex items-center justify-center mb-4">
+            <h2 className="font-body text-2xl md:text-3xl font-bold text-charcoal-black">
               Add Your Birthday Wish
             </h2>
-            <AnimatedSparkleIcon size="md" color="roseGold" intensity="normal" />
           </div>
           <p className="font-body text-base text-charcoal-black/70">
             Share a heartfelt message to make this birthday extra special
@@ -272,7 +302,6 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-2">
-                      <AnimatedHeartIcon size="xs" color="pink" intensity="subtle" />
                       Your Name
                       <span className="text-destructive">*</span>
                     </FormLabel>
@@ -298,7 +327,6 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-2">
-                      <AnimatedSparkleIcon size="xs" color="roseGold" intensity="subtle" />
                       Email Address
                       <span className="text-destructive">*</span>
                     </FormLabel>
@@ -328,7 +356,6 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-2">
-                      <span>📍</span>
                       Location (Optional)
                     </FormLabel>
                     <FormControl>
@@ -352,7 +379,6 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-2">
-                      <AnimatedGiftIcon size="xs" color="pink" intensity="subtle" />
                       Your Birthday Message
                       <span className="text-destructive">*</span>
                     </FormLabel>
@@ -390,10 +416,10 @@ export const MessageForm: React.FC<MessageFormProps> = ({
               {/* File Upload Section */}
               <div className="space-y-3">
                 <Label className="flex items-center gap-2">
-                  <span>📎</span>
                   Photos & Videos (Optional)
                 </Label>
                 <FileUpload
+                  ref={fileUploadRef}
                   variant="compact"
                   disabled={disabled || isSubmitting}
                   messageId={tempUploadId}
@@ -428,7 +454,6 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel className="flex items-center gap-2 cursor-pointer">
-                        <AnimatedSparkleIcon size="xs" color="pink" intensity="subtle" />
                         Send me birthday reminders
                       </FormLabel>
                       <FormDescription>
@@ -447,20 +472,9 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                   className="flex-1 h-12 text-base font-semibold bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white shadow-lg hover:shadow-xl transition-all duration-300"
                 >
                   {isSubmitting ? (
-                    <div className="flex items-center space-x-2">
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      >
-                        <AnimatedSparkleIcon size="sm" color="white" animate={false} />
-                      </motion.div>
-                      <span>Submitting...</span>
-                    </div>
+                    <span>Submitting...</span>
                   ) : (
-                    <div className="flex items-center space-x-2">
-                      <AnimatedHeartIcon size="sm" color="white" intensity="normal" />
-                      <span>Submit Birthday Wish</span>
-                    </div>
+                    <span>Submit Birthday Wish</span>
                   )}
                 </Button>
                 

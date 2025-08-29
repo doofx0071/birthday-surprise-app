@@ -1,6 +1,7 @@
 import { MailtrapClient } from 'mailtrap'
 import nodemailer from 'nodemailer'
 import type { EmailTemplateData } from '@/types'
+import { EmailService } from '@/lib/email/mailtrap'
 
 // Mailtrap API Client (for advanced features)
 const createMailtrapClient = () => {
@@ -425,21 +426,127 @@ export const testAllConnections = async () => {
   }
 }
 
+// Message review email functions
+export const sendMessagePendingReviewEmail = async (
+  to: string,
+  messageData: {
+    contributorName: string
+    messagePreview: string
+    girlfriendName?: string
+    websiteUrl?: string
+  }
+) => {
+  try {
+    const emailService = new EmailService()
+    const { MessagePendingReview } = await import('@/components/emails/message-pending-review')
+
+    const template = MessagePendingReview({
+      contributorName: messageData.contributorName,
+      contributorEmail: to,
+      messagePreview: messageData.messagePreview,
+      girlfriendName: messageData.girlfriendName || 'Gracela Elmera C. Betarmos',
+      websiteUrl: messageData.websiteUrl || process.env.NEXT_PUBLIC_SITE_URL || 'https://birthday-surprise-app.vercel.app',
+    })
+
+    const result = await emailService.sendTemplateEmail(
+      to,
+      'Message Under Review - Thank You',
+      template,
+      {
+        recipientName: messageData.contributorName,
+        category: 'message-pending-review',
+        customVariables: {
+          contributor_name: messageData.contributorName,
+          girlfriend_name: messageData.girlfriendName || 'Gracela Elmera C. Betarmos',
+          message_preview: messageData.messagePreview.substring(0, 100),
+        },
+      }
+    )
+
+    return result
+  } catch (error) {
+    console.error('Failed to send message pending review email:', error)
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+}
+
+export const sendMessageApprovedEmail = async (
+  to: string,
+  messageData: {
+    contributorName: string
+    messagePreview: string
+    girlfriendName?: string
+    websiteUrl?: string
+    approvedAt?: string
+  }
+) => {
+  try {
+    const emailService = new EmailService()
+    const { MessageApproved } = await import('@/components/emails/message-approved')
+
+    const template = MessageApproved({
+      contributorName: messageData.contributorName,
+      contributorEmail: to,
+      messagePreview: messageData.messagePreview,
+      girlfriendName: messageData.girlfriendName || 'Gracela Elmera C. Betarmos',
+      websiteUrl: messageData.websiteUrl || process.env.NEXT_PUBLIC_SITE_URL || 'https://birthday-surprise-app.vercel.app',
+      approvedAt: messageData.approvedAt || new Date().toLocaleDateString(),
+    })
+
+    const result = await emailService.sendTemplateEmail(
+      to,
+      '🎉 Great News! Your Message is Approved',
+      template,
+      {
+        recipientName: messageData.contributorName,
+        category: 'message-approved',
+        customVariables: {
+          contributor_name: messageData.contributorName,
+          girlfriend_name: messageData.girlfriendName || 'Gracela Elmera C. Betarmos',
+          message_preview: messageData.messagePreview.substring(0, 100),
+          approved_at: messageData.approvedAt || new Date().toISOString(),
+        },
+      }
+    )
+
+    return result
+  } catch (error) {
+    console.error('Failed to send message approved email:', error)
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+}
+
 // Smart email sending (tries API first, falls back to SMTP)
 export const sendEmailSmart = async (
-  type: 'birthday' | 'thank_you',
+  type: 'birthday' | 'thank_you' | 'message_pending' | 'message_approved',
   to: string,
-  templateData: EmailTemplateData
+  templateData: EmailTemplateData | {
+    contributorName: string
+    messagePreview: string
+    girlfriendName?: string
+    websiteUrl?: string
+    approvedAt?: string
+  }
 ) => {
   // Try API first for better tracking and features
   try {
     if (type === 'birthday') {
-      const result = await sendBirthdayReminderAPI(to, templateData)
+      const result = await sendBirthdayReminderAPI(to, templateData as EmailTemplateData)
       if (result.success) {
         return { ...result, method: 'API' }
       }
-    } else {
-      const result = await sendThankYouEmailAPI(to, templateData)
+    } else if (type === 'thank_you') {
+      const result = await sendThankYouEmailAPI(to, templateData as EmailTemplateData)
+      if (result.success) {
+        return { ...result, method: 'API' }
+      }
+    } else if (type === 'message_pending') {
+      const result = await sendMessagePendingReviewEmail(to, templateData as any)
+      if (result.success) {
+        return { ...result, method: 'API' }
+      }
+    } else if (type === 'message_approved') {
+      const result = await sendMessageApprovedEmail(to, templateData as any)
       if (result.success) {
         return { ...result, method: 'API' }
       }

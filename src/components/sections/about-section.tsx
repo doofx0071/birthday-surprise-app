@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { cn } from '@/lib/utils'
-import { AnimatedHeartIcon, AnimatedSparkleIcon, AnimatedCakeIcon } from '@/design-system/icons/animated-birthday-icons'
+
 import { BirthdayCard, BirthdayCardContent } from '@/components/birthday-card'
 
 interface AboutSectionProps {
@@ -16,19 +16,17 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ className }) => {
     <section
       id="about"
       className={cn(
-        'py-16 md:py-24 bg-gradient-to-br from-white to-primary/5',
+        'py-16 md:py-24',
         className
       )}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12 md:mb-16">
-          <div className="flex items-center justify-center space-x-2 mb-4">
-            <AnimatedSparkleIcon size="md" color="pink" intensity="normal" />
+          <div className="flex items-center justify-center mb-4">
             <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-charcoal-black">
               About This Surprise
             </h2>
-            <AnimatedSparkleIcon size="md" color="roseGold" intensity="normal" />
           </div>
           <p className="font-body text-lg md:text-xl text-charcoal-black/70 max-w-3xl mx-auto">
             A heartfelt collection of love, memories, and birthday wishes from everyone who cares about you
@@ -41,10 +39,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ className }) => {
           <div className="space-y-6">
             <BirthdayCard className="p-6 md:p-8">
               <BirthdayCardContent>
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0">
-                    <AnimatedHeartIcon size="lg" color="pink" intensity="normal" />
-                  </div>
+                <div>
                   <div>
                     <h3 className="font-display text-xl md:text-2xl font-bold text-charcoal-black mb-3">
                       What Makes This Special?
@@ -61,10 +56,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ className }) => {
 
             <BirthdayCard className="p-6 md:p-8">
               <BirthdayCardContent>
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0">
-                    <AnimatedCakeIcon size="lg" color="roseGold" intensity="normal" />
-                  </div>
+                <div>
                   <div>
                     <h3 className="font-display text-xl md:text-2xl font-bold text-charcoal-black mb-3">
                       How It Works
@@ -89,33 +81,26 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ className }) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
               {[
                 {
-                  icon: <AnimatedHeartIcon size="md" color="pink" intensity="normal" />,
                   title: "Heartfelt Messages",
                   description: "Personal notes and wishes from loved ones"
                 },
                 {
-                  icon: <AnimatedSparkleIcon size="md" color="roseGold" intensity="normal" />,
                   title: "Memory Map",
                   description: "Interactive map of special places and moments"
                 },
                 {
-                  icon: <AnimatedCakeIcon size="md" color="pink" intensity="normal" />,
                   title: "Photo Gallery",
                   description: "Beautiful collection of memories and moments"
                 },
                 {
-                  icon: <AnimatedHeartIcon size="md" color="roseGold" intensity="normal" />,
                   title: "Countdown Timer",
                   description: "Building excitement for the big day"
                 }
               ].map((feature, index) => (
                 <div
                   key={index}
-                  className="flex items-center space-x-4 p-4 rounded-2xl bg-white/50 hover:bg-white/80 transition-all duration-300 hover:scale-105"
+                  className="p-4 neuro-card"
                 >
-                  <div className="flex-shrink-0">
-                    {feature.icon}
-                  </div>
                   <div>
                     <h4 className="font-display text-lg font-semibold text-charcoal-black">
                       {feature.title}
@@ -132,12 +117,10 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ className }) => {
 
         {/* Bottom CTA */}
         <div className="text-center mt-12 md:mt-16">
-          <div className="inline-flex items-center space-x-2 px-6 py-3 bg-primary/10 rounded-full">
-            <AnimatedSparkleIcon size="sm" color="pink" intensity="normal" />
+          <div className="inline-flex items-center px-6 py-3 neuro-card">
             <p className="font-body text-sm md:text-base text-charcoal-black/80">
               Ready to add your own special message?
             </p>
-            <AnimatedSparkleIcon size="sm" color="roseGold" intensity="normal" />
           </div>
         </div>
       </div>
