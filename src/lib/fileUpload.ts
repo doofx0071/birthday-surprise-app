@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { supabase, getSupabaseAdmin } from './supabase'
 import { UploadOptions, UploadProgress, MediaFileRecord } from '@/types/upload'
 
 // Upload a file to Supabase Storage (Temporary - Phase 1)
@@ -93,6 +93,9 @@ export async function finalizeUploads(
   console.log(`🔄 Starting finalization of ${tempFiles.length} files for message ${realMessageId}`)
 
   try {
+    // Use admin client for file operations
+    const supabaseAdmin = getSupabaseAdmin()
+
     for (let i = 0; i < tempFiles.length; i++) {
       const tempFile = tempFiles[i]
       console.log(`📁 Processing file ${i + 1}/${tempFiles.length}:`, tempFile.fileInfo.file_name)
@@ -103,8 +106,8 @@ export async function finalizeUploads(
 
       console.log(`🚚 Moving file from ${tempFile.tempPath} to ${newPath}`)
 
-      // Move the file
-      const { error: moveError } = await supabase.storage
+      // Move the file using admin client
+      const { error: moveError } = await supabaseAdmin.storage
         .from('birthday-media')
         .move(tempFile.tempPath, newPath)
 
@@ -123,7 +126,7 @@ export async function finalizeUploads(
 
         console.log(`🖼️ Moving thumbnail from ${tempFile.fileInfo.thumbnail_path} to ${newThumbnailPath}`)
 
-        const { error: thumbMoveError } = await supabase.storage
+        const { error: thumbMoveError } = await supabaseAdmin.storage
           .from('birthday-media')
           .move(tempFile.fileInfo.thumbnail_path, newThumbnailPath)
 
@@ -242,7 +245,8 @@ async function generateVideoThumbnail(file: File, messageId: string): Promise<st
 
 // Save file record to database
 async function saveFileRecord(record: Omit<MediaFileRecord, 'id' | 'created_at'>) {
-  const { error } = await supabase
+  const supabaseAdmin = getSupabaseAdmin()
+  const { error } = await supabaseAdmin
     .from('media_files')
     .insert([record])
 

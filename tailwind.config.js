@@ -76,11 +76,17 @@ module.exports = {
   			}
   		},
   		fontFamily: {
+  			sans: [
+  				'Poppins',
+  				'Inter',
+  				'sans-serif'
+  			],
   			display: [
   				'Playfair Display',
   				'serif'
   			],
   			body: [
+  				'Poppins',
   				'Inter',
   				'sans-serif'
   			],

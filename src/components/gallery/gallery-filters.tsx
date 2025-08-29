@@ -1,326 +1,157 @@
 'use client'
 
-import React, { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import React from 'react'
+import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { SortOption } from './memory-gallery'
-import {
-  FilterIcon,
-  SortAscIcon,
-  SortDescIcon,
-  ImageIcon,
-  VideoIcon,
-  MessageSquareIcon,
-  CalendarIcon,
-  MapPinIcon,
-  ShuffleIcon,
-  ClockIcon,
-  XIcon,
-  FileIcon,
-} from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { FilterIcon, ImageIcon, VideoIcon, FileTextIcon, LayersIcon } from 'lucide-react'
+
+export type ContentType = 'all' | 'text' | 'image' | 'video' | 'mixed'
+export type DateRange = 'all' | 'week' | 'month' | 'year'
 
 interface GalleryFiltersProps {
-  filters: {
-    contentType: 'all' | 'text' | 'image' | 'video' | 'mixed'
-    location: string
-    dateRange: 'all' | 'week' | 'month' | 'year'
-  }
-  onFiltersChange: (filters: GalleryFiltersProps['filters']) => void
-  sortBy: SortOption
-  onSortChange: (sort: SortOption) => void
+  contentType: ContentType
+  location: string
+  dateRange: DateRange
+  onContentTypeChange: (type: ContentType) => void
+  onLocationChange: (location: string) => void
+  onDateRangeChange: (range: DateRange) => void
+  onClearFilters: () => void
   className?: string
 }
 
 export const GalleryFilters: React.FC<GalleryFiltersProps> = ({
-  filters,
-  onFiltersChange,
-  sortBy,
-  onSortChange,
-  className,
+  contentType,
+  location,
+  dateRange,
+  onContentTypeChange,
+  onLocationChange,
+  onDateRangeChange,
+  onClearFilters,
+  className
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false)
+  const hasActiveFilters = contentType !== 'all' || location !== '' || dateRange !== 'all'
 
-  // Content type options
-  const contentTypes = [
-    { value: 'all', label: 'All Content', icon: FilterIcon },
-    { value: 'text', label: 'Text Only', icon: MessageSquareIcon },
-    { value: 'image', label: 'With Photos', icon: ImageIcon },
-    { value: 'video', label: 'With Videos', icon: VideoIcon },
-    { value: 'mixed', label: 'With Media', icon: FileIcon },
+  const contentTypeOptions = [
+    { value: 'all', label: 'All Content', icon: FilterIcon, color: 'bg-gray-400' },
+    { value: 'text', label: 'Text Only', icon: FileTextIcon, color: 'bg-blue-400' },
+    { value: 'image', label: 'Photos', icon: ImageIcon, color: 'bg-green-400' },
+    { value: 'video', label: 'Videos', icon: VideoIcon, color: 'bg-purple-400' },
+    { value: 'mixed', label: 'Mixed Media', icon: LayersIcon, color: 'bg-pink-400' },
   ] as const
 
-  // Date range options
-  const dateRanges = [
+  const dateRangeOptions = [
     { value: 'all', label: 'All Time' },
     { value: 'week', label: 'This Week' },
     { value: 'month', label: 'This Month' },
     { value: 'year', label: 'This Year' },
   ] as const
 
-  // Sort options
-  const sortOptions = [
-    { value: 'newest', label: 'Newest First', icon: SortDescIcon },
-    { value: 'oldest', label: 'Oldest First', icon: SortAscIcon },
-    { value: 'location', label: 'By Location', icon: MapPinIcon },
-    { value: 'length', label: 'By Length', icon: MessageSquareIcon },
-    { value: 'random', label: 'Random', icon: ShuffleIcon },
-  ] as const
-
-  // Count active filters
-  const activeFiltersCount = [
-    filters.contentType !== 'all',
-    filters.location !== '',
-    filters.dateRange !== 'all',
-  ].filter(Boolean).length
-
-  // Clear all filters
-  const clearAllFilters = () => {
-    onFiltersChange({
-      contentType: 'all',
-      location: '',
-      dateRange: 'all',
-    })
-  }
-
   return (
-    <div className={cn('space-y-4', className)}>
-      {/* Filter Toggle Button */}
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={cn(
+        'neuro-card p-4 space-y-4',
+        className
+      )}
+    >
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <Button
-          variant="outline"
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="flex items-center space-x-2"
-        >
-          <FilterIcon className="h-4 w-4" />
-          <span>Filters</span>
-          {activeFiltersCount > 0 && (
-            <Badge variant="secondary" className="ml-1 text-xs">
-              {activeFiltersCount}
+        <div className="flex items-center gap-2">
+          <FilterIcon className="w-4 h-4 text-pink-500" />
+          <h3 className="font-medium text-charcoal-black font-body">Filters</h3>
+          {hasActiveFilters && (
+            <Badge variant="secondary" className="text-xs neuro-card px-2 py-1">
+              Active
             </Badge>
           )}
-        </Button>
+        </div>
 
-        {/* Sort Dropdown */}
-        <div className="flex items-center space-x-2">
-          <Label className="text-sm text-charcoal-black/70">Sort:</Label>
-          <select
-            value={sortBy}
-            onChange={(e) => onSortChange(e.target.value as SortOption)}
-            className="px-3 py-1 text-sm border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-primary/20"
+        {hasActiveFilters && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClearFilters}
+            className="text-xs text-charcoal-black/60 hover:text-primary font-body neuro-button-hover"
           >
-            {sortOptions.map((option) => (
-              <option key={option.value} value={option.value}>
+            Clear All
+          </Button>
+        )}
+      </div>
+
+      {/* Content Type Filter */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-charcoal-black font-body">
+          Content Type
+        </label>
+        <div className="flex flex-wrap gap-2">
+          {contentTypeOptions.map((option) => {
+            const Icon = option.icon
+            const isActive = contentType === option.value
+
+            return (
+              <Button
+                key={option.value}
+                variant={isActive ? "default" : "outline"}
+                size="sm"
+                onClick={() => onContentTypeChange(option.value)}
+                className={cn(
+                  "flex items-center gap-2 text-xs font-body transition-all duration-300",
+                  "neuro-button hover:neuro-button-hover",
+                  isActive && "bg-primary hover:bg-primary/90 text-white border-primary"
+                )}
+              >
+                <div className={cn('w-2 h-2 rounded-full', option.color)} />
+                <Icon className="w-3 h-3" />
                 {option.label}
-              </option>
-            ))}
-          </select>
+              </Button>
+            )
+          })}
         </div>
       </div>
 
-      {/* Expanded Filters */}
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden"
-          >
-            <div className="p-4 bg-white/50 backdrop-blur-sm rounded-xl border border-white/20 space-y-6">
-              {/* Content Type Filter */}
-              <div>
-                <Label className="text-sm font-medium text-charcoal-black mb-3 block">
-                  Content Type
-                </Label>
-                <div className="flex flex-wrap gap-2">
-                  {contentTypes.map((type) => {
-                    const Icon = type.icon
-                    const isActive = filters.contentType === type.value
-                    
-                    return (
-                      <Button
-                        key={type.value}
-                        variant={isActive ? "default" : "outline"}
-                        size="sm"
-                        onClick={() =>
-                          onFiltersChange({
-                            ...filters,
-                            contentType: type.value,
-                          })
-                        }
-                        className="flex items-center space-x-2"
-                      >
-                        <Icon className="h-3 w-3" />
-                        <span>{type.label}</span>
-                      </Button>
-                    )
-                  })}
-                </div>
-              </div>
+      {/* Location Filter */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-gray-700">
+          Location
+        </label>
+        <Select value={location} onValueChange={onLocationChange}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Filter by location..." />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Locations</SelectItem>
+            <SelectItem value="Philippines">Philippines</SelectItem>
+            <SelectItem value="USA">United States</SelectItem>
+            <SelectItem value="UK">United Kingdom</SelectItem>
+            <SelectItem value="Canada">Canada</SelectItem>
+            <SelectItem value="Australia">Australia</SelectItem>
+            <SelectItem value="Other">Other</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-              {/* Location Filter */}
-              <div>
-                <Label className="text-sm font-medium text-charcoal-black mb-3 block">
-                  Location
-                </Label>
-                <div className="relative">
-                  <MapPinIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-charcoal-black/40" />
-                  <Input
-                    type="text"
-                    placeholder="Filter by city or country..."
-                    value={filters.location}
-                    onChange={(e) =>
-                      onFiltersChange({
-                        ...filters,
-                        location: e.target.value,
-                      })
-                    }
-                    className="pl-10"
-                  />
-                  {filters.location && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() =>
-                        onFiltersChange({
-                          ...filters,
-                          location: '',
-                        })
-                      }
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 h-auto"
-                    >
-                      <XIcon className="h-3 w-3" />
-                    </Button>
-                  )}
-                </div>
-              </div>
-
-              {/* Date Range Filter */}
-              <div>
-                <Label className="text-sm font-medium text-charcoal-black mb-3 block">
-                  Date Range
-                </Label>
-                <div className="flex flex-wrap gap-2">
-                  {dateRanges.map((range) => {
-                    const isActive = filters.dateRange === range.value
-                    
-                    return (
-                      <Button
-                        key={range.value}
-                        variant={isActive ? "default" : "outline"}
-                        size="sm"
-                        onClick={() =>
-                          onFiltersChange({
-                            ...filters,
-                            dateRange: range.value,
-                          })
-                        }
-                        className="flex items-center space-x-2"
-                      >
-                        <CalendarIcon className="h-3 w-3" />
-                        <span>{range.label}</span>
-                      </Button>
-                    )
-                  })}
-                </div>
-              </div>
-
-              {/* Filter Actions */}
-              <div className="flex items-center justify-between pt-4 border-t border-white/20">
-                <div className="text-xs text-charcoal-black/60">
-                  {activeFiltersCount > 0 ? (
-                    `${activeFiltersCount} filter${activeFiltersCount === 1 ? '' : 's'} active`
-                  ) : (
-                    'No filters applied'
-                  )}
-                </div>
-                
-                {activeFiltersCount > 0 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={clearAllFilters}
-                    className="text-xs"
-                  >
-                    Clear all
-                  </Button>
-                )}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Active Filters Summary */}
-      {activeFiltersCount > 0 && !isExpanded && (
-        <div className="flex flex-wrap gap-2">
-          {filters.contentType !== 'all' && (
-            <Badge variant="secondary" className="flex items-center space-x-1">
-              <span className="text-xs">
-                {contentTypes.find(t => t.value === filters.contentType)?.label}
-              </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() =>
-                  onFiltersChange({
-                    ...filters,
-                    contentType: 'all',
-                  })
-                }
-                className="p-0 h-auto ml-1"
-              >
-                <XIcon className="h-3 w-3" />
-              </Button>
-            </Badge>
-          )}
-          
-          {filters.location && (
-            <Badge variant="secondary" className="flex items-center space-x-1">
-              <span className="text-xs">📍 {filters.location}</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() =>
-                  onFiltersChange({
-                    ...filters,
-                    location: '',
-                  })
-                }
-                className="p-0 h-auto ml-1"
-              >
-                <XIcon className="h-3 w-3" />
-              </Button>
-            </Badge>
-          )}
-          
-          {filters.dateRange !== 'all' && (
-            <Badge variant="secondary" className="flex items-center space-x-1">
-              <span className="text-xs">
-                📅 {dateRanges.find(r => r.value === filters.dateRange)?.label}
-              </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() =>
-                  onFiltersChange({
-                    ...filters,
-                    dateRange: 'all',
-                  })
-                }
-                className="p-0 h-auto ml-1"
-              >
-                <XIcon className="h-3 w-3" />
-              </Button>
-            </Badge>
-          )}
-        </div>
-      )}
-    </div>
+      {/* Date Range Filter */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-gray-700">
+          Date Range
+        </label>
+        <Select value={dateRange} onValueChange={onDateRangeChange}>
+          <SelectTrigger className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {dateRangeOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    </motion.div>
   )
 }

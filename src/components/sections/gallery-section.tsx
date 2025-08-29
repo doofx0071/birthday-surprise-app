@@ -13,18 +13,13 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ className }) => 
     <section
       id="gallery"
       className={cn(
-        'py-16 md:py-24 bg-gradient-to-br from-accent/5 to-primary/10',
+        'py-16 md:py-24',
         className
       )}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Memory Gallery */}
-        <MemoryGallery
-          initialViewMode="grid"
-          showFilters={true}
-          showSearch={true}
-          className="w-full"
-        />
+        <MemoryGallery className="w-full" />
       </div>
     </section>
   )

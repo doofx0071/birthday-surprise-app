@@ -22,13 +22,13 @@ const BirthdayCard = React.forwardRef<HTMLDivElement, BirthdayCardProps>(
     const getVariantStyles = () => {
       switch (variant) {
         case 'gradient':
-          return 'bg-gradient-to-br from-card via-primary/5 to-secondary/10 border-primary/20'
+          return 'neuro-card'
         case 'floating':
-          return 'bg-card/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl'
+          return 'neuro-card'
         case 'sparkle':
-          return 'bg-card border-primary/30 shadow-md hover:shadow-lg sparkle-effect'
+          return 'neuro-card sparkle-effect'
         default:
-          return 'bg-card border-border'
+          return 'neuro-card'
       }
     }
 
@@ -36,10 +36,9 @@ const BirthdayCard = React.forwardRef<HTMLDivElement, BirthdayCardProps>(
       <Card
         ref={ref}
         className={cn(
-          'relative overflow-hidden transition-all duration-300',
-          'hover:scale-105 transform',
+          'relative overflow-hidden',
           getVariantStyles(),
-          glowEffect && 'hover:shadow-primary/20 hover:shadow-2xl',
+          glowEffect && 'neuro-animate-pulse',
           withHearts && 'floating-hearts',
           className
         )}
@@ -69,7 +68,7 @@ const BirthdayCard = React.forwardRef<HTMLDivElement, BirthdayCardProps>(
 
         {/* Gradient overlay for gradient variant */}
         {isMounted && variant === 'gradient' && isHovered && (
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent transform -skew-x-12 -translate-x-full transition-transform duration-1000 translate-x-full" />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent transform -skew-x-12 transition-transform duration-1000 hover:translate-x-full" />
         )}
 
         {/* Card content */}
@@ -99,7 +98,7 @@ const BirthdayCardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttri
   ({ className, ...props }, ref) => (
     <CardTitle
       ref={ref}
-      className={cn('font-display text-xl text-foreground', className)}
+      className={cn('font-body text-xl text-foreground', className)}
       {...props}
     />
   )

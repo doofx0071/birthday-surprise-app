@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { cn } from '@/lib/utils'
-import { AnimatedHeartIcon, AnimatedSparkleIcon } from '@/design-system/icons/animated-birthday-icons'
+
 
 interface FooterProps {
   className?: string
@@ -23,8 +23,7 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand Section */}
           <div className="text-center md:text-left">
-            <div className="flex items-center justify-center md:justify-start space-x-2 mb-4">
-              <AnimatedHeartIcon size="md" color="pink" intensity="subtle" />
+            <div className="flex items-center justify-center md:justify-start mb-4">
               <h3 className="font-display text-xl font-bold text-charcoal-black">
                 Birthday Surprise
               </h3>
@@ -43,17 +42,22 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
               {[
                 { label: 'Home', href: '#home' },
                 { label: 'About', href: '#about' },
-                { label: 'Contribute', href: '#contribute' },
-                { label: 'Memory Map', href: '#memory-map' },
                 { label: 'Gallery', href: '#gallery' },
+                { label: 'Memory Map', href: '/memory-map' },
               ].map((link) => (
                 <button
                   key={link.href}
                   onClick={() => {
-                    const element = document.getElementById(link.href.replace('#', ''))
-                    element?.scrollIntoView({ behavior: 'smooth' })
+                    if (link.href.startsWith('/')) {
+                      // External link
+                      window.location.href = link.href
+                    } else {
+                      // Internal anchor link
+                      const element = document.getElementById(link.href.replace('#', ''))
+                      element?.scrollIntoView({ behavior: 'smooth' })
+                    }
                   }}
-                  className="block font-body text-sm text-charcoal-black/70 hover:text-primary transition-colors duration-200 mx-auto"
+                  className="block font-body text-sm text-charcoal-black/70 hover:text-primary transition-colors duration-200 mx-auto cursor-pointer hover:cursor-pointer"
                 >
                   {link.label}
                 </button>
@@ -74,9 +78,9 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
                 for the most amazing person ✨
               </p>
               <div className="flex items-center justify-center md:justify-end space-x-1 mt-4">
-                <AnimatedSparkleIcon size="xs" color="pink" intensity="subtle" />
+                <span className="text-pink-500 text-xs">✨</span>
                 <AnimatedHeartIcon size="xs" color="roseGold" intensity="subtle" />
-                <AnimatedSparkleIcon size="xs" color="pink" intensity="subtle" />
+                <span className="text-pink-500 text-xs">✨</span>
               </div>
             </div>
           </div>
@@ -89,21 +93,10 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
               © {currentYear} Birthday Surprise. Created with 💕 for {girlfriendName}.
             </p>
             
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center">
               <p className="font-body text-xs text-charcoal-black/50">
                 Every moment matters
               </p>
-              <div className="flex space-x-1">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <AnimatedHeartIcon
-                    key={i}
-                    size="xs"
-                    color="pink"
-                    intensity="subtle"
-                    className="opacity-60"
-                  />
-                ))}
-              </div>
             </div>
           </div>
         </div>

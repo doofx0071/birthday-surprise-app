@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import { Header, Footer } from '@/components/layout'
-import { AboutSection, ContributeSection, MessageSection, MemoryMapSection, GallerySection } from '@/components/sections'
+import { Header } from '@/components/layout'
+import { AboutSection, MessageSection, GallerySection } from '@/components/sections'
 import { CountdownWrapper } from '@/components/countdown/countdown-wrapper'
 
 export const metadata: Metadata = {
@@ -10,9 +10,22 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pure-white to-soft-pink/10">
-      {/* Header */}
-      <Header />
+    <div className="min-h-screen w-full bg-white relative">
+      {/* Pink Glow Background */}
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: `
+            radial-gradient(125% 125% at 50% 90%, #ffffff 40%, #ec4899 100%)
+          `,
+          backgroundSize: "100% 100%",
+        }}
+      />
+
+      {/* Content */}
+      <div className="relative z-10">
+        {/* Header */}
+        <Header />
 
       {/* Main Content */}
       <main>
@@ -61,18 +74,10 @@ export default function HomePage() {
         {/* Message Section */}
         <MessageSection />
 
-        {/* Contribute Section */}
-        <ContributeSection />
-
-        {/* Memory Map Section */}
-        <MemoryMapSection />
-
         {/* Gallery Section */}
         <GallerySection />
       </main>
-
-      {/* Footer */}
-      <Footer />
+      </div>
     </div>
   )
 }

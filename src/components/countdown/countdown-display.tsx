@@ -4,7 +4,7 @@ import React from 'react'
 import { cn } from '@/lib/utils'
 import { TimeUnit, FlipTimeUnit } from './time-unit'
 import { CelebrationAnimation, PulseCelebration } from './celebration-animation'
-import { AnimatedHeartIcon, AnimatedSparkleIcon } from '@/design-system/icons/animated-birthday-icons'
+
 import {
   useCountdown,
   useCountdownAnimations,
@@ -98,8 +98,8 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
   if (!timeRemaining.isValid) {
     return (
       <div className={cn(
-        'relative bg-gradient-to-br from-white to-primary/10',
-        'rounded-3xl shadow-xl border border-primary/20',
+        'relative bg-gradient-to-br from-white to-primary/5',
+        'rounded-3xl shadow-xl border border-primary/10',
         'text-center',
         styles.container,
         className
@@ -115,8 +115,7 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
   return (
     <div
       className={cn(
-        'relative bg-gradient-to-br from-white to-primary/10',
-        'rounded-2xl sm:rounded-3xl shadow-xl border border-primary/20',
+        'relative neuro-countdown-container',
         'overflow-hidden w-full max-w-6xl mx-auto',
         'countdown-container countdown-text',
         styles.container,
@@ -124,37 +123,20 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
       )}
     >
       {/* Background decorative elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {showSparkles && (
-          <>
-            <div className="absolute top-4 left-4">
-              <AnimatedSparkleIcon size="sm" color="pink" intensity="subtle" className="opacity-30" />
-            </div>
-            <div className="absolute top-8 right-8">
-              <AnimatedHeartIcon size="sm" color="pink" intensity="subtle" className="opacity-20" />
-            </div>
-            <div className="absolute bottom-4 left-8">
-              <AnimatedHeartIcon size="xs" color="roseGold" intensity="subtle" className="opacity-25" />
-            </div>
-            <div className="absolute bottom-8 right-4">
-              <AnimatedSparkleIcon size="xs" color="roseGold" intensity="subtle" className="opacity-30" />
-            </div>
-          </>
-        )}
-      </div>
+
 
       {/* Content */}
       <div className="relative z-10">
         {/* Title */}
         <div className="text-center mb-6">
           <h1 className={cn(
-            'font-display font-bold text-charcoal-black',
+            'font-body font-bold text-charcoal-black',
             styles.title
           )}>
             Countdown to
           </h1>
           <h2 className={cn(
-            'font-display font-bold text-primary',
+            'font-body font-bold text-primary',
             styles.subtitle
           )}>
             {girlfriendName}&apos;s Birthday
@@ -172,7 +154,7 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
         {timeRemaining.isComplete ? (
           <div className="text-center">
             <div className="text-6xl md:text-8xl mb-4">🎉</div>
-            <h3 className="font-display text-3xl md:text-5xl font-bold text-primary mb-4">
+            <h3 className="font-body text-3xl md:text-5xl font-bold text-primary mb-4">
               Happy Birthday!
             </h3>
             <p className="font-body text-lg md:text-xl text-charcoal-black/70">
@@ -270,25 +252,7 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
           </>
         )}
 
-        {/* Decorative hearts */}
-        {showSparkles && !timeRemaining.isComplete && (
-          <div className="flex justify-center items-center mt-4 sm:mt-6 space-x-1 sm:space-x-2 px-4">
-            {Array.from({ length: 7 }).map((_, i) => (
-              <AnimatedHeartIcon
-                key={i}
-                size="xs"
-                color="pink"
-                intensity="subtle"
-                className={cn(
-                  'opacity-60 transition-all duration-300',
-                  i % 2 === 0 && 'animate-float',
-                  'hover:scale-110 hover:opacity-80'
-                )}
-                style={{ animationDelay: `${i * 0.2}s` }}
-              />
-            ))}
-          </div>
-        )}
+
       </div>
 
       {/* Celebration effects */}

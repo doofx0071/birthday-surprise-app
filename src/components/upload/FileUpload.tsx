@@ -178,12 +178,12 @@ export const FileUpload = forwardRef<FileUploadRef, FileUploadProps>(({
         <div
           {...getRootProps()}
           className={cn(
-            'relative border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors',
+            'relative p-4 text-center cursor-pointer neuro-card',
             isDragActive
               ? isDragAccept
                 ? 'border-green-500 bg-green-50'
                 : 'border-red-500 bg-red-50'
-              : 'border-muted-foreground/25 hover:border-muted-foreground/50',
+              : '',
             disabled && 'opacity-50 cursor-not-allowed'
           )}
         >
@@ -258,12 +258,12 @@ export const FileUpload = forwardRef<FileUploadRef, FileUploadProps>(({
       <div
         {...getRootProps()}
         className={cn(
-          'relative border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200',
+          'relative p-8 text-center cursor-pointer neuro-card',
           isDragActive
             ? isDragAccept
               ? 'border-green-500 bg-green-50 scale-105'
               : 'border-red-500 bg-red-50'
-            : 'border-muted-foreground/25 hover:border-muted-foreground/50 hover:bg-muted/20',
+            : '',
           disabled && 'opacity-50 cursor-not-allowed'
         )}
       >
@@ -275,7 +275,7 @@ export const FileUpload = forwardRef<FileUploadRef, FileUploadProps>(({
           className="space-y-4"
         >
           {/* Upload icon */}
-          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+          <div className="mx-auto w-16 h-16 neuro-icon-container rounded-full flex items-center justify-center">
             <Upload className={cn(
               'w-8 h-8 transition-colors',
               isDragAccept ? 'text-green-600' : 

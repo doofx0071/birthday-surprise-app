@@ -1,12 +1,70 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { messageFormSchema, type MessageFormData } from '@/lib/validations/message-schema'
-import { messageOperations, type MessageInsert } from '@/lib/supabase'
+import { messageOperations, type MessageInsert, supabase } from '@/lib/supabase'
+import { finalizeUploads } from '@/lib/fileUpload'
 import { z } from 'zod'
 
-// Helper function to send thank you email
-async function sendThankYouEmail(message: any) {
+// Helper function to auto-finalize recent temp files
+async function autoFinalizeRecentTempFiles(messageId: string) {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/emails/thank-you`, {
+    console.log(`🤖 Auto-finalizing temp files for message ${messageId}`)
+
+    // Get recent temp directories (last 10 minutes)
+    const { data: tempDirs, error: listError } = await supabase.storage
+      .from('birthday-media')
+      .list('temp', { limit: 5 })
+
+    if (listError || !tempDirs || tempDirs.length === 0) {
+      console.log('No temp directories found for auto-finalization')
+      return
+    }
+
+    // Process the most recent temp directory
+    const latestTempDir = tempDirs[0]
+    const { data: filesInDir, error: filesError } = await supabase.storage
+      .from('birthday-media')
+      .list(`temp/${latestTempDir.name}`, { limit: 10 })
+
+    if (filesError || !filesInDir) {
+      console.log(`No files found in temp directory ${latestTempDir.name}`)
+      return
+    }
+
+    // Create temp file data for finalization
+    const tempFiles = []
+
+    for (const file of filesInDir) {
+      if (file.name.includes('.') && !file.name.includes('thumbnails/')) {
+        const tempPath = `temp/${latestTempDir.name}/${file.name}`
+        const fileExt = file.name.split('.').pop()?.toLowerCase()
+        const fileType = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExt || '') ? 'image' : 'video'
+
+        tempFiles.push({
+          tempPath,
+          fileInfo: {
+            file_name: file.name,
+            file_type: fileType,
+            file_size: 12345, // Placeholder
+          },
+          thumbnailUrl: undefined
+        })
+      }
+    }
+
+    if (tempFiles.length > 0) {
+      console.log(`🔄 Auto-finalizing ${tempFiles.length} temp files for message ${messageId}`)
+      await finalizeUploads(tempFiles, messageId)
+      console.log(`✅ Auto-finalized ${tempFiles.length} files for message ${messageId}`)
+    }
+  } catch (error) {
+    console.error('Auto-finalization failed:', error)
+  }
+}
+
+// Helper function to send pending review email
+async function sendPendingReviewEmail(message: any) {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/emails/pending-review`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -21,13 +79,13 @@ async function sendThankYouEmail(message: any) {
     })
 
     if (response.ok) {
-      console.log(`✅ Thank you email sent to ${message.email}`)
+      console.log(`✅ Pending review email sent to ${message.email}`)
     } else {
       const error = await response.text()
-      console.error(`❌ Thank you email failed for ${message.email}:`, error)
+      console.error(`❌ Pending review email failed for ${message.email}:`, error)
     }
   } catch (error) {
-    console.error('Thank you email request failed:', error)
+    console.error('Pending review email request failed:', error)
   }
 }
 
@@ -99,9 +157,15 @@ export async function POST(request: NextRequest) {
       createdAt: savedMessage.created_at,
     })
 
-    // Send thank you email (async, don't wait for completion)
-    sendThankYouEmail(savedMessage).catch(error => {
-      console.error('Failed to send thank you email:', error)
+    // Auto-finalize any recent temp files for this message (async, don't wait for completion)
+    autoFinalizeRecentTempFiles(savedMessage.id).catch(error => {
+      console.error('Failed to auto-finalize temp files:', error)
+      // Don't fail the request if finalization fails
+    })
+
+    // Send pending review email (async, don't wait for completion)
+    sendPendingReviewEmail(savedMessage).catch(error => {
+      console.error('Failed to send pending review email:', error)
       // Don't fail the request if email fails
     })
 

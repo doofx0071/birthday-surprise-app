@@ -52,17 +52,13 @@ export const TimeUnit: React.FC<TimeUnitProps> = ({
   return (
     <div
       className={cn(
-        'relative bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg',
-        'border border-primary/20 transition-all duration-300',
-        'hover:shadow-xl hover:shadow-primary/20 hover:scale-105',
+        'relative neuro-time-unit',
         isAnimating && 'animate-pulse-soft scale-110',
         styles.container,
         className
       )}
     >
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white to-primary/5 rounded-2xl" />
-      
+
       {/* Sparkle effects */}
       {showSparkles && (
         <>
@@ -180,17 +176,13 @@ export const FlipTimeUnit: React.FC<FlipTimeUnitProps> = ({
   return (
     <div
       className={cn(
-        'relative bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg',
-        'border border-primary/20 transition-all duration-300',
-        'hover:shadow-xl hover:shadow-primary/20 hover:scale-105',
+        'relative neuro-time-unit',
         'perspective-1000',
         styles.container,
         className
       )}
     >
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white to-primary/5 rounded-2xl" />
-      
+
       {/* Sparkle effects */}
       {showSparkles && (
         <>

@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { createBrowserClient } from '@supabase/ssr'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -7,7 +8,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables')
 }
 
-// Client for browser/frontend use
+// Client for browser/frontend use with SSR support
+export const createSupabaseClient = () => {
+  return createBrowserClient(supabaseUrl, supabaseAnonKey)
+}
+
+// Legacy client for backward compatibility
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Admin client for server-side operations (with service role key)
@@ -186,7 +192,7 @@ export const messageOperations = {
     }
   },
 
-  // Get message statistics using the database function
+  // Get message statistics using direct queries (more reliable than RPC)
   async getStats(): Promise<{
     total_messages: number
     total_countries: number
@@ -195,14 +201,76 @@ export const messageOperations = {
     pending_messages: number
     total_with_reminders: number
   }> {
-    const { data, error } = await supabase.rpc('get_message_stats')
+    try {
+      // Get total messages
+      const { count: totalMessages, error: messagesError } = await supabase
+        .from('messages')
+        .select('*', { count: 'exact', head: true })
 
-    if (error) {
+      if (messagesError) throw messagesError
+
+      // Get total countries
+      const { data: countriesData, error: countriesError } = await supabase
+        .from('messages')
+        .select('location_country')
+        .not('location_country', 'is', null)
+
+      if (countriesError) throw countriesError
+
+      const uniqueCountries = new Set(countriesData?.map(m => m.location_country) || [])
+
+      // Get total media files
+      const { count: totalMedia, error: mediaError } = await supabase
+        .from('media_files')
+        .select('*', { count: 'exact', head: true })
+
+      if (mediaError) throw mediaError
+
+      // Get latest message
+      const { data: latestData, error: latestError } = await supabase
+        .from('messages')
+        .select('created_at')
+        .order('created_at', { ascending: false })
+        .limit(1)
+
+      if (latestError) throw latestError
+
+      // Get pending messages
+      const { count: pendingMessages, error: pendingError } = await supabase
+        .from('messages')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending')
+
+      if (pendingError) throw pendingError
+
+      // Get messages with reminders
+      const { count: withReminders, error: remindersError } = await supabase
+        .from('messages')
+        .select('*', { count: 'exact', head: true })
+        .eq('wants_reminders', true)
+
+      if (remindersError) throw remindersError
+
+      return {
+        total_messages: totalMessages || 0,
+        total_countries: uniqueCountries.size,
+        total_media: totalMedia || 0,
+        latest_message: latestData?.[0]?.created_at || null,
+        pending_messages: pendingMessages || 0,
+        total_with_reminders: withReminders || 0
+      }
+    } catch (error) {
       console.error('Database error:', error)
-      throw new Error(`Failed to fetch stats: ${error.message}`)
-    }
 
-    return data
+      // Provide more detailed error information
+      if (error && typeof error === 'object' && 'message' in error) {
+        throw new Error(`Failed to fetch stats: ${(error as Error).message}`)
+      } else if (error && typeof error === 'object' && 'code' in error) {
+        throw new Error(`Failed to fetch stats: Database error code ${(error as any).code}`)
+      } else {
+        throw new Error(`Failed to fetch stats: ${JSON.stringify(error) || 'Unknown error'}`)
+      }
+    }
   },
 
   // Get messages by country

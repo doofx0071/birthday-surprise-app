@@ -4,7 +4,7 @@ import * as React from 'react'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
-import { AnimatedHeartIcon, AnimatedSparkleIcon } from '@/design-system/icons/animated-birthday-icons'
+import { AnimatedHeartIcon } from '@/design-system/icons/animated-birthday-icons'
 
 interface BirthdayTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string
@@ -42,11 +42,11 @@ const BirthdayTextarea = React.forwardRef<HTMLTextAreaElement, BirthdayTextareaP
     const getVariantStyles = () => {
       switch (variant) {
         case 'birthday':
-          return 'border-primary/30 focus:border-primary focus:ring-primary/20 bg-gradient-to-br from-white to-primary/5'
+          return 'neuro-input'
         case 'celebration':
-          return 'border-accent/30 focus:border-accent focus:ring-accent/20 bg-gradient-to-br from-white to-accent/5'
+          return 'neuro-input'
         default:
-          return 'border-border focus:border-primary focus:ring-primary/20'
+          return 'neuro-input'
       }
     }
 
@@ -102,13 +102,10 @@ const BirthdayTextarea = React.forwardRef<HTMLTextAreaElement, BirthdayTextareaP
             maxLength={maxLength}
             value={value}
             className={cn(
-              'min-h-[100px] transition-all duration-300',
-              'placeholder:text-muted-foreground/60',
-              'hover:border-primary/50',
-              'resize-none',
+              'min-h-[100px] placeholder:text-muted-foreground/60 resize-none',
               getVariantStyles(),
-              error && 'border-destructive focus:border-destructive focus:ring-destructive/20',
-              sparkle && charCount > 0 && 'shadow-md shadow-primary/10',
+              error && 'border-destructive focus:border-destructive',
+              sparkle && charCount > 0 && 'neuro-animate-pulse',
               className
             )}
             onFocus={() => setIsFocused(true)}
@@ -127,12 +124,7 @@ const BirthdayTextarea = React.forwardRef<HTMLTextAreaElement, BirthdayTextareaP
                   intensity="subtle"
                   className="opacity-60"
                 />
-                <AnimatedSparkleIcon
-                  size="xs"
-                  color="pink"
-                  intensity="normal"
-                  className="absolute -top-1 -right-1"
-                />
+                <span className="absolute -top-1 -right-1 text-xs text-pink-500">✨</span>
               </div>
             </div>
           )}
@@ -156,7 +148,7 @@ const BirthdayTextarea = React.forwardRef<HTMLTextAreaElement, BirthdayTextareaP
         {hint && !error && (
           <p className="text-xs text-muted-foreground flex items-center gap-1">
             {sparkle && (
-              <AnimatedSparkleIcon size="xs" intensity="subtle" className="opacity-50" />
+              <span className="text-pink-500 text-xs opacity-50">✨</span>
             )}
             {hint}
           </p>

@@ -22,17 +22,17 @@ const BirthdayButton = React.forwardRef<HTMLButtonElement, BirthdayButtonProps>(
     const getVariantStyles = () => {
       switch (variant) {
         case 'primary':
-          return 'bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white shadow-md hover:shadow-lg'
+          return 'neuro-button text-primary hover:text-white'
         case 'secondary':
-          return 'bg-secondary hover:bg-secondary/90 text-secondary-foreground'
+          return 'neuro-button text-secondary-foreground'
         case 'ghost':
-          return 'hover:bg-primary/10 hover:text-primary'
+          return 'hover:neuro-button hover:text-primary'
         case 'outline':
-          return 'border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground'
+          return 'neuro-button text-primary'
         case 'heart':
-          return 'bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white shadow-lg hover:shadow-xl'
+          return 'neuro-button text-primary hover:text-white'
         default:
-          return 'bg-primary hover:bg-primary/90 text-primary-foreground'
+          return 'neuro-button text-primary'
       }
     }
 
@@ -40,8 +40,8 @@ const BirthdayButton = React.forwardRef<HTMLButtonElement, BirthdayButtonProps>(
       <Button
         ref={ref}
         className={cn(
-          'relative overflow-hidden transition-all duration-300 transform hover:scale-105',
-          'font-semibold rounded-full',
+          'relative overflow-hidden font-semibold cursor-pointer hover:cursor-pointer',
+          'disabled:cursor-not-allowed',
           getVariantStyles(),
           withHearts && 'animate-pulse-soft',
           sparkle && 'sparkle-effect',

@@ -4,12 +4,12 @@ import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { MessageWithMedia } from '@/types/database'
-import { ViewMode } from './memory-gallery'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { HeartIcon, SparkleIcon } from '@/design-system/icons/birthday-icons'
 import { MapPinIcon, CalendarIcon, ImageIcon, VideoIcon, ExpandIcon, ShrinkIcon } from 'lucide-react'
 import Image from 'next/image'
+
+export type ViewMode = 'grid' | 'list' | 'slideshow' | 'fullscreen'
 
 interface MessageCardProps {
   message: MessageWithMedia
@@ -22,7 +22,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({
   message,
   viewMode,
   onMediaClick,
-  className,
+  className
 }) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const [imageError, setImageError] = useState<Record<string, boolean>>({})
@@ -33,16 +33,8 @@ export const MessageCard: React.FC<MessageCardProps> = ({
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric',
+      day: 'numeric'
     })
-  }
-
-  // Get location display
-  const getLocationDisplay = () => {
-    if (message.location_city && message.location_country) {
-      return `${message.location_city}, ${message.location_country}`
-    }
-    return message.location_country || message.location_city || message.location || 'Unknown Location'
   }
 
   // Get media stats
@@ -61,7 +53,6 @@ export const MessageCard: React.FC<MessageCardProps> = ({
 
   // Get storage URL for media files
   const getMediaUrl = (storagePath: string) => {
-    // This should match your Supabase storage configuration
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     return `${supabaseUrl}/storage/v1/object/public/birthday-media/${storagePath}`
   }
@@ -72,65 +63,100 @@ export const MessageCard: React.FC<MessageCardProps> = ({
     return text.substring(0, maxLength) + '...'
   }
 
-  // Card variants for different view modes
-  const cardVariants = {
-    grid: 'p-6 bg-white/80 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300',
-    list: 'p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-white/20 shadow-md hover:shadow-lg transition-all duration-300 flex flex-col md:flex-row gap-4',
-    slideshow: 'p-8 bg-white/90 backdrop-blur-sm rounded-3xl border border-white/30 shadow-xl max-w-4xl mx-auto',
-    fullscreen: 'p-12 bg-white/95 backdrop-blur-sm rounded-3xl border border-white/30 shadow-2xl',
-  }
-
   return (
     <motion.div
-      className={cn(cardVariants[viewMode], className)}
-      whileHover={{ scale: viewMode === 'grid' ? 1.02 : 1.01 }}
-      transition={{ duration: 0.2 }}
+      layout
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      whileHover={{
+        scale: 1.02,
+        transition: { duration: 0.2 }
+      }}
+      className={cn(
+        'neuro-card overflow-hidden relative group cursor-pointer',
+        'hover:shadow-lg transition-all duration-300',
+        'border-l-4',
+        cardType === 'text' && 'border-l-blue-400',
+        cardType === 'image' && 'border-l-green-400',
+        cardType === 'video' && 'border-l-purple-400',
+        cardType === 'mixed' && 'border-l-pink-400',
+        viewMode === 'list' && 'flex flex-row',
+        className
+      )}
     >
+      {/* Celebratory shimmer effect */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent
+                      transform -skew-x-12 -translate-x-full group-hover:translate-x-full
+                      transition-transform duration-1000 ease-out pointer-events-none" />
+
       {/* Card Header */}
       <div className={cn(
-        'flex items-start justify-between mb-4',
-        viewMode === 'list' && 'md:w-1/3 md:mb-0'
+        'p-4 relative',
+        viewMode === 'list' && 'border-r border-gray-50'
       )}>
-        <div className="flex-1">
-          <div className="flex items-center space-x-2 mb-2">
-            <HeartIcon size="sm" color="pink" />
-            <h3 className="font-display text-lg font-semibold text-charcoal-black">
-              {message.name}
-            </h3>
-            {cardType !== 'text' && (
-              <Badge variant="secondary" className="text-xs">
-                {cardType === 'mixed' ? 'Media' : cardType}
-              </Badge>
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <div className={cn(
+                'w-3 h-3 rounded-full flex-shrink-0',
+                cardType === 'text' && 'bg-blue-400',
+                cardType === 'image' && 'bg-green-400',
+                cardType === 'video' && 'bg-purple-400',
+                cardType === 'mixed' && 'bg-pink-400'
+              )} />
+              <h3 className="font-semibold text-charcoal-black text-sm font-body">
+                {message.name}
+              </h3>
+              {cardType !== 'text' && (
+                <Badge variant="secondary" className="text-xs neuro-card px-2 py-0.5">
+                  {cardType === 'mixed' ? 'Mixed' : cardType === 'image' ? 'Photo' : 'Video'}
+                </Badge>
+              )}
+            </div>
+            
+            {/* Location */}
+            {(message.location_city || message.location_country || message.location) && (
+              <div className="flex items-center gap-1 text-xs text-charcoal-black/60 mb-2">
+                <div className="neuro-card px-2 py-1 rounded-full flex items-center gap-1">
+                  <MapPinIcon className="w-3 h-3 text-pink-500" />
+                  <span className="font-body">
+                    {message.location_city && message.location_country
+                      ? `${message.location_city}, ${message.location_country}`
+                      : message.location || 'Unknown Location'
+                    }
+                  </span>
+                </div>
+              </div>
             )}
-          </div>
-          
-          <div className="flex flex-col space-y-1 text-xs text-charcoal-black/60">
-            <div className="flex items-center space-x-1">
-              <MapPinIcon className="h-3 w-3" />
-              <span>{getLocationDisplay()}</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <CalendarIcon className="h-3 w-3" />
-              <span>{formatDate(message.created_at)}</span>
-            </div>
-          </div>
-        </div>
 
-        {/* Expand/Collapse Button */}
-        {viewMode === 'grid' && message.message.length > 150 && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1 h-auto"
-          >
-            {isExpanded ? (
-              <ShrinkIcon className="h-4 w-4" />
-            ) : (
-              <ExpandIcon className="h-4 w-4" />
-            )}
-          </Button>
-        )}
+            {/* Date */}
+            <div className="flex items-center gap-1 text-xs text-charcoal-black/60">
+              <div className="neuro-card px-2 py-1 rounded-full flex items-center gap-1">
+                <CalendarIcon className="w-3 h-3 text-pink-500" />
+                <span className="font-body">{formatDate(message.created_at)}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Media count indicator */}
+          {(mediaStats.images > 0 || mediaStats.videos > 0) && (
+            <div className="flex items-center gap-2">
+              {mediaStats.images > 0 && (
+                <div className="neuro-card px-2 py-1 rounded-full flex items-center gap-1 text-xs">
+                  <ImageIcon className="w-3 h-3 text-green-500" />
+                  <span className="font-body text-charcoal-black/70">{mediaStats.images}</span>
+                </div>
+              )}
+              {mediaStats.videos > 0 && (
+                <div className="neuro-card px-2 py-1 rounded-full flex items-center gap-1 text-xs">
+                  <VideoIcon className="w-3 h-3 text-purple-500" />
+                  <span className="font-body text-charcoal-black/70">{mediaStats.videos}</span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Media Preview */}
@@ -140,7 +166,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({
           viewMode === 'list' && 'md:w-1/3 md:mb-0'
         )}>
           <div className={cn(
-            'grid gap-2',
+            'grid gap-2 p-4',
             message.media_files.length === 1 && 'grid-cols-1',
             message.media_files.length === 2 && 'grid-cols-2',
             message.media_files.length >= 3 && 'grid-cols-2 md:grid-cols-3'
@@ -148,7 +174,8 @@ export const MessageCard: React.FC<MessageCardProps> = ({
             {message.media_files.slice(0, viewMode === 'grid' ? 4 : 6).map((file, index) => (
               <div
                 key={file.id}
-                className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group"
+                className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group
+                          neuro-card hover:scale-105 transition-all duration-300"
                 onClick={() => onMediaClick(
                   getMediaUrl(file.storage_path),
                   file.file_type as 'image' | 'video',
@@ -191,78 +218,58 @@ export const MessageCard: React.FC<MessageCardProps> = ({
                     </div>
                   </div>
                 )}
-                
-                {/* Media count overlay */}
-                {index === 3 && message.media_files!.length > 4 && viewMode === 'grid' && (
+
+                {/* Show count if more files */}
+                {index === 3 && message.media_files && message.media_files.length > 4 && (
                   <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                     <span className="text-white font-semibold">
-                      +{message.media_files!.length - 4}
+                      +{message.media_files.length - 4}
                     </span>
                   </div>
                 )}
               </div>
             ))}
           </div>
-
-          {/* Media Stats */}
-          {(mediaStats.images > 0 || mediaStats.videos > 0) && (
-            <div className="flex items-center space-x-3 mt-2 text-xs text-charcoal-black/60">
-              {mediaStats.images > 0 && (
-                <div className="flex items-center space-x-1">
-                  <ImageIcon className="h-3 w-3" />
-                  <span>{mediaStats.images}</span>
-                </div>
-              )}
-              {mediaStats.videos > 0 && (
-                <div className="flex items-center space-x-1">
-                  <VideoIcon className="h-3 w-3" />
-                  <span>{mediaStats.videos}</span>
-                </div>
-              )}
-            </div>
-          )}
         </div>
       )}
 
       {/* Message Content */}
       <div className={cn(
-        'flex-1',
-        viewMode === 'list' && 'md:w-1/3'
+        'p-4',
+        viewMode === 'list' && 'flex-1'
       )}>
-        <div className="relative">
-          <p className={cn(
-            'font-body text-charcoal-black leading-relaxed',
-            viewMode === 'grid' && 'text-sm',
-            viewMode === 'list' && 'text-sm',
-            viewMode === 'slideshow' && 'text-base',
-            viewMode === 'fullscreen' && 'text-lg'
-          )}>
-            {viewMode === 'grid' && !isExpanded
-              ? truncateMessage(message.message)
-              : message.message}
-          </p>
-          
-          {/* Sparkle decoration for special messages */}
-          {message.message.length > 200 && (
-            <SparkleIcon 
-              size="sm" 
-              color="roseGold" 
-              className="absolute -top-2 -right-2 animate-sparkle opacity-60" 
-            />
+        <div className="space-y-3">
+          {/* Message text */}
+          <div className="text-charcoal-black/80 text-sm leading-relaxed font-body
+                          p-3 neuro-card bg-gradient-to-br from-white to-pink-50/30 rounded-lg">
+            {isExpanded || viewMode === 'fullscreen'
+              ? message.message
+              : truncateMessage(message.message)
+            }
+          </div>
+
+          {/* Expand/Collapse button */}
+          {message.message.length > 150 && viewMode !== 'fullscreen' && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="text-xs text-gray-500 hover:text-gray-700 p-0 h-auto"
+            >
+              {isExpanded ? (
+                <>
+                  <ShrinkIcon className="w-3 h-3 mr-1" />
+                  Show less
+                </>
+              ) : (
+                <>
+                  <ExpandIcon className="w-3 h-3 mr-1" />
+                  Read more
+                </>
+              )}
+            </Button>
           )}
         </div>
-
-        {/* Read More/Less for long messages in grid view */}
-        {viewMode === 'grid' && message.message.length > 150 && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="mt-2 p-0 h-auto text-xs text-primary hover:text-primary/80"
-          >
-            {isExpanded ? 'Show less' : 'Read more'}
-          </Button>
-        )}
       </div>
     </motion.div>
   )

@@ -8,6 +8,7 @@ import {
   Text,
   Button,
   Preview,
+  Img,
 } from '@react-email/components'
 import type { ContributorNotificationProps } from '@/types/email'
 
@@ -42,6 +43,15 @@ export function ContributorNotificationEmail({
                 <table role="presentation" border={0} cellPadding={0} cellSpacing={0} style={mainStyle}>
                   <tr>
                     <td style={wrapperStyle}>
+
+                      {/* Logo Section */}
+                      <div style={logoSectionStyle}>
+                        <Img
+                          src="http://localhost:3000/assets/icons/svg/logo.svg"
+                          alt="Birthday Surprise Logo"
+                          style={logoStyle}
+                        />
+                      </div>
 
                       {/* Header */}
                       <h1 style={headingStyle}>🎉 Today is the Big Day! 🎉</h1>
@@ -240,4 +250,18 @@ const buttonStyle = {
   padding: '16px 32px',
   textDecoration: 'none',
   textTransform: 'capitalize' as const,
+}
+
+const logoSectionStyle = {
+  textAlign: 'center' as const,
+  marginBottom: '32px',
+  paddingBottom: '24px',
+  borderBottom: '2px solid #fce7f3',
+}
+
+const logoStyle = {
+  width: '120px',
+  height: '120px',
+  margin: '0 auto',
+  display: 'block',
 }

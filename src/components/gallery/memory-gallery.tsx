@@ -1,306 +1,358 @@
 'use client'
 
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
-import { MessageCard } from './message-card'
-import { GalleryFilters } from './gallery-filters'
-import { GallerySearch } from './gallery-search'
-import { MediaLightbox } from './media-lightbox'
 import { useGalleryData } from '@/hooks/use-gallery-data'
-import { HeartIcon, SparkleIcon } from '@/design-system/icons/birthday-icons'
+import { MessageCard, ViewMode } from './message-card'
+import { MediaLightbox } from './media-lightbox'
+import { GalleryFilters, ContentType, DateRange } from './gallery-filters'
+import { GallerySearch } from './gallery-search'
 import { Button } from '@/components/ui/button'
-import { GridIcon, ListIcon, PlayIcon, FullscreenIcon } from 'lucide-react'
-
-export type ViewMode = 'grid' | 'list' | 'slideshow' | 'fullscreen'
-export type SortOption = 'newest' | 'oldest' | 'location' | 'length' | 'random'
+import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { SparkleEffect } from '@/components/ui/confetti-animation'
+import {
+  GridIcon,
+  ListIcon,
+  PlayIcon,
+  ExpandIcon,
+  FilterIcon,
+  RefreshCwIcon
+} from 'lucide-react'
 
 interface MemoryGalleryProps {
   className?: string
-  initialViewMode?: ViewMode
-  showFilters?: boolean
-  showSearch?: boolean
 }
 
-export const MemoryGallery: React.FC<MemoryGalleryProps> = ({
-  className,
-  initialViewMode = 'grid',
-  showFilters = true,
-  showSearch = true,
-}) => {
-  // State management
-  const [viewMode, setViewMode] = useState<ViewMode>(initialViewMode)
-  const [sortBy, setSortBy] = useState<SortOption>('newest')
+export const MemoryGallery: React.FC<MemoryGalleryProps> = ({ className }) => {
+  // Data fetching
+  const { messages, loading, error, refetch, hasMore, loadMore } = useGalleryData(20)
+
+  // View state
+  const [viewMode, setViewMode] = useState<ViewMode>('grid')
+  const [showFilters, setShowFilters] = useState(false)
+
+  // Filter state
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedFilters, setSelectedFilters] = useState({
-    contentType: 'all' as 'all' | 'text' | 'image' | 'video' | 'mixed',
-    location: '',
-    dateRange: 'all' as 'all' | 'week' | 'month' | 'year',
-  })
+  const [contentType, setContentType] = useState<ContentType>('all')
+  const [location, setLocation] = useState('all')
+  const [dateRange, setDateRange] = useState<DateRange>('all')
+
+  // Lightbox state
   const [lightboxMedia, setLightboxMedia] = useState<{
     url: string
     type: 'image' | 'video'
     title?: string
   } | null>(null)
 
-  // Data fetching
-  const { messages, loading, error, refetch } = useGalleryData()
+  // Celebration state
+  const [showSparkles, setShowSparkles] = useState(false)
 
-  // Filter and sort messages
-  const filteredAndSortedMessages = useMemo(() => {
-    if (!messages) return []
-
-    let filtered = messages.filter(message => {
+  // Filter messages based on current filters
+  const filteredMessages = useMemo(() => {
+    return messages.filter(message => {
       // Search filter
       if (searchQuery) {
         const query = searchQuery.toLowerCase()
         const matchesSearch = 
           message.name.toLowerCase().includes(query) ||
           message.message.toLowerCase().includes(query) ||
-          message.location_city?.toLowerCase().includes(query) ||
-          message.location_country?.toLowerCase().includes(query)
+          (message.location && message.location.toLowerCase().includes(query)) ||
+          (message.location_city && message.location_city.toLowerCase().includes(query)) ||
+          (message.location_country && message.location_country.toLowerCase().includes(query))
         
         if (!matchesSearch) return false
       }
 
       // Content type filter
-      if (selectedFilters.contentType !== 'all') {
-        const hasMedia = message.media_files && message.media_files.length > 0
-        const hasImages = message.media_files?.some(f => f.file_type === 'image')
-        const hasVideos = message.media_files?.some(f => f.file_type === 'video')
-        
-        switch (selectedFilters.contentType) {
+      if (contentType !== 'all') {
+        const hasImages = message.media_files?.some(f => f.file_type === 'image') || false
+        const hasVideos = message.media_files?.some(f => f.file_type === 'video') || false
+        const hasMedia = hasImages || hasVideos
+
+        switch (contentType) {
           case 'text':
             if (hasMedia) return false
             break
           case 'image':
-            if (!hasImages) return false
+            if (!hasImages || hasVideos) return false
             break
           case 'video':
-            if (!hasVideos) return false
+            if (!hasVideos || hasImages) return false
             break
           case 'mixed':
-            if (!hasMedia) return false
+            if (!hasImages || !hasVideos) return false
             break
         }
       }
 
       // Location filter
-      if (selectedFilters.location) {
-        const locationMatch = 
-          message.location_country?.toLowerCase().includes(selectedFilters.location.toLowerCase()) ||
-          message.location_city?.toLowerCase().includes(selectedFilters.location.toLowerCase())
-        
-        if (!locationMatch) return false
+      if (location && location !== 'all') {
+        const messageLocation = message.location_country || message.location || ''
+        if (!messageLocation.toLowerCase().includes(location.toLowerCase())) {
+          return false
+        }
       }
 
       // Date range filter
-      if (selectedFilters.dateRange !== 'all') {
+      if (dateRange !== 'all') {
         const messageDate = new Date(message.created_at)
         const now = new Date()
-        const daysDiff = Math.floor((now.getTime() - messageDate.getTime()) / (1000 * 60 * 60 * 24))
         
-        switch (selectedFilters.dateRange) {
+        switch (dateRange) {
           case 'week':
-            if (daysDiff > 7) return false
+            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+            if (messageDate < weekAgo) return false
             break
           case 'month':
-            if (daysDiff > 30) return false
+            const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+            if (messageDate < monthAgo) return false
             break
           case 'year':
-            if (daysDiff > 365) return false
+            const yearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000)
+            if (messageDate < yearAgo) return false
             break
         }
       }
 
       return true
     })
+  }, [messages, searchQuery, contentType, location, dateRange])
 
-    // Sort messages
-    switch (sortBy) {
-      case 'newest':
-        filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-        break
-      case 'oldest':
-        filtered.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-        break
-      case 'location':
-        filtered.sort((a, b) => {
-          const locationA = a.location_country || a.location_city || ''
-          const locationB = b.location_country || b.location_city || ''
-          return locationA.localeCompare(locationB)
-        })
-        break
-      case 'length':
-        filtered.sort((a, b) => b.message.length - a.message.length)
-        break
-      case 'random':
-        filtered.sort(() => Math.random() - 0.5)
-        break
-    }
 
-    return filtered
-  }, [messages, searchQuery, selectedFilters, sortBy])
 
-  // View mode icons
-  const viewModeIcons = {
-    grid: GridIcon,
-    list: ListIcon,
-    slideshow: PlayIcon,
-    fullscreen: FullscreenIcon,
-  }
+  // Handle media click for lightbox
+  const handleMediaClick = useCallback((url: string, type: 'image' | 'video', title?: string) => {
+    setLightboxMedia({ url, type, title })
 
-  // Loading state
-  if (loading) {
-    return (
-      <div className={cn('w-full', className)}>
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-charcoal-black/70">Loading beautiful memories...</p>
-        </div>
-      </div>
-    )
-  }
+    // Trigger subtle sparkle effects for interaction feedback
+    setShowSparkles(true)
+    setTimeout(() => setShowSparkles(false), 2000)
+  }, [])
 
-  // Error state
-  if (error) {
-    return (
-      <div className={cn('w-full', className)}>
-        <div className="text-center py-12">
-          <div className="text-red-500 mb-4">
-            <HeartIcon size="lg" color="pink" />
-          </div>
-          <p className="text-charcoal-black/70 mb-4">Oops! Something went wrong loading the memories.</p>
-          <Button onClick={refetch} variant="outline">
-            Try Again
-          </Button>
-        </div>
-      </div>
-    )
-  }
+  // Clear all filters
+  const handleClearFilters = useCallback(() => {
+    setSearchQuery('')
+    setContentType('all')
+    setLocation('all')
+    setDateRange('all')
+  }, [])
+
+  // View mode options
+  const viewModeOptions = [
+    { mode: 'grid' as ViewMode, icon: GridIcon, label: 'Grid' },
+    { mode: 'list' as ViewMode, icon: ListIcon, label: 'List' },
+    { mode: 'slideshow' as ViewMode, icon: PlayIcon, label: 'Slideshow' },
+    { mode: 'fullscreen' as ViewMode, icon: ExpandIcon, label: 'Fullscreen' },
+  ]
 
   return (
-    <div className={cn('w-full space-y-6', className)}>
+    <div className={cn('space-y-6', className)}>
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div className="flex items-center space-x-2">
-          <HeartIcon size="md" color="pink" className="animate-pulse-soft" />
-          <h2 className="font-display text-2xl md:text-3xl font-bold text-charcoal-black">
-            Memory Gallery
-          </h2>
-          <SparkleIcon size="sm" color="roseGold" className="animate-sparkle" />
-        </div>
-        
-        {/* View Mode Controls */}
-        <div className="flex items-center space-x-2">
-          {Object.entries(viewModeIcons).map(([mode, Icon]) => (
-            <Button
-              key={mode}
-              variant={viewMode === mode ? "default" : "outline"}
-              size="sm"
-              onClick={() => setViewMode(mode as ViewMode)}
-              className="p-2"
-            >
-              <Icon className="h-4 w-4" />
-            </Button>
-          ))}
-        </div>
-      </div>
-
-      {/* Search and Filters */}
-      <div className="flex flex-col lg:flex-row gap-4">
-        {showSearch && (
-          <div className="flex-1">
-            <GallerySearch
-              value={searchQuery}
-              onChange={setSearchQuery}
-              placeholder="Search messages, names, or locations..."
-            />
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <h1 className="text-2xl md:text-3xl font-bold text-primary font-body">
+                Memory Gallery
+              </h1>
+              <div className="absolute -top-1 -right-1 w-2 h-2 bg-pink-400 rounded-full animate-pulse"></div>
+            </div>
           </div>
-        )}
-        
-        {showFilters && (
-          <GalleryFilters
-            filters={selectedFilters}
-            onFiltersChange={setSelectedFilters}
-            sortBy={sortBy}
-            onSortChange={setSortBy}
-          />
-        )}
-      </div>
 
-      {/* Results Summary */}
-      <div className="flex items-center justify-between text-sm text-charcoal-black/70">
-        <span>
-          {filteredAndSortedMessages.length} {filteredAndSortedMessages.length === 1 ? 'memory' : 'memories'} found
-        </span>
-        {searchQuery && (
+          {filteredMessages.length > 0 && (
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="text-sm neuro-card px-3 py-1">
+                {filteredMessages.length} {filteredMessages.length === 1 ? 'memory' : 'memories'}
+              </Badge>
+              <div className="hidden sm:block text-sm text-charcoal-black/60 font-body">
+                Celebrating together
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2">
+          {/* View Mode Selector */}
+          <div className="flex items-center neuro-card p-1">
+            {viewModeOptions.map(({ mode, icon: Icon, label }) => (
+              <Button
+                key={mode}
+                variant={viewMode === mode ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode(mode)}
+                className={cn(
+                  "px-3 py-1.5 text-xs",
+                  viewMode === mode && "neuro-button"
+                )}
+                title={label}
+              >
+                <Icon className="w-4 h-4" />
+              </Button>
+            ))}
+          </div>
+
+          {/* Filter Toggle */}
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
-            onClick={() => setSearchQuery('')}
-            className="text-xs"
-          >
-            Clear search
-          </Button>
-        )}
-      </div>
-
-      {/* Gallery Content */}
-      <AnimatePresence mode="wait">
-        {filteredAndSortedMessages.length === 0 ? (
-          <motion.div
-            key="empty"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="text-center py-12"
-          >
-            <div className="text-6xl mb-4">💌</div>
-            <h3 className="font-display text-xl font-semibold text-charcoal-black mb-2">
-              No memories found
-            </h3>
-            <p className="text-charcoal-black/70">
-              {searchQuery || selectedFilters.contentType !== 'all' || selectedFilters.location
-                ? 'Try adjusting your search or filters'
-                : 'Be the first to share a beautiful memory!'}
-            </p>
-          </motion.div>
-        ) : (
-          <motion.div
-            key={`${viewMode}-${filteredAndSortedMessages.length}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            onClick={() => setShowFilters(!showFilters)}
             className={cn(
-              'grid gap-6',
-              viewMode === 'grid' && 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
-              viewMode === 'list' && 'grid-cols-1',
-              (viewMode === 'slideshow' || viewMode === 'fullscreen') && 'grid-cols-1'
+              "flex items-center gap-2",
+              showFilters && "neuro-button"
             )}
           >
-            {filteredAndSortedMessages.map((message, index) => (
-              <motion.div
-                key={message.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.3 }}
-              >
-                <MessageCard
-                  message={message}
-                  viewMode={viewMode}
-                  onMediaClick={(url, type, title) => setLightboxMedia({ url, type, title })}
-                />
-              </motion.div>
-            ))}
+            <FilterIcon className="w-4 h-4" />
+            Filters
+          </Button>
+
+          {/* Refresh */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={refetch}
+            disabled={loading}
+            className="flex items-center gap-2"
+          >
+            <RefreshCwIcon className={cn("w-4 h-4", loading && "animate-spin")} />
+            Refresh
+          </Button>
+
+
+        </div>
+      </div>
+
+      {/* Search */}
+      <GallerySearch
+        value={searchQuery}
+        onChange={setSearchQuery}
+        className="max-w-md"
+      />
+
+      {/* Filters */}
+      <AnimatePresence>
+        {showFilters && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden"
+          >
+            <GalleryFilters
+              contentType={contentType}
+              location={location}
+              dateRange={dateRange}
+              onContentTypeChange={setContentType}
+              onLocationChange={setLocation}
+              onDateRangeChange={setDateRange}
+              onClearFilters={handleClearFilters}
+            />
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Error State */}
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>
+            {error}
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Loading State */}
+      {loading && messages.length === 0 && (
+        <div className={cn(
+          'grid gap-6',
+          viewMode === 'grid' && 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
+          viewMode === 'list' && 'grid-cols-1'
+        )}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="space-y-3">
+              <Skeleton className="h-48 w-full rounded-lg" />
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!loading && filteredMessages.length === 0 && messages.length > 0 && (
+        <div className="text-center py-12">
+          <HeartIcon className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No memories found</h3>
+          <p className="text-gray-500 mb-4">
+            Try adjusting your search or filters to find more memories.
+          </p>
+          <Button variant="outline" onClick={handleClearFilters}>
+            Clear Filters
+          </Button>
+        </div>
+      )}
+
+      {/* No Data State */}
+      {!loading && messages.length === 0 && (
+        <div className="text-center py-12">
+          <HeartIcon className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No memories yet</h3>
+          <p className="text-gray-500">
+            Be the first to share a memory! Messages will appear here once they're approved.
+          </p>
+        </div>
+      )}
+
+      {/* Messages Grid */}
+      {filteredMessages.length > 0 && (
+        <motion.div
+          layout
+          className={cn(
+            'grid gap-6',
+            viewMode === 'grid' && 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
+            viewMode === 'list' && 'grid-cols-1',
+            viewMode === 'slideshow' && 'grid-cols-1 md:grid-cols-2',
+            viewMode === 'fullscreen' && 'grid-cols-1'
+          )}
+        >
+          <AnimatePresence mode="popLayout">
+            {filteredMessages.map((message) => (
+              <MessageCard
+                key={message.id}
+                message={message}
+                viewMode={viewMode}
+                onMediaClick={handleMediaClick}
+              />
+            ))}
+          </AnimatePresence>
+        </motion.div>
+      )}
+
+      {/* Load More */}
+      {hasMore && !loading && (
+        <div className="text-center">
+          <Button
+            variant="outline"
+            onClick={loadMore}
+            className="px-8"
+          >
+            Load More Memories
+          </Button>
+        </div>
+      )}
 
       {/* Media Lightbox */}
       <MediaLightbox
         media={lightboxMedia}
         onClose={() => setLightboxMedia(null)}
+      />
+
+      {/* Interaction Effects */}
+      <SparkleEffect
+        trigger={showSparkles}
+        duration={2000}
+        className="relative"
       />
     </div>
   )

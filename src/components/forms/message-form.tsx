@@ -29,12 +29,7 @@ import {
 } from '@/components/ui/form'
 
 // Icons and UI
-import { 
-  AnimatedHeartIcon, 
-  AnimatedSparkleIcon, 
-  AnimatedGiftIcon,
-  AnimatedCelebrationIcon 
-} from '@/design-system/icons/animated-birthday-icons'
+
 import { BirthdayCard, BirthdayCardContent, BirthdayCardHeader } from '@/components/birthday-card'
 import { useAutoSave } from '@/hooks/use-auto-save'
 
@@ -104,7 +99,12 @@ export const MessageForm: React.FC<MessageFormProps> = ({
 
   // Handle form submission
   const handleSubmit = async (data: MessageFormData) => {
-    if (disabled || isSubmitting) return
+    console.log('🚀 Form submission started:', { disabled, isSubmitting, data: { ...data, message: data.message.substring(0, 50) + '...' } })
+
+    if (disabled || isSubmitting) {
+      console.log('⚠️ Form submission blocked:', { disabled, isSubmitting })
+      return
+    }
 
     setIsSubmitting(true)
     setSubmitError(null)
@@ -202,7 +202,7 @@ export const MessageForm: React.FC<MessageFormProps> = ({
 
       // Show success toast
       toast({
-        title: "🎉 Message Submitted Successfully!",
+        title: "Message Submitted Successfully!",
         description: "Thank you for your birthday wish. It will be displayed on the special day!",
         variant: "default",
         duration: 5000,
@@ -231,12 +231,10 @@ export const MessageForm: React.FC<MessageFormProps> = ({
     <div className={cn('w-full max-w-2xl mx-auto', className)}>
       <BirthdayCard className="overflow-hidden">
         <BirthdayCardHeader className="text-center pb-6">
-          <div className="flex items-center justify-center space-x-2 mb-4">
-            <AnimatedSparkleIcon size="md" color="pink" intensity="normal" />
-            <h2 className="font-display text-2xl md:text-3xl font-bold text-charcoal-black">
+          <div className="flex items-center justify-center mb-4">
+            <h2 className="font-body text-2xl md:text-3xl font-bold text-charcoal-black">
               Add Your Birthday Wish
             </h2>
-            <AnimatedSparkleIcon size="md" color="roseGold" intensity="normal" />
           </div>
           <p className="font-body text-base text-charcoal-black/70">
             Share a heartfelt message to make this birthday extra special
@@ -304,7 +302,6 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-2">
-                      <AnimatedHeartIcon size="xs" color="pink" intensity="subtle" />
                       Your Name
                       <span className="text-destructive">*</span>
                     </FormLabel>
@@ -330,7 +327,6 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-2">
-                      <AnimatedSparkleIcon size="xs" color="roseGold" intensity="subtle" />
                       Email Address
                       <span className="text-destructive">*</span>
                     </FormLabel>
@@ -360,7 +356,6 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-2">
-                      <span>📍</span>
                       Location (Optional)
                     </FormLabel>
                     <FormControl>
@@ -384,7 +379,6 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-2">
-                      <AnimatedGiftIcon size="xs" color="pink" intensity="subtle" />
                       Your Birthday Message
                       <span className="text-destructive">*</span>
                     </FormLabel>
@@ -422,7 +416,6 @@ export const MessageForm: React.FC<MessageFormProps> = ({
               {/* File Upload Section */}
               <div className="space-y-3">
                 <Label className="flex items-center gap-2">
-                  <span>📎</span>
                   Photos & Videos (Optional)
                 </Label>
                 <FileUpload
@@ -461,7 +454,6 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel className="flex items-center gap-2 cursor-pointer">
-                        <AnimatedSparkleIcon size="xs" color="pink" intensity="subtle" />
                         Send me birthday reminders
                       </FormLabel>
                       <FormDescription>
@@ -480,20 +472,9 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                   className="flex-1 h-12 text-base font-semibold bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white shadow-lg hover:shadow-xl transition-all duration-300"
                 >
                   {isSubmitting ? (
-                    <div className="flex items-center space-x-2">
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      >
-                        <AnimatedSparkleIcon size="sm" color="white" animate={false} />
-                      </motion.div>
-                      <span>Submitting...</span>
-                    </div>
+                    <span>Submitting...</span>
                   ) : (
-                    <div className="flex items-center space-x-2">
-                      <AnimatedHeartIcon size="sm" color="white" intensity="normal" />
-                      <span>Submit Birthday Wish</span>
-                    </div>
+                    <span>Submit Birthday Wish</span>
                   )}
                 </Button>
                 

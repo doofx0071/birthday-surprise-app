@@ -8,6 +8,7 @@ import {
   Text,
   Button,
   Preview,
+  Img,
 } from '@react-email/components'
 
 interface ThankYouEmailProps {
@@ -44,7 +45,16 @@ export function ThankYouEmail({
                 <table role="presentation" border={0} cellPadding={0} cellSpacing={0} style={mainStyle}>
                   <tr>
                     <td style={wrapperStyle}>
-                      
+
+                      {/* Logo Section */}
+                      <div style={logoSectionStyle}>
+                        <Img
+                          src="http://localhost:3000/assets/icons/svg/logo.svg"
+                          alt="Birthday Surprise Logo"
+                          style={logoStyle}
+                        />
+                      </div>
+
                       {/* Header */}
                       <h1 style={headingStyle}>Thank You! 💕</h1>
                       
@@ -245,6 +255,20 @@ const sectionHeadingStyle = {
   fontWeight: 'bold',
   margin: '24px 0 16px 0',
   color: '#ec4899',
+}
+
+const logoSectionStyle = {
+  textAlign: 'center' as const,
+  marginBottom: '32px',
+  paddingBottom: '24px',
+  borderBottom: '2px solid #fce7f3',
+}
+
+const logoStyle = {
+  width: '120px',
+  height: '120px',
+  margin: '0 auto',
+  display: 'block',
 }
 
 
