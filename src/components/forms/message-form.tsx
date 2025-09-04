@@ -225,7 +225,6 @@ export const MessageForm: React.FC<MessageFormProps> = ({
   // Character count for message field
   const messageValue = form.watch('message') || ''
   const messageLength = messageValue.length
-  const maxMessageLength = 500
 
   return (
     <div className={cn('w-full max-w-2xl mx-auto', className)}>
@@ -388,7 +387,7 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                         placeholder="Write your heartfelt birthday message here..."
                         variant="birthday"
                         sparkle
-                        maxLength={maxMessageLength}
+
                         showCharCount
                         disabled={disabled || isSubmitting}
                         error={form.formState.errors.message?.message}

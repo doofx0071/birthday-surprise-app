@@ -54,10 +54,9 @@ export const messageFormSchema = z.object({
     .max(180, "Longitude must be between -180 and 180")
     .optional(),
 
-  // Message: Required, 10-500 characters
+  // Message: Required, minimum 10 characters
   message: z.string()
     .min(10, "Message must be at least 10 characters")
-    .max(500, "Message must be less than 500 characters")
     .refine(
       (msg) => msg.trim().length >= 10,
       "Message must contain at least 10 meaningful characters"
@@ -87,8 +86,7 @@ export const fieldValidationSchemas = {
     .optional(),
   
   message: z.string()
-    .min(10, "Message must be at least 10 characters")
-    .max(500, "Message must be less than 500 characters"),
+    .min(10, "Message must be at least 10 characters"),
 }
 
 // Helper function to validate individual fields

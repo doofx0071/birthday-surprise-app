@@ -138,7 +138,7 @@ describe('MessageForm Component', () => {
       const messageInput = screen.getByLabelText(/your message/i)
       await user.type(messageInput, 'Hello world!')
 
-      expect(screen.getByText(/12 \/ 500/)).toBeInTheDocument()
+      expect(screen.getByText(/12/)).toBeInTheDocument()
     })
 
     it('should prevent submission when form is invalid', async () => {

@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS public.messages (
   name VARCHAR(50) NOT NULL,
   email VARCHAR(255) NOT NULL,
   location VARCHAR(255),
-  message TEXT NOT NULL CHECK (char_length(message) >= 10 AND char_length(message) <= 500),
+  message TEXT NOT NULL CHECK (char_length(message) >= 10),
   wants_reminders BOOLEAN DEFAULT false,
   status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,

@@ -39,7 +39,19 @@ export const MemoryGallery: React.FC<MemoryGalleryProps> = ({ className, headerO
     url: string
     type: 'image' | 'video'
     title?: string
+    id: string
   } | null>(null)
+
+  // Media navigation state
+  const [currentMediaList, setCurrentMediaList] = useState<Array<{
+    url: string
+    type: 'image' | 'video'
+    title?: string
+    id: string
+  }>>([])
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0)
+
+
 
   // Celebration state
   const [showSparkles, setShowSparkles] = useState(false)
@@ -93,18 +105,63 @@ export const MemoryGallery: React.FC<MemoryGalleryProps> = ({ className, headerO
 
 
 
-  // Handle media click for lightbox
-  const handleMediaClick = useCallback((url: string, type: 'image' | 'video', title?: string) => {
-    setLightboxMedia({
-      url,
-      type,
-      title
-    })
+  // Handle media click for lightbox with navigation support
+  const handleMediaClick = useCallback((
+    url: string,
+    type: 'image' | 'video',
+    title?: string,
+    mediaFiles?: Array<any>,
+    clickedIndex?: number
+  ) => {
+    // If mediaFiles are provided, set up navigation
+    if (mediaFiles && mediaFiles.length > 0) {
+      const mediaList = mediaFiles.map((file) => ({
+        url: getMediaUrl(file.storage_path),
+        type: file.file_type as 'image' | 'video',
+        title: `${title?.split("'s")[0]}'s ${file.file_type}`,
+        id: file.id
+      }))
+
+      setCurrentMediaList(mediaList)
+      setCurrentMediaIndex(clickedIndex || 0)
+      setLightboxMedia(mediaList[clickedIndex || 0])
+    } else {
+      // Fallback for single media
+      setLightboxMedia({
+        url,
+        type,
+        title,
+        id: 'single-media'
+      })
+      setCurrentMediaList([])
+      setCurrentMediaIndex(0)
+    }
 
     // Trigger subtle sparkle effects for interaction feedback
     setShowSparkles(true)
     setTimeout(() => setShowSparkles(false), 2000)
   }, [])
+
+  // Get storage URL for media files
+  const getMediaUrl = (storagePath: string) => {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    return `${supabaseUrl}/storage/v1/object/public/birthday-media/${storagePath}`
+  }
+
+  // Handle navigation between media items
+  const handleMediaNavigation = useCallback((direction: 'prev' | 'next') => {
+    if (currentMediaList.length === 0) return
+
+    let newIndex = currentMediaIndex
+    if (direction === 'prev' && currentMediaIndex > 0) {
+      newIndex = currentMediaIndex - 1
+    } else if (direction === 'next' && currentMediaIndex < currentMediaList.length - 1) {
+      newIndex = currentMediaIndex + 1
+    }
+
+    setCurrentMediaIndex(newIndex)
+    setLightboxMedia(currentMediaList[newIndex])
+  }, [currentMediaList, currentMediaIndex])
 
   // Removed filter functionality for cleaner experience
 
@@ -242,6 +299,28 @@ export const MemoryGallery: React.FC<MemoryGalleryProps> = ({ className, headerO
             </Button>
           </div>
         )}
+
+
+
+        {/* Media Lightbox */}
+        <MediaLightbox
+          media={lightboxMedia}
+          mediaList={currentMediaList}
+          currentIndex={currentMediaIndex}
+          onClose={() => {
+            setLightboxMedia(null)
+            setCurrentMediaList([])
+            setCurrentMediaIndex(0)
+          }}
+          onNavigate={handleMediaNavigation}
+        />
+
+        {/* Interaction Effects */}
+        <SparkleEffect
+          trigger={showSparkles}
+          duration={2000}
+          className="relative"
+        />
       </div>
     )
   }
@@ -368,10 +447,19 @@ export const MemoryGallery: React.FC<MemoryGalleryProps> = ({ className, headerO
         </div>
       )}
 
+
+
       {/* Media Lightbox */}
       <MediaLightbox
         media={lightboxMedia}
-        onClose={() => setLightboxMedia(null)}
+        mediaList={currentMediaList}
+        currentIndex={currentMediaIndex}
+        onClose={() => {
+          setLightboxMedia(null)
+          setCurrentMediaList([])
+          setCurrentMediaIndex(0)
+        }}
+        onNavigate={handleMediaNavigation}
       />
 
       {/* Interaction Effects */}

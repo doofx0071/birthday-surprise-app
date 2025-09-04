@@ -152,19 +152,16 @@ describe('Message Schema Validation', () => {
       }
     })
 
-    it('should reject messages that are too long', () => {
+    it('should accept long messages', () => {
       const data = {
         name: 'John Doe',
         email: 'john@example.com',
-        message: 'A'.repeat(501),
+        message: 'A'.repeat(1000), // Test with a very long message
         wantsReminders: false,
       }
 
       const result = messageFormSchema.safeParse(data)
-      expect(result.success).toBe(false)
-      if (!result.success) {
-        expect(result.error.errors[0].message).toContain('less than 500 characters')
-      }
+      expect(result.success).toBe(true)
     })
 
     it('should accept messages at the boundary limits', () => {

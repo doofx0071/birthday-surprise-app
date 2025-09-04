@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 import { MessageWithMedia } from '@/types/database'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { MapPinIcon, CalendarIcon, VideoIcon, ExpandIcon, ShrinkIcon } from 'lucide-react'
+import { MapPinIcon, CalendarIcon, VideoIcon, ExpandIcon, ShrinkIcon, ImageIcon } from 'lucide-react'
 import Image from 'next/image'
 
 export type ViewMode = 'grid' | 'list' | 'slideshow' | 'fullscreen'
@@ -14,7 +14,13 @@ export type ViewMode = 'grid' | 'list' | 'slideshow' | 'fullscreen'
 interface MessageCardProps {
   message: MessageWithMedia
   viewMode: ViewMode
-  onMediaClick: (url: string, type: 'image' | 'video', title?: string) => void
+  onMediaClick: (
+    url: string,
+    type: 'image' | 'video',
+    title?: string,
+    mediaFiles?: Array<any>,
+    clickedIndex?: number
+  ) => void
   className?: string
 }
 
@@ -157,11 +163,25 @@ export const MessageCard: React.FC<MessageCardProps> = ({
                 key={file.id}
                 className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group
                           bg-white border border-gray-200 hover:scale-105 transition-all duration-300"
-                onClick={() => onMediaClick(
-                  getMediaUrl(file.storage_path),
-                  file.file_type as 'image' | 'video',
-                  `${message.name}'s ${file.file_type}`
-                )}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+
+                  // Visual feedback
+                  const target = e.currentTarget as HTMLElement
+                  target.style.transform = 'scale(0.95)'
+                  setTimeout(() => {
+                    target.style.transform = ''
+                  }, 150)
+
+                  onMediaClick(
+                    getMediaUrl(file.storage_path),
+                    file.file_type as 'image' | 'video',
+                    `${message.name}'s ${file.file_type}`,
+                    message.media_files,
+                    index
+                  )
+                }}
               >
                 {file.file_type === 'image' ? (
                   <>

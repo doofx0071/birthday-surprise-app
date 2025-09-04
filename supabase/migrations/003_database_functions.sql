@@ -125,8 +125,8 @@ CREATE OR REPLACE FUNCTION validate_message_content()
 RETURNS TRIGGER AS $$
 BEGIN
   -- Ensure message length is within bounds
-  IF length(NEW.message) < 10 OR length(NEW.message) > 500 THEN
-    RAISE EXCEPTION 'Message must be between 10 and 500 characters';
+  IF length(NEW.message) < 10 THEN
+    RAISE EXCEPTION 'Message must be at least 10 characters';
   END IF;
   
   -- Ensure name is valid
