@@ -4,6 +4,7 @@ import { BirthdayNotificationEmail } from '@/components/emails/BirthdayNotificat
 import { ContributorNotificationEmail } from '@/components/emails/ContributorNotification'
 import { MessagePendingReview } from '@/components/emails/message-pending-review'
 import { MessageApproved } from '@/components/emails/message-approved'
+import PasswordResetEmail from '@/components/emails/password-reset'
 
 export interface EmailTemplateData {
   id: string
@@ -111,6 +112,22 @@ export const emailTemplates: EmailTemplateData[] = [
       { key: 'girlfriendName', label: 'Birthday Person Name', type: 'text', required: true },
       { key: 'websiteUrl', label: 'Website URL', type: 'url', required: true },
       { key: 'approvedAt', label: 'Approval Date', type: 'text' },
+    ],
+  },
+  {
+    id: 'password-reset',
+    name: 'Password Reset',
+    description: 'Email sent to admin users when they request a password reset',
+    component: PasswordResetEmail,
+    defaultProps: {
+      adminName: 'Admin',
+      resetLink: 'https://doofio.site/admin/reset-password?token=sample-token-123',
+      expirationTime: '1 hour',
+    },
+    editableProps: [
+      { key: 'adminName', label: 'Admin Name', type: 'text', required: true },
+      { key: 'resetLink', label: 'Reset Link', type: 'url', required: true },
+      { key: 'expirationTime', label: 'Expiration Time', type: 'text', required: true },
     ],
   },
 ]

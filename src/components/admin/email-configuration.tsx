@@ -20,7 +20,7 @@ const configSchema = z.object({
   replyToEmail: z.string().email('Valid reply-to email is required'),
   webhookUrl: z.string().url('Valid webhook URL is required').optional().or(z.literal('')),
   webhookSecret: z.string().optional(),
-  testEmail: z.string().email('Valid test email is required'),
+  testEmail: z.string().email('Valid test email is required').optional().or(z.literal('')),
 })
 
 type ConfigFormData = z.infer<typeof configSchema>
@@ -116,6 +116,15 @@ export function EmailConfiguration() {
   }
 
   const handleTestEmail = async (data: ConfigFormData) => {
+    if (!data.testEmail) {
+      toast({
+        title: 'Test Email Required',
+        description: 'Please enter a test email address',
+        variant: 'destructive',
+      })
+      return
+    }
+
     setTesting(true)
     try {
       const response = await fetch('/api/admin/email-test', {
@@ -300,7 +309,7 @@ export function EmailConfiguration() {
           <div className="flex items-end space-x-4">
             <div className="flex-1">
               <label className="block text-sm font-medium text-charcoal-black mb-1">
-                Test Email Address
+                Test Email Address <span className="text-charcoal-black/60">(optional)</span>
               </label>
               <input
                 {...register('testEmail')}

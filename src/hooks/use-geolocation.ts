@@ -124,7 +124,7 @@ export const useGeolocation = () => {
       const options: PositionOptions = {
         enableHighAccuracy: highAccuracy,
         timeout: timeout,
-        maximumAge: 30000, // Reduce cache time to 30 seconds for more accurate location
+        maximumAge: 60000, // Use cached location for 1 minute for better performance
       }
 
       console.log(`Attempting geolocation with high accuracy: ${highAccuracy}, timeout: ${timeout}ms`)
@@ -151,7 +151,7 @@ export const useGeolocation = () => {
           // If high accuracy failed, try with low accuracy
           if (highAccuracy) {
             console.log('Retrying with low accuracy...')
-            tryGeolocation(false, 10000) // 10 second timeout for low accuracy
+            tryGeolocation(false, 3000) // 3 second timeout for low accuracy (faster)
             return
           }
 
@@ -185,8 +185,8 @@ export const useGeolocation = () => {
       )
     }
 
-    // Start with high accuracy and short timeout
-    tryGeolocation(true, 5000)
+    // Start with high accuracy and shorter timeout for better performance
+    tryGeolocation(true, 3000)
   }, [state.supported])
 
   // IP-based location detection as fallback

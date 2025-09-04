@@ -14,6 +14,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
+import timezones from 'timezones-list'
 
 const configSchema = z.object({
   birthdayDate: z.string().min(1, 'Birthday date is required'),
@@ -22,7 +23,7 @@ const configSchema = z.object({
   countdownStartDate: z.string().optional(),
   enableCountdown: z.boolean(),
   enableEmailNotifications: z.boolean(),
-  enableMessageApproval: z.boolean(),
+  requireMessageApproval: z.boolean(),
 })
 
 type ConfigFormData = z.infer<typeof configSchema>
@@ -34,20 +35,9 @@ interface SystemConfig {
   countdownStartDate: string | null
   enableCountdown: boolean
   enableEmailNotifications: boolean
-  enableMessageApproval: boolean
+  requireMessageApproval: boolean
   lastUpdated: string | null
 }
-
-const timezones = [
-  { value: 'Asia/Manila', label: 'Asia/Manila (Philippine Time)' },
-  { value: 'America/New_York', label: 'America/New_York (Eastern Time)' },
-  { value: 'America/Los_Angeles', label: 'America/Los_Angeles (Pacific Time)' },
-  { value: 'Europe/London', label: 'Europe/London (GMT)' },
-  { value: 'Europe/Paris', label: 'Europe/Paris (CET)' },
-  { value: 'Asia/Tokyo', label: 'Asia/Tokyo (JST)' },
-  { value: 'Australia/Sydney', label: 'Australia/Sydney (AEST)' },
-  { value: 'UTC', label: 'UTC (Coordinated Universal Time)' },
-]
 
 export function SystemConfiguration() {
   const [config, setConfig] = useState<SystemConfig | null>(null)
@@ -87,7 +77,7 @@ export function SystemConfiguration() {
           countdownStartDate: data.countdownStartDate || '',
           enableCountdown: data.enableCountdown ?? true,
           enableEmailNotifications: data.enableEmailNotifications ?? true,
-          enableMessageApproval: data.enableMessageApproval ?? true,
+          requireMessageApproval: data.requireMessageApproval ?? true,
         })
       }
     } catch (error) {
@@ -220,8 +210,8 @@ export function SystemConfiguration() {
                 className="w-full px-3 py-2 border border-soft-pink/30 rounded-lg focus:border-soft-pink focus:outline-none"
               >
                 {timezones.map((tz) => (
-                  <option key={tz.value} value={tz.value}>
-                    {tz.label}
+                  <option key={tz.tzCode} value={tz.tzCode}>
+                    {tz.label} ({tz.name})
                   </option>
                 ))}
               </select>
@@ -295,7 +285,7 @@ export function SystemConfiguration() {
             <div>
               <label className="flex items-center space-x-2">
                 <input
-                  {...register('enableMessageApproval')}
+                  {...register('requireMessageApproval')}
                   type="checkbox"
                   className="rounded border-soft-pink/30 text-soft-pink focus:ring-soft-pink"
                 />

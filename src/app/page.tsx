@@ -1,14 +1,13 @@
-import type { Metadata } from 'next'
+'use client'
+
 import { Header } from '@/components/layout'
 import { AboutSection, MessageSection, GallerySection } from '@/components/sections'
 import { CountdownWrapper } from '@/components/countdown/countdown-wrapper'
-
-export const metadata: Metadata = {
-  title: 'Home',
-  description: 'Welcome to the Birthday Surprise - A magical countdown to a special day',
-}
+import { useSystemConfig, getBirthdayConfigFromSystem } from '@/hooks/use-system-config'
 
 export default function HomePage() {
+  const { config, loading, error } = useSystemConfig()
+  const birthdayConfig = getBirthdayConfigFromSystem(config)
   return (
     <div className="min-h-screen w-full bg-white relative">
       {/* Pink Glow Background */}
@@ -41,22 +40,25 @@ export default function HomePage() {
 
           {/* Main Content */}
           <div className="relative z-10 text-center w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Title */}
-            <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-charcoal-black mb-4 sm:mb-6 lg:mb-8">
-              Birthday Surprise
-            </h1>
-
-            {/* Subtitle */}
-            <p className="font-body text-base sm:text-lg md:text-xl lg:text-2xl text-charcoal-black/80 mb-6 sm:mb-8 lg:mb-12 max-w-4xl mx-auto">
-              Something magical is coming...
-            </p>
 
             {/* Countdown Timer */}
             <div className="mb-6 sm:mb-8 lg:mb-12 w-full">
+              {loading ? (
+                <div className="text-center py-8">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-soft-pink"></div>
+                  <p className="mt-2 text-charcoal-black/60">Loading countdown...</p>
+                </div>
+              ) : error ? (
+                <div className="text-center py-8">
+                  <p className="text-red-500 mb-2">Failed to load countdown configuration</p>
+                  <p className="text-sm text-charcoal-black/60">Using fallback values</p>
+                </div>
+              ) : null}
+
               <CountdownWrapper
-                targetDate={process.env.NEXT_PUBLIC_BIRTHDAY_DATE}
-                timezone={process.env.NEXT_PUBLIC_TIMEZONE}
-                girlfriendName={process.env.NEXT_PUBLIC_GIRLFRIEND_NAME?.replace(/"/g, '') || "Your Special Someone"}
+                targetDate={birthdayConfig.targetDate}
+                timezone={birthdayConfig.timezone}
+                girlfriendName={birthdayConfig.girlfriendName}
                 variant="large"
                 showSparkles={true}
                 enableFlipAnimation={true}

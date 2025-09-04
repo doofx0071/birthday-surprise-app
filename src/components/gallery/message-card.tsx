@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 import { MessageWithMedia } from '@/types/database'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { MapPinIcon, CalendarIcon, ImageIcon, VideoIcon, ExpandIcon, ShrinkIcon } from 'lucide-react'
+import { MapPinIcon, CalendarIcon, VideoIcon, ExpandIcon, ShrinkIcon } from 'lucide-react'
 import Image from 'next/image'
 
 export type ViewMode = 'grid' | 'list' | 'slideshow' | 'fullscreen'
@@ -81,7 +81,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({
         cardType === 'image' && 'border-l-green-400',
         cardType === 'video' && 'border-l-purple-400',
         cardType === 'mixed' && 'border-l-pink-400',
-        viewMode === 'list' && 'flex flex-row',
+        'w-full',
         className
       )}
     >
@@ -109,8 +109,8 @@ export const MessageCard: React.FC<MessageCardProps> = ({
                 {message.name}
               </h3>
               {cardType !== 'text' && (
-                <Badge variant="secondary" className="text-xs neuro-card px-2 py-0.5">
-                  {cardType === 'mixed' ? 'Mixed' : cardType === 'image' ? 'Photo' : 'Video'}
+                <Badge variant="secondary" className="text-xs bg-gray-100 text-charcoal-black border border-gray-200 px-2 py-0.5">
+                  Media
                 </Badge>
               )}
             </div>
@@ -118,7 +118,7 @@ export const MessageCard: React.FC<MessageCardProps> = ({
             {/* Location */}
             {(message.location_city || message.location_country || message.location) && (
               <div className="flex items-center gap-1 text-xs text-charcoal-black/60 mb-2">
-                <div className="neuro-card px-2 py-1 rounded-full flex items-center gap-1">
+                <div className="bg-gray-50 border border-gray-200 px-2 py-1 rounded-full flex items-center gap-1">
                   <MapPinIcon className="w-3 h-3 text-pink-500" />
                   <span className="font-body">
                     {message.location_city && message.location_country
@@ -132,50 +132,31 @@ export const MessageCard: React.FC<MessageCardProps> = ({
 
             {/* Date */}
             <div className="flex items-center gap-1 text-xs text-charcoal-black/60">
-              <div className="neuro-card px-2 py-1 rounded-full flex items-center gap-1">
+              <div className="bg-gray-50 border border-gray-200 px-2 py-1 rounded-full flex items-center gap-1">
                 <CalendarIcon className="w-3 h-3 text-pink-500" />
                 <span className="font-body">{formatDate(message.created_at)}</span>
               </div>
             </div>
           </div>
 
-          {/* Media count indicator */}
-          {(mediaStats.images > 0 || mediaStats.videos > 0) && (
-            <div className="flex items-center gap-2">
-              {mediaStats.images > 0 && (
-                <div className="neuro-card px-2 py-1 rounded-full flex items-center gap-1 text-xs">
-                  <ImageIcon className="w-3 h-3 text-green-500" />
-                  <span className="font-body text-charcoal-black/70">{mediaStats.images}</span>
-                </div>
-              )}
-              {mediaStats.videos > 0 && (
-                <div className="neuro-card px-2 py-1 rounded-full flex items-center gap-1 text-xs">
-                  <VideoIcon className="w-3 h-3 text-purple-500" />
-                  <span className="font-body text-charcoal-black/70">{mediaStats.videos}</span>
-                </div>
-              )}
-            </div>
-          )}
+
         </div>
       </div>
 
       {/* Media Preview */}
       {message.media_files && message.media_files.length > 0 && (
-        <div className={cn(
-          'mb-4',
-          viewMode === 'list' && 'md:w-1/3 md:mb-0'
-        )}>
+        <div className="mb-4">
           <div className={cn(
             'grid gap-2 p-4',
             message.media_files.length === 1 && 'grid-cols-1',
             message.media_files.length === 2 && 'grid-cols-2',
-            message.media_files.length >= 3 && 'grid-cols-2 md:grid-cols-3'
+            message.media_files.length >= 3 && 'grid-cols-2'
           )}>
-            {message.media_files.slice(0, viewMode === 'grid' ? 4 : 6).map((file, index) => (
+            {message.media_files.slice(0, 4).map((file, index) => (
               <div
                 key={file.id}
                 className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group
-                          neuro-card hover:scale-105 transition-all duration-300"
+                          bg-white border border-gray-200 hover:scale-105 transition-all duration-300"
                 onClick={() => onMediaClick(
                   getMediaUrl(file.storage_path),
                   file.file_type as 'image' | 'video',
@@ -234,22 +215,16 @@ export const MessageCard: React.FC<MessageCardProps> = ({
       )}
 
       {/* Message Content */}
-      <div className={cn(
-        'p-4',
-        viewMode === 'list' && 'flex-1'
-      )}>
+      <div className="p-4">
         <div className="space-y-3">
           {/* Message text */}
           <div className="text-charcoal-black/80 text-sm leading-relaxed font-body
-                          p-3 neuro-card bg-gradient-to-br from-white to-pink-50/30 rounded-lg">
-            {isExpanded || viewMode === 'fullscreen'
-              ? message.message
-              : truncateMessage(message.message)
-            }
+                          p-3 bg-gray-50 border border-gray-200 rounded-lg">
+            {isExpanded ? message.message : truncateMessage(message.message)}
           </div>
 
           {/* Expand/Collapse button */}
-          {message.message.length > 150 && viewMode !== 'fullscreen' && (
+          {message.message.length > 150 && (
             <Button
               variant="ghost"
               size="sm"

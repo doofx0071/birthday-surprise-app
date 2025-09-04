@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -11,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { BirthdayCard } from '@/components/birthday-card'
 import { useToast } from '@/hooks/use-toast'
 import { useAdminAuth } from '@/contexts/admin-auth-context'
+import { ForgotPasswordModal } from '@/components/admin/forgot-password-modal'
 
 // Login form schema
 const loginSchema = z.object({
@@ -27,6 +29,7 @@ export default function AdminLoginPage() {
   const { signIn, user, isAdmin, isLoading: authLoading } = useAdminAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false)
 
   const redirectPath = searchParams.get('redirect') || '/admin'
 
@@ -169,6 +172,17 @@ export default function AdminLoginPage() {
             </Button>
           </form>
 
+          {/* Forgot Password Link */}
+          <div className="mt-6 text-center">
+            <button
+              type="button"
+              onClick={() => setShowForgotPasswordModal(true)}
+              className="text-sm text-soft-pink hover:text-soft-pink/80 font-medium cursor-pointer"
+            >
+              Forgot your password?
+            </button>
+          </div>
+
           {/* Footer */}
           <div className="mt-8 text-center">
             <p className="text-xs text-charcoal-black/50">
@@ -177,6 +191,12 @@ export default function AdminLoginPage() {
           </div>
         </BirthdayCard>
       </motion.div>
+
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal
+        isOpen={showForgotPasswordModal}
+        onClose={() => setShowForgotPasswordModal(false)}
+      />
     </div>
   )
 }

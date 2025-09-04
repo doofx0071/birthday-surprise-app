@@ -20,7 +20,7 @@ export function AdminAuthProvider({ children }: AdminAuthProviderProps) {
   const [shouldRender, setShouldRender] = useState(false)
 
   // Public routes that don't require authentication
-  const publicRoutes = ['/admin/login']
+  const publicRoutes = ['/admin/login', '/admin/forgot-password', '/admin/reset-password']
   const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route))
 
   useEffect(() => {
@@ -31,9 +31,18 @@ export function AdminAuthProvider({ children }: AdminAuthProviderProps) {
         router.push(loginUrl)
         setShouldRender(false)
       } else if (isAuthenticated && pathname === '/admin/login') {
-        // Redirect to dashboard if authenticated and on login page
-        router.push('/admin')
-        setShouldRender(false)
+        // Check if user came from password reset (don't auto-redirect)
+        const urlParams = new URLSearchParams(window.location.search)
+        const fromReset = urlParams.get('from') === 'reset'
+
+        if (!fromReset) {
+          // Redirect to dashboard if authenticated and on login page (but not from password reset)
+          router.push('/admin')
+          setShouldRender(false)
+        } else {
+          // Allow rendering login page if coming from password reset
+          setShouldRender(true)
+        }
       } else {
         // Allow rendering
         setShouldRender(true)

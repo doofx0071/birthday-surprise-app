@@ -9,8 +9,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Allow access to login page
-  if (pathname === '/admin/login') {
+  // Allow access to login and password reset pages
+  if (pathname === '/admin/login' || pathname === '/admin/forgot-password' || pathname === '/admin/reset-password') {
     return NextResponse.next()
   }
 

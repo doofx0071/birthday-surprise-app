@@ -75,7 +75,7 @@ const BirthdayInput = React.forwardRef<HTMLInputElement, BirthdayInputProps>(
             ref={ref}
             id={inputId}
             className={cn(
-              'placeholder:text-muted-foreground/60',
+              'placeholder:text-muted-foreground/40',
               getVariantStyles(),
               error && 'border-destructive focus:border-destructive',
               sparkle && hasValue && 'neuro-animate-pulse',

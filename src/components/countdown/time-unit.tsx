@@ -24,24 +24,25 @@ export const TimeUnit: React.FC<TimeUnitProps> = ({
 }) => {
   const formattedValue = formatTimeUnit(value, variant === 'large' ? 3 : 2, label.toLowerCase())
 
+  // Updated font sizes to be much smaller - v2
   const getVariantStyles = () => {
     switch (variant) {
       case 'large':
         return {
           container: 'p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10',
-          value: 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-countdown font-black',
+          value: 'text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-light',
           label: 'text-xs sm:text-sm md:text-base lg:text-lg font-body font-semibold tracking-wider',
         }
       case 'compact':
         return {
           container: 'p-2 sm:p-3 md:p-4',
-          value: 'text-lg sm:text-xl md:text-2xl lg:text-3xl font-countdown font-bold',
+          value: 'text-sm sm:text-base md:text-lg lg:text-xl font-light',
           label: 'text-xs sm:text-xs md:text-sm font-body font-medium tracking-wide',
         }
       default:
         return {
           container: 'p-3 sm:p-4 md:p-5 lg:p-6',
-          value: 'text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-countdown font-bold',
+          value: 'text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-light',
           label: 'text-xs sm:text-xs md:text-sm lg:text-base font-body font-semibold tracking-wide',
         }
     }
@@ -89,6 +90,10 @@ export const TimeUnit: React.FC<TimeUnitProps> = ({
             isAnimating && 'animate-bounce',
             styles.value
           )}
+          style={{
+            fontFamily: 'Arial Black, Arial, sans-serif'
+          }}
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold"
         >
           {formattedValue.split('').map((digit, index) => (
             <span
@@ -153,19 +158,19 @@ export const FlipTimeUnit: React.FC<FlipTimeUnitProps> = ({
       case 'large':
         return {
           container: 'p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10',
-          value: 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-countdown font-black',
+          value: 'text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-black',
           label: 'text-xs sm:text-sm md:text-base lg:text-lg font-body font-semibold tracking-wider',
         }
       case 'compact':
         return {
           container: 'p-2 sm:p-3 md:p-4',
-          value: 'text-lg sm:text-xl md:text-2xl lg:text-3xl font-countdown font-bold',
+          value: 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black',
           label: 'text-xs sm:text-xs md:text-sm font-body font-medium tracking-wide',
         }
       default:
         return {
           container: 'p-3 sm:p-4 md:p-5 lg:p-6',
-          value: 'text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-countdown font-bold',
+          value: 'text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black',
           label: 'text-xs sm:text-xs md:text-sm lg:text-base font-body font-semibold tracking-wide',
         }
     }
@@ -214,6 +219,10 @@ export const FlipTimeUnit: React.FC<FlipTimeUnitProps> = ({
               isFlipping && 'animate-flip-in',
               styles.value
             )}
+            style={{
+              fontFamily: 'Arial Black, Arial, sans-serif'
+            }}
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold"
           >
             {formattedValue}
           </div>
@@ -225,6 +234,10 @@ export const FlipTimeUnit: React.FC<FlipTimeUnitProps> = ({
                 'absolute inset-0 text-charcoal-black mb-2 animate-flip-out',
                 styles.value
               )}
+              style={{
+                fontFamily: 'Arial Black, Arial, sans-serif'
+              }}
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold"
             >
               {formattedPrevious}
             </div>

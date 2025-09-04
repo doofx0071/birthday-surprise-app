@@ -277,14 +277,13 @@ export function formatTargetDate(
 
     switch (format) {
       case 'long':
+        // Show only date without time for clean display
         return date.toLocaleDateString('en-US', {
           ...options,
           weekday: 'long',
           year: 'numeric',
           month: 'long',
           day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
         })
 
       case 'short':

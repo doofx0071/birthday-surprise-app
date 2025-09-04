@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { messageFormSchema, type MessageFormData } from '@/lib/validations/message-schema'
 import { messageOperations, type MessageInsert } from '@/lib/supabase'
+import { geocodeLocationWithFallback } from '@/lib/geocoding'
 
 // Helper function to send pending review email
 async function sendPendingReviewEmail(message: any) {
@@ -60,16 +61,42 @@ export async function POST(request: NextRequest) {
     const ip = forwarded ? forwarded.split(',')[0] : request.headers.get('x-real-ip') || 'unknown'
     const userAgent = request.headers.get('user-agent') || 'unknown'
 
+    // Process location data if provided but city/country are missing
+    let locationCity = data.locationCity || ''
+    let locationCountry = data.locationCountry || ''
+    let latitude = data.latitude
+    let longitude = data.longitude
+
+    // If we have a location string but missing city/country or coordinates, try to geocode
+    if (data.location && (!locationCity || !locationCountry || !latitude || !longitude)) {
+      console.log('🌍 Attempting to geocode location:', data.location)
+      try {
+        const geocoded = await geocodeLocationWithFallback(data.location)
+        if (geocoded) {
+          console.log('✅ Geocoding successful:', geocoded)
+          locationCity = geocoded.city || locationCity
+          locationCountry = geocoded.country || locationCountry
+          latitude = geocoded.latitude || latitude
+          longitude = geocoded.longitude || longitude
+        } else {
+          console.log('⚠️ Geocoding returned no results for:', data.location)
+        }
+      } catch (error) {
+        console.error('❌ Geocoding failed:', error)
+        // Continue without geocoding - not a critical failure
+      }
+    }
+
     // Prepare message data for database
     const messageData: MessageInsert = {
       name: data.name,
       email: data.email,
       message: data.message,
       location: data.location || '',
-      location_city: data.locationCity || '',
-      location_country: data.locationCountry || '',
-      latitude: data.latitude,
-      longitude: data.longitude,
+      location_city: locationCity,
+      location_country: locationCountry,
+      latitude: latitude,
+      longitude: longitude,
       wants_reminders: data.wantsReminders || false,
       is_approved: true, // Auto-approve for now
       is_visible: true,  // Auto-visible for now

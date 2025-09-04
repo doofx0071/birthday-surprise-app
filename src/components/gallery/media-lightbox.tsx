@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Download, ZoomIn, ZoomOut } from 'lucide-react'
+import { X, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 
@@ -18,24 +18,32 @@ interface MediaLightboxProps {
 export const MediaLightbox: React.FC<MediaLightboxProps> = ({ media, onClose }) => {
   const videoRef = useRef<HTMLVideoElement>(null)
 
-  // Handle escape key
+
+
+  // Handle keyboard navigation
   useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose()
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!media) return
+
+      switch (e.key) {
+        case 'Escape':
+          onClose()
+          break
       }
     }
 
     if (media) {
-      document.addEventListener('keydown', handleEscape)
+      document.addEventListener('keydown', handleKeyDown)
       document.body.style.overflow = 'hidden'
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscape)
+      document.removeEventListener('keydown', handleKeyDown)
       document.body.style.overflow = 'unset'
     }
   }, [media, onClose])
+
+
 
   // Handle download
   const handleDownload = async () => {
@@ -95,13 +103,15 @@ export const MediaLightbox: React.FC<MediaLightboxProps> = ({ media, onClose }) 
         </div>
 
         {/* Title */}
-        {media.title && (
-          <div className="absolute top-4 left-4 z-10">
-            <h3 className="text-white text-lg font-semibold">
+        <div className="absolute top-4 left-4 z-10">
+          {media?.title && (
+            <h3 className="text-white text-lg font-semibold mb-1">
               {media.title}
             </h3>
-          </div>
-        )}
+          )}
+        </div>
+
+
 
         {/* Media Content */}
         <motion.div
@@ -111,33 +121,35 @@ export const MediaLightbox: React.FC<MediaLightboxProps> = ({ media, onClose }) 
           className="relative max-w-full max-h-full"
           onClick={(e) => e.stopPropagation()}
         >
-          {media.type === 'image' ? (
-            <div className="relative max-w-[90vw] max-h-[90vh]">
-              <Image
+          {media && (
+            media.type === 'image' ? (
+              <div className="relative max-w-[90vw] max-h-[90vh]">
+                <Image
+                  src={media.url}
+                  alt={media.title || 'Media'}
+                  width={1200}
+                  height={800}
+                  className="object-contain max-w-full max-h-full"
+                  priority
+                />
+              </div>
+            ) : (
+              <video
+                ref={videoRef}
                 src={media.url}
-                alt={media.title || 'Media'}
-                width={1200}
-                height={800}
-                className="object-contain max-w-full max-h-full"
-                priority
-              />
-            </div>
-          ) : (
-            <video
-              ref={videoRef}
-              src={media.url}
-              controls
-              autoPlay
-              className="max-w-[90vw] max-h-[90vh] rounded-lg"
-              onLoadedData={() => {
-                // Auto-play when loaded
-                if (videoRef.current) {
-                  videoRef.current.play().catch(console.error)
-                }
-              }}
-            >
-              Your browser does not support the video tag.
-            </video>
+                controls
+                autoPlay
+                className="max-w-[90vw] max-h-[90vh] rounded-lg"
+                onLoadedData={() => {
+                  // Auto-play when loaded
+                  if (videoRef.current) {
+                    videoRef.current.play().catch(console.error)
+                  }
+                }}
+              >
+                Your browser does not support the video tag.
+              </video>
+            )
           )}
         </motion.div>
 

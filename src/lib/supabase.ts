@@ -8,13 +8,18 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables')
 }
 
-// Client for browser/frontend use with SSR support
+// Singleton client instance for browser/frontend use with SSR support
+let _supabaseClient: ReturnType<typeof createBrowserClient> | null = null
+
 export const createSupabaseClient = () => {
-  return createBrowserClient(supabaseUrl, supabaseAnonKey)
+  if (!_supabaseClient) {
+    _supabaseClient = createBrowserClient(supabaseUrl, supabaseAnonKey)
+  }
+  return _supabaseClient
 }
 
-// Legacy client for backward compatibility
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Legacy client for backward compatibility - use singleton pattern
+export const supabase = createSupabaseClient()
 
 // Admin client for server-side operations (with service role key)
 // Only create this on the server side where the service role key is available
@@ -217,7 +222,7 @@ export const messageOperations = {
 
       if (countriesError) throw countriesError
 
-      const uniqueCountries = new Set(countriesData?.map(m => m.location_country) || [])
+      const uniqueCountries = new Set(countriesData?.map((m: any) => m.location_country) || [])
 
       // Get total media files
       const { count: totalMedia, error: mediaError } = await supabase

@@ -27,7 +27,8 @@ export async function PUT(
     }
 
     // Check if template is a default template (cannot be updated)
-    if (id === 'birthday-notification' || id === 'contributor-notification') {
+    if (id === 'birthday-notification' || id === 'contributor-notification' ||
+        id === 'message-pending-review' || id === 'message-approved' || id === 'password-reset') {
       return NextResponse.json(
         { error: 'Default templates cannot be modified' },
         { status: 400 }
@@ -95,7 +96,8 @@ export async function DELETE(
     const { id } = await params
 
     // Check if template is a default template (cannot be deleted)
-    if (id === 'birthday-notification' || id === 'contributor-notification') {
+    if (id === 'birthday-notification' || id === 'contributor-notification' ||
+        id === 'message-pending-review' || id === 'message-approved' || id === 'password-reset') {
       return NextResponse.json(
         { error: 'Default templates cannot be deleted' },
         { status: 400 }
