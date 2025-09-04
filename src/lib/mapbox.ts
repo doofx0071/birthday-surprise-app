@@ -6,6 +6,21 @@ import type { MapConfig, MapViewState, GeocodeResult } from '@/types/map'
 // Set Mapbox access token
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || ''
 
+// Disable Mapbox telemetry to prevent analytics errors
+if (typeof window !== 'undefined') {
+  // Suppress Mapbox telemetry errors
+  const originalConsoleError = console.error
+  console.error = (...args) => {
+    // Filter out Mapbox telemetry errors
+    const message = args[0]?.toString() || ''
+    if (message.includes('events.mapbox.com') ||
+        message.includes('Failed to fetch') && message.includes('mapbox')) {
+      return // Suppress these specific errors
+    }
+    originalConsoleError.apply(console, args)
+  }
+}
+
 // Default map configuration
 export const DEFAULT_MAP_CONFIG: MapConfig = {
   accessToken: process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || '',

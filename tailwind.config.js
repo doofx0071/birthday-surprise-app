@@ -11,6 +11,7 @@ module.exports = {
   		colors: {
   			'pure-white': '#FFFFFF',
   			'soft-pink': '#FFB6C1',
+  			'bright-pink': '#FF1493',
   			'rose-gold': '#E8B4B8',
   			'charcoal-black': '#2D2D2D',
   			'light-gray': '#F8F9FA',
@@ -77,21 +78,34 @@ module.exports = {
   		},
   		fontFamily: {
   			sans: [
-  				'Poppins',
+  				'Nunito',
   				'Inter',
+  				'system-ui',
   				'sans-serif'
   			],
   			display: [
-  				'Playfair Display',
-  				'serif'
+  				'Nunito Black',
+  				'Arial Black',
+  				'Helvetica Neue',
+  				'sans-serif'
   			],
   			body: [
-  				'Poppins',
+  				'Nunito',
   				'Inter',
+  				'system-ui',
   				'sans-serif'
   			],
   			countdown: [
-  				'Poppins',
+  				'Arial Black',
+  				'Arial',
+  				'Helvetica Neue',
+  				'Helvetica',
+  				'sans-serif'
+  			],
+  			heading: [
+  				'Nunito Black',
+  				'Arial Black',
+  				'Impact',
   				'sans-serif'
   			]
   		},

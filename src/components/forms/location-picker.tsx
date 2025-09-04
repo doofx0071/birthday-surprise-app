@@ -278,7 +278,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
       {/* Helper Text */}
       {!error && !geoError && (
         <p className="text-xs text-muted-foreground">
-          You can enter your location manually or click "Detect" to use your current location
+          Your location will be used to show where your message comes from on the memory map
         </p>
       )}
     </div>

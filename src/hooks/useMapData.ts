@@ -1,7 +1,7 @@
 // Hook for managing map data and real-time updates
 
 import { useState, useEffect, useCallback } from 'react'
-import { messageOperations } from '@/lib/supabase'
+import { messageOperations, supabase } from '@/lib/supabase'
 import { processMessagesIntoLocationPins } from '@/lib/geocoding'
 import type { 
   LocationPin, 
@@ -129,12 +129,7 @@ export const useMapData = (): UseMapDataReturn => {
     // Initial data fetch
     fetchMapData()
 
-    // Set up real-time subscription for new messages
-    const { createClient } = require('@supabase/supabase-js')
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
+    // Set up real-time subscription for new messages using existing supabase instance
 
     const subscription = supabase
       .channel('map-messages')

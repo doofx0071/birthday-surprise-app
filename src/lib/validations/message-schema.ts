@@ -63,8 +63,8 @@ export const messageFormSchema = z.object({
       "Message must contain at least 10 meaningful characters"
     ),
 
-  // Notifications: Optional checkbox for birthday reminders
-  wantsReminders: z.boolean().default(false),
+  // Notifications: Automatically set to true for birthday reminders
+  wantsReminders: z.boolean().default(true),
 
   // Auto-detected location data (separate from manual location input)
   detectedLocation: locationSchema,
@@ -114,7 +114,7 @@ export const defaultFormValues: Partial<MessageFormData> = {
   latitude: undefined,
   longitude: undefined,
   message: '',
-  wantsReminders: false,
+  wantsReminders: true,
   detectedLocation: undefined,
 }
 

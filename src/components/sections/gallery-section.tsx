@@ -17,9 +17,14 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ className }) => 
         className
       )}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Memory Gallery */}
-        <MemoryGallery className="w-full" />
+      {/* Header at 70% width - responsive */}
+      <div className="w-[95%] sm:w-[85%] md:w-[75%] lg:w-[70%] mx-auto mb-6">
+        <MemoryGallery className="w-full" headerOnly />
+      </div>
+
+      {/* Cards at 90% width - responsive */}
+      <div className="w-[95%] sm:w-[92%] md:w-[90%] mx-auto">
+        <MemoryGallery className="w-full" cardsOnly />
       </div>
     </section>
   )

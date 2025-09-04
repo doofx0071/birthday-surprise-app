@@ -69,8 +69,8 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
       case 'large':
         return {
           container: 'p-4 sm:p-6 md:p-8 lg:p-12 xl:p-16',
-          title: 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl mb-4 sm:mb-6',
-          subtitle: 'text-lg sm:text-xl md:text-2xl lg:text-3xl mb-6 sm:mb-8',
+          title: 'text-lg sm:text-xl md:text-2xl lg:text-3xl mb-2 sm:mb-3', // Smaller "Countdown to" text
+          subtitle: 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl mb-6 sm:mb-8', // Larger birthday name
           grid: 'grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8',
           description: 'text-base sm:text-lg md:text-xl lg:text-2xl mt-6 sm:mt-8',
         }
@@ -130,16 +130,16 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
         {/* Title */}
         <div className="text-center mb-6">
           <h1 className={cn(
-            'font-body font-bold text-charcoal-black',
+            'font-body font-medium text-lg text-charcoal-black/60', // Smaller, lighter text for "Countdown to"
             styles.title
           )}>
             Countdown to
           </h1>
           <h2 className={cn(
-            'font-body font-bold text-primary',
+            'font-heading font-black text-4xl md:text-5xl lg:text-6xl text-bright-pink drop-shadow-sm', // Much larger, bolder, BRIGHT pink name
             styles.subtitle
           )}>
-            {girlfriendName}&apos;s Birthday
+            {girlfriendName} Birthday
           </h2>
 
           {/* Target Date Display */}

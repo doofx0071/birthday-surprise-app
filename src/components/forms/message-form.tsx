@@ -414,9 +414,15 @@ export const MessageForm: React.FC<MessageFormProps> = ({
               />
 
               {/* File Upload Section */}
-              <div className="space-y-3">
-                <Label className="flex items-center gap-2">
-                  Photos & Videos (Optional)
+              <div className="space-y-4">
+                <Label className="flex items-center gap-3 font-heading font-bold text-charcoal-black">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-soft-pink to-rose-gold flex items-center justify-center">
+                      <span className="text-white text-sm">📸</span>
+                    </div>
+                    <span>Photos & Videos</span>
+                  </div>
+                  <span className="text-xs font-normal text-muted-foreground">(Optional)</span>
                 </Label>
                 <FileUpload
                   ref={fileUploadRef}
@@ -433,48 +439,38 @@ export const MessageForm: React.FC<MessageFormProps> = ({
                     setTempFiles(tempFileData)
                   }}
                 />
-                <p className="text-xs text-muted-foreground">
-                  Add photos or videos to make your birthday message extra special!
-                  Supports images (JPG, PNG, WebP, GIF) up to 5MB and videos (MP4, WebM, MOV) up to 50MB.
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  <span className="font-medium">✨ Make your message extra special!</span><br />
+                  📷 Images: JPG, PNG, WebP, GIF (up to 5MB)<br />
+                  🎥 Videos: MP4, WebM, MOV (up to 50MB)
                 </p>
               </div>
 
-              {/* Notifications Checkbox */}
-              <FormField
-                control={form.control}
-                name="wantsReminders"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-primary/20 p-4 bg-gradient-to-r from-primary/5 to-accent/5">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={disabled || isSubmitting}
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel className="flex items-center gap-2 cursor-pointer">
-                        Send me birthday reminders
-                      </FormLabel>
-                      <FormDescription>
-                        Get notified about upcoming birthdays so you never miss celebrating with loved ones
-                      </FormDescription>
-                    </div>
-                  </FormItem>
-                )}
-              />
+              {/* Auto-enable reminders - no checkbox needed */}
+              <input type="hidden" {...form.register('wantsReminders')} value={true} />
 
               {/* Submit Button */}
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <Button
                   type="submit"
                   disabled={disabled || isSubmitting || !form.formState.isValid}
-                  className="flex-1 h-12 text-base font-semibold bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="flex-1 h-14 text-lg font-heading font-black cursor-pointer
+                    bg-gradient-to-br from-white to-gray-50 text-soft-pink
+                    border-2 border-soft-pink/30 rounded-2xl
+                    shadow-[6px_6px_12px_rgba(0,0,0,0.15),-6px_-6px_12px_rgba(255,255,255,0.9)]
+                    hover:shadow-[4px_4px_8px_rgba(0,0,0,0.1),-4px_-4px_8px_rgba(255,255,255,0.9)]
+                    active:shadow-[inset_3px_3px_6px_rgba(0,0,0,0.15),inset_-3px_-3px_6px_rgba(255,255,255,0.9)]
+                    transition-all duration-300 ease-in-out transform
+                    hover:scale-[0.98] active:scale-[0.96]
+                    disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   {isSubmitting ? (
-                    <span>Submitting...</span>
+                    <span className="flex items-center gap-2">
+                      <div className="w-5 h-5 border-2 border-soft-pink border-t-transparent rounded-full animate-spin"></div>
+                      Submitting...
+                    </span>
                   ) : (
-                    <span>Submit Birthday Wish</span>
+                    <span>Send Birthday Message</span>
                   )}
                 </Button>
                 

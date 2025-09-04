@@ -3,36 +3,36 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { SystemConfiguration } from '@/components/admin/system-configuration'
-import { ApplicationSettings } from '@/components/admin/application-settings'
 import { BackupRestore } from '@/components/admin/backup-restore'
 import { SystemLogs } from '@/components/admin/system-logs'
 import { UserManagement } from '@/components/admin/user-management'
+import { DatabaseReset } from '@/components/admin/database-reset'
 
-type TabType = 'system' | 'application' | 'backup' | 'logs' | 'users'
+type TabType = 'system' | 'backup' | 'logs' | 'users' | 'reset'
 
 export default function AdminSettingsPage() {
   const [activeTab, setActiveTab] = useState<TabType>('system')
 
   const tabs = [
     { id: 'system', label: 'System Configuration', icon: '⚙️' },
-    { id: 'application', label: 'Application Settings', icon: '🔧' },
     { id: 'backup', label: 'Backup & Restore', icon: '💾' },
     { id: 'logs', label: 'System Logs', icon: '📋' },
     { id: 'users', label: 'User Management', icon: '👥' },
+    { id: 'reset', label: 'Reset', icon: '🗑️' },
   ] as const
 
   const renderTabContent = () => {
     switch (activeTab) {
       case 'system':
         return <SystemConfiguration />
-      case 'application':
-        return <ApplicationSettings />
       case 'backup':
         return <BackupRestore />
       case 'logs':
         return <SystemLogs />
       case 'users':
         return <UserManagement />
+      case 'reset':
+        return <DatabaseReset />
       default:
         return <SystemConfiguration />
     }
@@ -71,8 +71,12 @@ export default function AdminSettingsPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium transition-colors whitespace-nowrap ${
                 activeTab === tab.id
-                  ? 'text-soft-pink border-b-2 border-soft-pink bg-soft-pink/5'
-                  : 'text-charcoal-black/70 hover:text-charcoal-black hover:bg-soft-pink/5'
+                  ? tab.id === 'reset'
+                    ? 'text-red-600 border-b-2 border-red-600 bg-red-50'
+                    : 'text-soft-pink border-b-2 border-soft-pink bg-soft-pink/5'
+                  : tab.id === 'reset'
+                    ? 'text-red-500/70 hover:text-red-600 hover:bg-red-50'
+                    : 'text-charcoal-black/70 hover:text-charcoal-black hover:bg-soft-pink/5'
               }`}
             >
               <span className="text-lg">{tab.icon}</span>

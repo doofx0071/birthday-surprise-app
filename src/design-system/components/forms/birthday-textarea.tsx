@@ -102,7 +102,7 @@ const BirthdayTextarea = React.forwardRef<HTMLTextAreaElement, BirthdayTextareaP
             maxLength={maxLength}
             value={value}
             className={cn(
-              'min-h-[100px] placeholder:text-muted-foreground/60 resize-none',
+              'min-h-[100px] placeholder:text-muted-foreground/40 resize-none',
               getVariantStyles(),
               error && 'border-destructive focus:border-destructive',
               sparkle && charCount > 0 && 'neuro-animate-pulse',

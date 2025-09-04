@@ -91,14 +91,17 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
             <div className="flex items-center space-x-3">
               <Image
                 src="/assets/icons/svg/logo.svg"
-                alt="Birthday Surprise Logo"
+                alt="Cela's Birthday Logo"
                 width={40}
                 height={40}
                 className="w-8 h-8 md:w-10 md:h-10"
                 priority
               />
-              <h1 className="font-body text-xl md:text-2xl font-bold text-primary">
-                Birthday Surprise
+              <h1 className={cn(
+                "font-body text-xl md:text-2xl font-bold transition-colors duration-300",
+                isScrolled ? "text-primary" : "text-white"
+              )}>
+                Cela's Birthday
               </h1>
             </div>
           </div>

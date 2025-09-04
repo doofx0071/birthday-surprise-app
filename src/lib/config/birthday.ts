@@ -41,7 +41,7 @@ const defaultConfig: BirthdayConfig = {
   
   website: {
     url: process.env.NEXT_PUBLIC_SITE_URL || 'https://birthday-surprise-app.vercel.app',
-    name: 'Birthday Surprise',
+    name: "Cela's Birthday",
   },
   
   sender: {

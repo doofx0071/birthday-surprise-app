@@ -2,13 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+/* Import Google Fonts - Bold Neomorphism Theme */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;500;600;700;800;900;1000&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 /* Custom CSS Variables for Birthday Theme */
 :root {
   --color-pure-white: #ffffff;
   --color-soft-pink: #ffb6c1;
+  --color-bright-pink: #ff1493; /* Deep pink - much brighter */
   --color-rose-gold: #e8b4b8;
   --color-charcoal-black: #2d2d2d;
   --color-light-gray: #f8f9fa;
@@ -743,11 +744,82 @@ body {
   }
 }
 
+/* Additional responsive improvements for countdown */
+@media (max-width: 640px) {
+  .neuro-countdown-container {
+    padding: 1rem !important;
+    margin: 0.5rem auto !important;
+  }
+
+  .countdown-time-unit {
+    min-height: 5rem;
+    padding: 0.75rem !important;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .neuro-countdown-container {
+    padding: 1.5rem !important;
+  }
+
+  .countdown-time-unit {
+    min-height: 6rem;
+    padding: 1rem !important;
+  }
+}
+
 /* High DPI display optimizations */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .countdown-text {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Countdown numbers - Base desktop size */
+.neuro-countdown-container .countdown-time-unit div[style*="fontFamily"],
+.neuro-countdown-container .countdown-time-unit div[class*="mb-2"] {
+  font-size: 4.5rem !important; /* Desktop: 72px */
+  font-weight: 700 !important;
+}
+
+/* Keep labels at normal size */
+.neuro-countdown-container .countdown-time-unit div[class*="uppercase"] {
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+}
+
+/* Responsive countdown number sizes */
+/* Mobile (up to 640px) - Smaller numbers */
+@media (max-width: 640px) {
+  .neuro-countdown-container .countdown-time-unit div[style*="fontFamily"],
+  .neuro-countdown-container .countdown-time-unit div[class*="mb-2"] {
+    font-size: 2.5rem !important; /* Mobile: 40px */
+    font-weight: 700 !important;
+  }
+
+  /* Keep mobile labels smaller */
+  .neuro-countdown-container .countdown-time-unit div[class*="uppercase"] {
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+  }
+}
+
+/* Tablet (641px to 1024px) - Medium numbers */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .neuro-countdown-container .countdown-time-unit div[style*="fontFamily"],
+  .neuro-countdown-container .countdown-time-unit div[class*="mb-2"] {
+    font-size: 3.5rem !important; /* Tablet: 56px */
+    font-weight: 700 !important;
+  }
+}
+
+/* Large screens (1025px+) - Largest numbers */
+@media (min-width: 1025px) {
+  .neuro-countdown-container .countdown-time-unit div[style*="fontFamily"],
+  .neuro-countdown-container .countdown-time-unit div[class*="mb-2"] {
+    font-size: 4.5rem !important; /* Desktop: 72px */
+    font-weight: 700 !important;
   }
 }
 
@@ -844,4 +916,63 @@ body {
 
 .animate-celebration-bounce {
   animation: celebration-bounce 2s ease-in-out infinite;
+}
+
+/* True Pinterest-Style Masonry Layout */
+.masonry-container {
+  column-count: 1;
+  column-gap: 1.5rem;
+  column-fill: auto;
+}
+
+.masonry-item {
+  break-inside: avoid;
+  page-break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  display: inline-block;
+  width: 100%;
+  margin-bottom: 1.5rem;
+  vertical-align: top;
+}
+
+/* Responsive column counts for larger cards */
+@media (min-width: 640px) {
+  .masonry-container {
+    column-count: 2;
+    column-gap: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .masonry-container {
+    column-count: 4;
+    column-gap: 1.5rem;
+  }
+
+  .masonry-item {
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* Force masonry behavior */
+.masonry-container > * {
+  break-inside: avoid;
+  display: inline-block;
+  width: 100%;
+  vertical-align: top;
+}
+
+/* Fallback for browsers that don't support CSS columns */
+@supports not (column-count: 1) {
+  .masonry-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  .masonry-item {
+    display: block;
+    margin-bottom: 0;
+  }
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { messageFormSchema, type MessageFormData } from '@/lib/validations/message-schema'
 import { messageOperations, type MessageInsert, supabase } from '@/lib/supabase'
 import { finalizeUploads } from '@/lib/fileUpload'
+import { geocodeLocationWithFallback } from '@/lib/geocoding'
 import { z } from 'zod'
 
 // Helper function to auto-finalize recent temp files
@@ -124,15 +125,41 @@ export async function POST(request: NextRequest) {
                'unknown'
     const userAgent = request.headers.get('user-agent') || 'unknown'
 
+    // Process location data if provided but city/country are missing
+    let locationCity = messageData.locationCity || ''
+    let locationCountry = messageData.locationCountry || ''
+    let latitude = messageData.latitude
+    let longitude = messageData.longitude
+
+    // If we have a location string but missing city/country or coordinates, try to geocode
+    if (messageData.location && (!locationCity || !locationCountry || !latitude || !longitude)) {
+      console.log('🌍 Attempting to geocode location:', messageData.location)
+      try {
+        const geocoded = await geocodeLocationWithFallback(messageData.location)
+        if (geocoded) {
+          console.log('✅ Geocoding successful:', geocoded)
+          locationCity = geocoded.city || locationCity
+          locationCountry = geocoded.country || locationCountry
+          latitude = geocoded.latitude || latitude
+          longitude = geocoded.longitude || longitude
+        } else {
+          console.log('⚠️ Geocoding returned no results for:', messageData.location)
+        }
+      } catch (error) {
+        console.error('❌ Geocoding failed:', error)
+        // Continue without geocoding - not a critical failure
+      }
+    }
+
     // Prepare data for database insertion
     const insertData: MessageInsert = {
       name: messageData.name,
       email: messageData.email,
       location: messageData.location, // Legacy field for backward compatibility
-      location_city: messageData.locationCity,
-      location_country: messageData.locationCountry,
-      latitude: messageData.latitude,
-      longitude: messageData.longitude,
+      location_city: locationCity,
+      location_country: locationCountry,
+      latitude: latitude,
+      longitude: longitude,
       message: messageData.message,
       wants_reminders: messageData.wantsReminders || false,
       ip_address: ip,

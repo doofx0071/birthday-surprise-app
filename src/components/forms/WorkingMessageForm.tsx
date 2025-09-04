@@ -11,7 +11,7 @@ import { BirthdayInput } from '@/design-system/components/forms/birthday-input'
 import { BirthdayTextarea } from '@/design-system/components/forms/birthday-textarea'
 import { LocationPicker } from './location-picker'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
+
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import {
@@ -27,6 +27,7 @@ import {
   AnimatedHeartIcon,
   AnimatedGiftIcon
 } from '@/design-system/icons/animated-birthday-icons'
+import { User, Mail, MessageSquare, MapPin, Camera } from 'lucide-react'
 import { BirthdayCard, BirthdayCardContent, BirthdayCardHeader } from '@/components/birthday-card'
 import { FileSelectionModal } from './FileSelectionModal'
 
@@ -166,72 +167,74 @@ export const WorkingMessageForm: React.FC<WorkingMessageFormProps> = ({ classNam
   }
 
   return (
-    <div className={className}>
-      <BirthdayCard className="w-full max-w-2xl mx-auto">
+    <div className={cn("w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8", className)}>
+      <BirthdayCard className="w-full">
         <BirthdayCardHeader className="text-center space-y-4">
-          <div className="flex items-center justify-center space-x-3">
-            <AnimatedHeartIcon className="w-8 h-8 text-primary" />
-            <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          <div className="flex items-center justify-center">
+            <h2 className="font-heading text-2xl md:text-3xl font-bold text-charcoal-black">
               Share Your Birthday Message
             </h2>
           </div>
-          <p className="text-muted-foreground text-lg">
+          <p className="font-body text-muted-foreground text-lg">
             Send your heartfelt wishes and memories to make this birthday extra special!
           </p>
         </BirthdayCardHeader>
 
-        <BirthdayCardContent>
+        <BirthdayCardContent className="p-6 sm:p-8 md:p-10 lg:p-12">
           <Form {...form}>
             <motion.form
               onSubmit={form.handleSubmit(handleSubmit)}
-              className="space-y-8"
+              className="space-y-6 md:space-y-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              {/* Name Field */}
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-lg font-semibold">
-                      Your Name *
-                    </FormLabel>
-                    <FormControl>
-                      <BirthdayInput
-                        placeholder="Enter your beautiful name..."
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Name and Email Fields - Side by side on larger screens */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-heading text-lg font-semibold flex items-center gap-2">
+                        <User className="w-5 h-5 text-bright-pink" />
+                        Your Name
+                      </FormLabel>
+                      <FormControl>
+                        <BirthdayInput
+                          placeholder="Enter your beautiful name..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              {/* Email Field */}
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-lg font-semibold">
-                      Email Address *
-                    </FormLabel>
-                    <FormControl>
-                      <BirthdayInput
-                        type="email"
-                        placeholder="your.email@example.com"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      We'll send you a thank you note and birthday reminders if you'd like!
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-heading text-lg font-semibold flex items-center gap-2">
+                        <Mail className="w-5 h-5 text-bright-pink" />
+                        Email Address
+                      </FormLabel>
+                      <FormControl>
+                        <BirthdayInput
+                          type="email"
+                          placeholder="your.email@example.com"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription className="font-body">
+                        We'll send you a thank you note and birthday reminders if you'd like!
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               {/* Message Field */}
               <FormField
@@ -239,8 +242,9 @@ export const WorkingMessageForm: React.FC<WorkingMessageFormProps> = ({ classNam
                 name="message"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-lg font-semibold">
-                      Your Birthday Message *
+                    <FormLabel className="font-heading text-lg font-semibold flex items-center gap-2">
+                      <MessageSquare className="w-5 h-5 text-bright-pink" />
+                      Your Birthday Message
                     </FormLabel>
                     <FormControl>
                       <BirthdayTextarea
@@ -249,7 +253,7 @@ export const WorkingMessageForm: React.FC<WorkingMessageFormProps> = ({ classNam
                         {...field}
                       />
                     </FormControl>
-                    <FormDescription>
+                    <FormDescription className="font-body">
                       Share your thoughts, memories, or wishes - make it personal and from the heart!
                     </FormDescription>
                     <FormMessage />
@@ -263,8 +267,9 @@ export const WorkingMessageForm: React.FC<WorkingMessageFormProps> = ({ classNam
                 name="location"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-lg font-semibold">
-                      Your Location (Optional)
+                    <FormLabel className="font-heading text-lg font-semibold flex items-center gap-2">
+                      <MapPin className="w-5 h-5 text-bright-pink" />
+                      Your Location
                     </FormLabel>
                     <FormControl>
                       <LocationPicker
@@ -280,7 +285,7 @@ export const WorkingMessageForm: React.FC<WorkingMessageFormProps> = ({ classNam
                         disabled={isSubmitting}
                       />
                     </FormControl>
-                    <FormDescription>
+                    <FormDescription className="font-body">
                       Let them know where your birthday wishes are coming from around the world!
                     </FormDescription>
                     <FormMessage />
@@ -295,8 +300,9 @@ export const WorkingMessageForm: React.FC<WorkingMessageFormProps> = ({ classNam
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
-                <Label className="text-lg font-semibold">
-                  Photos & Videos (Optional)
+                <Label className="font-heading text-lg font-semibold flex items-center gap-2">
+                  <Camera className="w-5 h-5 text-bright-pink" />
+                  Photos & Videos
                 </Label>
 
                 <div className="space-y-4">
@@ -305,7 +311,7 @@ export const WorkingMessageForm: React.FC<WorkingMessageFormProps> = ({ classNam
                     onClick={() => setShowFileModal(true)}
                     disabled={isSubmitting}
                     className={cn(
-                      "w-full h-24 border-2 border-dashed rounded-xl",
+                      "w-full h-40 border-2 border-dashed rounded-xl",
                       "bg-gradient-to-br from-primary/5 via-secondary/5 to-primary/10",
                       "hover:from-primary/10 hover:via-secondary/10 hover:to-primary/15",
                       "border-primary/30 hover:border-primary/50",
@@ -313,23 +319,18 @@ export const WorkingMessageForm: React.FC<WorkingMessageFormProps> = ({ classNam
                       "disabled:opacity-50 disabled:cursor-not-allowed"
                     )}
                   >
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="relative">
-                        <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full flex items-center justify-center shadow-lg">
-                          <AnimatedGiftIcon className="w-6 h-6 text-white" />
-                        </div>
-                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-pink-600 to-rose-600 rounded-full flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">+</span>
-                        </div>
+                    <div className="flex flex-col items-center gap-6">
+                      <div className="w-20 h-20 bg-gradient-to-br from-bright-pink/10 to-soft-pink/20 rounded-2xl flex items-center justify-center border-2 border-dashed border-bright-pink/30">
+                        <Camera className="w-10 h-10 text-bright-pink" />
                       </div>
                       <div className="text-center">
-                        <p className="text-sm font-semibold text-charcoal-black">
+                        <p className="font-heading text-sm font-semibold text-charcoal-black">
                           {selectedFiles.length > 0
                             ? `${selectedFiles.length} file(s) selected - Click to change`
                             : 'Click to select photos & videos'
                           }
                         </p>
-                        <p className="text-xs text-charcoal-black/60">
+                        <p className="font-body text-xs text-charcoal-black/60">
                           Up to 10 files • Images & Videos
                         </p>
                       </div>
@@ -390,41 +391,12 @@ export const WorkingMessageForm: React.FC<WorkingMessageFormProps> = ({ classNam
                   </motion.div>
                 )}
 
-                <FormDescription>
+                <FormDescription className="font-body">
                   Share photos or videos to make your message even more special! Drag & drop or click to upload.
                 </FormDescription>
               </motion.div>
 
-              {/* Reminders Checkbox */}
-              <FormField
-                control={form.control}
-                name="wantsReminders"
-                render={({ field }) => (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                  >
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 p-4 rounded-lg bg-gradient-to-r from-primary/5 to-secondary/5 border border-primary/20">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          className="mt-1"
-                        />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel className="text-base font-medium cursor-pointer">
-                          Send me birthday reminders
-                        </FormLabel>
-                        <FormDescription>
-                          We'll remind you of upcoming birthdays so you never miss celebrating with your loved ones!
-                        </FormDescription>
-                      </div>
-                    </FormItem>
-                  </motion.div>
-                )}
-              />
+
 
               {/* Submit Button */}
               <motion.div

@@ -1,21 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createSupabaseClient } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
 
 /**
  * GET /api/admin/email-config - Get email configuration from database
  */
 export async function GET(request: NextRequest) {
   try {
-    // Verify admin authentication
-    const adminToken = request.cookies.get('admin-token')?.value
-    if (!adminToken) {
-      return NextResponse.json(
-        { success: false, message: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
-
-    const supabase = createSupabaseClient()
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
 
     // Get the active email configuration
     const { data, error } = await supabase
@@ -67,15 +61,6 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    // Verify admin authentication
-    const adminToken = request.cookies.get('admin-token')?.value
-    if (!adminToken) {
-      return NextResponse.json(
-        { success: false, message: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
-
     const body = await request.json()
 
     // Validate required fields
@@ -102,7 +87,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = createSupabaseClient()
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
 
     // Prepare update data
     const updateData = {
