@@ -516,6 +516,47 @@ export const sendMessageApprovedEmail = async (
   }
 }
 
+// Send admin notification email when a new message is submitted
+export const sendAdminNotificationEmail = async (
+  messageData: {
+    senderName: string
+    senderEmail: string
+    messagePreview: string
+    submissionTime?: string
+    girlfriendName?: string
+  }
+) => {
+  try {
+    // Call the admin notification API endpoint
+    const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/emails/admin-notification`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        senderName: messageData.senderName,
+        senderEmail: messageData.senderEmail,
+        messagePreview: messageData.messagePreview,
+        submissionTime: messageData.submissionTime || new Date().toISOString(),
+        girlfriendName: messageData.girlfriendName || process.env.NEXT_PUBLIC_GIRLFRIEND_NAME || 'Gracela Elmera C. Betarmos',
+      }),
+    })
+
+    const result = await response.json()
+
+    if (response.ok && result.success) {
+      console.log('✅ Admin notification email sent successfully')
+      return { success: true, messageId: result.messageId }
+    } else {
+      console.error('❌ Admin notification email failed:', result.error || result.message)
+      return { success: false, error: result.error || result.message || 'Unknown error' }
+    }
+  } catch (error) {
+    console.error('Failed to send admin notification email:', error)
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+}
+
 // Smart email sending (tries API first, falls back to SMTP)
 export const sendEmailSmart = async (
   type: 'birthday' | 'thank_you' | 'message_pending' | 'message_approved',

@@ -31,6 +31,34 @@ async function sendPendingReviewEmail(message: any) {
   }
 }
 
+// Helper function to send admin notification email
+async function sendAdminNotificationEmail(message: any) {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/emails/admin-notification`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        senderName: message.name,
+        senderEmail: message.email,
+        messagePreview: message.message,
+        submissionTime: message.created_at || new Date().toISOString(),
+        girlfriendName: process.env.NEXT_PUBLIC_GIRLFRIEND_NAME,
+      }),
+    })
+
+    if (response.ok) {
+      console.log(`✅ Admin notification email sent for message from ${message.name}`)
+    } else {
+      const error = await response.text()
+      console.error(`❌ Admin notification email failed for message from ${message.name}:`, error)
+    }
+  } catch (error) {
+    console.error('Admin notification email request failed:', error)
+  }
+}
+
 /**
  * POST /api/messages-simple
  * Submit a new birthday message with direct file upload (no temp storage)
@@ -122,9 +150,15 @@ export async function POST(request: NextRequest) {
       createdAt: savedMessage.created_at,
     })
 
-    // Send pending review email (async, don't wait for completion)
+    // Send pending review email to user (async, don't wait for completion)
     sendPendingReviewEmail(savedMessage).catch(error => {
       console.error('Failed to send pending review email:', error)
+      // Don't fail the request if email fails
+    })
+
+    // Send admin notification email (async, don't wait for completion)
+    sendAdminNotificationEmail(savedMessage).catch(error => {
+      console.error('Failed to send admin notification email:', error)
       // Don't fail the request if email fails
     })
 

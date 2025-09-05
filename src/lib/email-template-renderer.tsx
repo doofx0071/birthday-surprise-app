@@ -4,6 +4,7 @@ import { BirthdayNotificationEmail } from '@/components/emails/BirthdayNotificat
 import { ContributorNotificationEmail } from '@/components/emails/ContributorNotification'
 import { MessagePendingReview } from '@/components/emails/message-pending-review'
 import { MessageApproved } from '@/components/emails/message-approved'
+import { AdminNotificationEmail } from '@/components/emails/admin-notification'
 import PasswordResetEmail from '@/components/emails/password-reset'
 
 export interface EmailTemplateData {
@@ -112,6 +113,38 @@ export const emailTemplates: EmailTemplateData[] = [
       { key: 'girlfriendName', label: 'Birthday Person Name', type: 'text', required: true },
       { key: 'websiteUrl', label: 'Website URL', type: 'url', required: true },
       { key: 'approvedAt', label: 'Approval Date', type: 'text' },
+    ],
+  },
+  {
+    id: 'admin-notification',
+    name: 'Admin Notification',
+    description: 'Email sent to admin when a new birthday message is submitted',
+    component: AdminNotificationEmail,
+    defaultProps: {
+      senderName: 'John Doe',
+      senderEmail: 'john@example.com',
+      messagePreview: 'Happy birthday! I hope you have a wonderful day filled with joy and celebration...',
+      submissionTime: new Date().toLocaleString('en-US', {
+        timeZone: 'Asia/Manila',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZoneName: 'short'
+      }),
+      adminDashboardUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://birthday-surprise-app.vercel.app'}/admin/messages`,
+      girlfriendName: 'Gracela Elmera C. Betarmos',
+      previewText: 'New birthday message from John Doe',
+    },
+    editableProps: [
+      { key: 'senderName', label: 'Sender Name', type: 'text', required: true },
+      { key: 'senderEmail', label: 'Sender Email', type: 'email', required: true },
+      { key: 'messagePreview', label: 'Message Preview', type: 'text', required: true },
+      { key: 'submissionTime', label: 'Submission Time', type: 'text', required: true },
+      { key: 'adminDashboardUrl', label: 'Admin Dashboard URL', type: 'url', required: true },
+      { key: 'girlfriendName', label: 'Birthday Person Name', type: 'text', required: true },
+      { key: 'previewText', label: 'Preview Text', type: 'text' },
     ],
   },
   {

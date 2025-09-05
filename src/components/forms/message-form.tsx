@@ -14,6 +14,8 @@ import { LocationPicker } from './location-picker'
 import { DraftIndicator } from './draft-indicator'
 import { FileUpload, FileUploadRef } from '@/components/upload'
 import { finalizeUploads } from '@/lib/fileUpload'
+import { useAsyncFileUpload } from '@/hooks/useAsyncFileUpload'
+import { UploadProgressIndicator } from '@/components/upload/UploadProgressIndicator'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
@@ -57,6 +59,10 @@ export const MessageForm: React.FC<MessageFormProps> = ({
   const [tempFiles, setTempFiles] = useState<Array<{ tempPath: string; fileInfo: any; thumbnailUrl?: string }>>([])
   const [clearFilesTrigger, setClearFilesTrigger] = useState(0)
   const fileUploadRef = useRef<FileUploadRef>(null)
+
+  // Async file upload hook for performance optimization
+  const asyncUpload = useAsyncFileUpload()
+  const [useAsyncUpload, setUseAsyncUpload] = useState(true) // Toggle for async upload
 
   // Generate a temporary ID for file uploads (will be replaced with actual message ID after submission)
   const tempUploadId = useMemo(() => `${Date.now()}-${Math.random().toString(36).substring(2)}`, [])
@@ -149,9 +155,21 @@ export const MessageForm: React.FC<MessageFormProps> = ({
         messageId = result.data?.id || result.id || result.messageId
       }
 
-      // Check for pending files and upload them if needed
+      // Handle async file uploads if enabled
+      if (useAsyncUpload && asyncUpload.files.length > 0 && messageId) {
+        try {
+          console.log('🚀 Starting async file uploads...')
+          await asyncUpload.startUploads(messageId)
+          console.log(`✅ Completed async upload of ${asyncUpload.files.length} files`)
+        } catch (uploadError) {
+          console.error('❌ Async file upload failed:', uploadError)
+          // Don't fail the entire submission for file errors in async mode
+        }
+      }
+
+      // Check for pending files and upload them if needed (legacy mode)
       let finalTempFiles = tempFiles
-      if (fileUploadRef.current?.hasPendingFiles()) {
+      if (!useAsyncUpload && fileUploadRef.current?.hasPendingFiles()) {
         try {
           console.log('Uploading pending files before form submission...')
           const uploadedTempFiles = await fileUploadRef.current.uploadPendingFiles()
@@ -171,8 +189,8 @@ export const MessageForm: React.FC<MessageFormProps> = ({
         finalTempFiles: finalTempFiles
       })
 
-      // Finalize file uploads if we have a message ID and temp files
-      if (messageId && finalTempFiles.length > 0) {
+      // Finalize file uploads if we have a message ID and temp files (legacy mode only)
+      if (!useAsyncUpload && messageId && finalTempFiles.length > 0) {
         try {
           console.log('Starting file finalization...')
           await finalizeUploads(finalTempFiles, messageId)
@@ -181,11 +199,13 @@ export const MessageForm: React.FC<MessageFormProps> = ({
           console.error('❌ Failed to finalize file uploads:', fileError)
           // Don't fail the entire submission for file errors
         }
-      } else {
+      } else if (!useAsyncUpload) {
         console.log('⚠️ Skipping file finalization:', {
           hasMessageId: !!messageId,
           tempFilesCount: finalTempFiles.length
         })
+      } else {
+        console.log('📤 Using async upload mode - files handled separately')
       }
 
       // Clear temp files after finalization (or after skipping)
@@ -198,6 +218,12 @@ export const MessageForm: React.FC<MessageFormProps> = ({
       setUploadedFiles([])
       // Note: setTempFiles([]) is called after file finalization
       setClearFilesTrigger(prev => prev + 1) // Trigger file upload component to clear
+
+      // Clear async uploads if using async mode
+      if (useAsyncUpload) {
+        asyncUpload.clearFiles()
+      }
+
       onSuccess?.()
 
       // Show success toast
@@ -414,34 +440,111 @@ export const MessageForm: React.FC<MessageFormProps> = ({
 
               {/* File Upload Section */}
               <div className="space-y-4">
-                <Label className="flex items-center gap-3 font-heading font-bold text-charcoal-black">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-soft-pink to-rose-gold flex items-center justify-center">
-                      <span className="text-white text-sm">📸</span>
+                <div className="flex items-center justify-between">
+                  <Label className="flex items-center gap-3 font-heading font-bold text-charcoal-black">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-gradient-to-br from-soft-pink to-rose-gold flex items-center justify-center">
+                        <span className="text-white text-sm">📸</span>
+                      </div>
+                      <span>Photos & Videos</span>
                     </div>
-                    <span>Photos & Videos</span>
+                    <span className="text-xs font-normal text-muted-foreground">(Optional)</span>
+                  </Label>
+
+                  {/* Upload Mode Toggle */}
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className={useAsyncUpload ? 'text-muted-foreground' : 'text-blue-600 font-medium'}>
+                      Legacy
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setUseAsyncUpload(!useAsyncUpload)}
+                      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                        useAsyncUpload ? 'bg-blue-600' : 'bg-gray-300'
+                      }`}
+                      disabled={disabled || isSubmitting}
+                    >
+                      <span
+                        className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                          useAsyncUpload ? 'translate-x-5' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                    <span className={useAsyncUpload ? 'text-blue-600 font-medium' : 'text-muted-foreground'}>
+                      ⚡ Fast
+                    </span>
                   </div>
-                  <span className="text-xs font-normal text-muted-foreground">(Optional)</span>
-                </Label>
-                <FileUpload
-                  ref={fileUploadRef}
-                  variant="compact"
-                  disabled={disabled || isSubmitting}
-                  messageId={tempUploadId}
-                  clearTrigger={clearFilesTrigger}
-                  onFilesUploaded={(files) => {
-                    console.log('Files uploaded to temporary storage:', files)
-                    setUploadedFiles(files)
-                  }}
-                  onTempFilesReady={(tempFileData) => {
-                    console.log('Temporary files ready for finalization:', tempFileData)
-                    setTempFiles(tempFileData)
-                  }}
-                />
+                </div>
+
+                {useAsyncUpload ? (
+                  /* Async Upload Mode */
+                  <div className="space-y-4">
+                    {/* Async Upload Dropzone */}
+                    <div
+                      {...asyncUpload.getRootProps()}
+                      className={`relative p-6 text-center cursor-pointer neuro-card transition-all ${
+                        asyncUpload.isDragActive
+                          ? asyncUpload.isDragAccept
+                            ? 'border-green-500 bg-green-50 scale-105'
+                            : 'border-red-500 bg-red-50'
+                          : ''
+                      } ${(disabled || isSubmitting) && 'opacity-50 cursor-not-allowed'}`}
+                    >
+                      <input {...asyncUpload.getInputProps()} disabled={disabled || isSubmitting} />
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                          <span className="text-white text-xl">⚡</span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-800">
+                            {asyncUpload.isDragActive ? 'Drop files here' : 'Fast Upload Mode'}
+                          </p>
+                          <p className="text-sm text-gray-600 mt-1">
+                            Original quality preserved • Background upload with progress tracking
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Progress Indicator */}
+                    {asyncUpload.files.length > 0 && (
+                      <UploadProgressIndicator
+                        files={asyncUpload.files}
+                        queueStats={asyncUpload.queueStats}
+                        onPauseFile={asyncUpload.pauseUpload}
+                        onResumeFile={asyncUpload.resumeUpload}
+                        onCancelFile={asyncUpload.cancelUpload}
+                        onRetryFailed={asyncUpload.retryFailedUploads}
+                        onClearCompleted={asyncUpload.clearCompleted}
+                      />
+                    )}
+                  </div>
+                ) : (
+                  /* Legacy Upload Mode */
+                  <FileUpload
+                    ref={fileUploadRef}
+                    variant="compact"
+                    disabled={disabled || isSubmitting}
+                    messageId={tempUploadId}
+                    clearTrigger={clearFilesTrigger}
+                    onFilesUploaded={(files) => {
+                      console.log('Files uploaded to temporary storage:', files)
+                      setUploadedFiles(files)
+                    }}
+                    onTempFilesReady={(tempFileData) => {
+                      console.log('Temporary files ready for finalization:', tempFileData)
+                      setTempFiles(tempFileData)
+                    }}
+                  />
+                )}
+
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   <span className="font-medium">✨ Make your message extra special!</span><br />
                   📷 Images: JPG, PNG, WebP, GIF (up to 5MB)<br />
-                  🎥 Videos: MP4, WebM, MOV (up to 50MB)
+                  🎥 Videos: MP4, WebM, MOV (up to 50MB)<br />
+                  {useAsyncUpload && (
+                    <span className="text-blue-600">⚡ Fast mode: Original quality preserved • Background upload with progress tracking</span>
+                  )}
                 </p>
               </div>
 
