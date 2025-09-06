@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
+import { verifyAdminSessionFromRequest } from '@/lib/admin-auth'
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -9,81 +9,39 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Allow access to login and password reset pages
-  if (pathname === '/admin/login' || pathname === '/admin/forgot-password' || pathname === '/admin/reset-password') {
+  // Allow access to login, auth API routes, and password reset pages
+  if (
+    pathname === '/admin/login' ||
+    pathname === '/admin/forgot-password' ||
+    pathname === '/admin/reset-password' ||
+    pathname.startsWith('/api/admin/auth/')
+  ) {
     return NextResponse.next()
   }
 
-  // Create response object for cookie handling
+  // Create response object
   let response = NextResponse.next({
     request: {
       headers: request.headers,
     },
   })
 
-  // Create Supabase client
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value
-        },
-        set(name: string, value: string, options: any) {
-          request.cookies.set({
-            name,
-            value,
-            ...options,
-          })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
-          response.cookies.set({
-            name,
-            value,
-            ...options,
-          })
-        },
-        remove(name: string, options: any) {
-          request.cookies.set({
-            name,
-            value: '',
-            ...options,
-          })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
-          response.cookies.set({
-            name,
-            value: '',
-            ...options,
-          })
-        },
-      },
-    }
-  )
+  // Verify admin session using custom authentication
+  const adminUser = verifyAdminSessionFromRequest(request)
 
   try {
-    // Get user session
-    const { data: { user }, error } = await supabase.auth.getUser()
-
     // Debug logging for admin API routes
     if (pathname.startsWith('/api/admin')) {
       console.log('Middleware auth check for API route:', {
         pathname,
-        hasUser: !!user,
-        userEmail: user?.email,
-        authError: error?.message,
-        userRole: user?.user_metadata?.role || user?.app_metadata?.role
+        hasUser: !!adminUser,
+        userEmail: adminUser?.email,
+        username: adminUser?.username,
+        userRole: adminUser?.role
       })
     }
 
-    if (error || !user) {
+    if (!adminUser) {
       // Redirect to login for admin pages
       if (pathname.startsWith('/admin')) {
         const loginUrl = new URL('/admin/login', request.url)
@@ -99,8 +57,8 @@ export async function middleware(request: NextRequest) {
       }
     }
 
-    // Check if user has admin role
-    const isAdmin = user?.user_metadata?.role === 'admin' || user?.app_metadata?.role === 'admin'
+    // Check if user has admin role (should always be true for admin_users table users)
+    const isAdmin = adminUser?.role === 'admin'
 
     if (!isAdmin) {
       // Redirect to login for admin pages

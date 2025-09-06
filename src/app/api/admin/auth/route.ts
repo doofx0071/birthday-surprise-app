@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createSupabaseServerClientForAPI, getCurrentUser, isAdminUser } from '@/lib/supabase-server'
+import { getCurrentAdminUser } from '@/lib/admin-auth'
 
 /**
  * GET /api/admin/auth - Check admin authentication status
  */
 export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser()
-    const isAdmin = await isAdminUser()
+    const user = await getCurrentAdminUser()
 
-    if (!user || !isAdmin) {
+    if (!user) {
       return NextResponse.json(
         {
           success: false,
@@ -27,7 +26,8 @@ export async function GET(request: NextRequest) {
         user: {
           id: user.id,
           email: user.email,
-          username: user.user_metadata?.username || user.email?.split('@')[0],
+          username: user.username,
+          role: user.role,
         },
         message: 'Admin authenticated',
       },
@@ -51,18 +51,25 @@ export async function GET(request: NextRequest) {
  */
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = await createSupabaseServerClientForAPI()
-
-    // Sign out from Supabase
-    await supabase.auth.signOut()
-
-    return NextResponse.json(
+    // Create response
+    const response = NextResponse.json(
       {
         success: true,
         message: 'Admin logout successful',
       },
       { status: 200 }
     )
+
+    // Clear the admin session cookie
+    response.cookies.set('admin-session', '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 0, // Expire immediately
+      path: '/'
+    })
+
+    return response
   } catch (error) {
     console.error('Admin logout error:', error)
     return NextResponse.json(

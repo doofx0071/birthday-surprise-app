@@ -20,7 +20,7 @@ import { useNotifications } from '@/contexts/notification-context'
 export function AdminHeader() {
   const router = useRouter()
   const { toast } = useToast()
-  const { signOut, user } = useAdminAuth()
+  const { signOut, user, clearAllSessions } = useAdminAuth()
   const { notifications, unreadCount, loading: notificationsLoading, markAsRead, markAllAsRead } = useNotifications()
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
@@ -65,6 +65,34 @@ export function AdminHeader() {
       toast({
         title: 'Logout Error',
         description: 'Failed to logout. Please try again.',
+        variant: 'destructive',
+      })
+    } finally {
+      setIsLoggingOut(false)
+    }
+  }
+
+  const handleClearAllSessions = async () => {
+    setIsLoggingOut(true)
+    setShowUserMenu(false)
+
+    try {
+      toast({
+        title: 'Clearing All Sessions',
+        description: 'Removing all stored session data...',
+      })
+
+      await clearAllSessions()
+
+      toast({
+        title: 'Sessions Cleared',
+        description: 'All session data has been cleared. Please login again.',
+      })
+    } catch (error) {
+      console.error('Clear sessions error:', error)
+      toast({
+        title: 'Clear Sessions Error',
+        description: 'Failed to clear sessions. Please try again.',
         variant: 'destructive',
       })
     } finally {
@@ -171,6 +199,15 @@ export function AdminHeader() {
                       <p className="text-sm font-medium text-charcoal-black">Admin User</p>
                       <p className="text-xs text-charcoal-black/60">Administrator</p>
                     </div>
+
+                    <button
+                      onClick={handleClearAllSessions}
+                      disabled={isLoggingOut}
+                      className="w-full flex items-center space-x-2 px-4 py-3 text-sm text-charcoal-black/70 hover:text-charcoal-black hover:bg-soft-pink/10 transition-colors disabled:opacity-50 cursor-pointer border-b border-soft-pink/10"
+                    >
+                      <ArrowPathIcon className="w-4 h-4" />
+                      <span>Clear All Sessions</span>
+                    </button>
 
                     <button
                       onClick={handleLogout}

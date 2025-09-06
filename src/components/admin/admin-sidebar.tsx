@@ -13,6 +13,7 @@ import {
   CogIcon,
   HeartIcon,
   EyeIcon,
+  BugAntIcon,
 } from '@heroicons/react/24/outline'
 
 interface NavItem {
@@ -54,6 +55,12 @@ const navigation: NavItem[] = [
     href: '/admin/settings',
     icon: CogIcon,
   },
+  // Debug page (only in development)
+  ...(process.env.NODE_ENV === 'development' ? [{
+    name: 'Debug Session',
+    href: '/admin/debug-session',
+    icon: BugAntIcon,
+  }] : []),
 ]
 
 export function AdminSidebar() {

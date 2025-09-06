@@ -1,65 +1,64 @@
 'use client'
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { User } from '@supabase/supabase-js'
-import { createSupabaseClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 
+interface AdminUser {
+  id: string
+  username: string
+  email: string | null
+  role: 'admin'
+}
+
 interface AdminAuthContextType {
-  user: User | null
+  user: AdminUser | null
   isLoading: boolean
   isAdmin: boolean
   signIn: (username: string, password: string) => Promise<{ success: boolean; error?: string }>
   signOut: () => Promise<void>
   checkAdminStatus: () => Promise<boolean>
+  clearAllSessions: () => Promise<void>
 }
 
 const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefined)
 
 export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<AdminUser | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isAdmin, setIsAdmin] = useState(false)
   const router = useRouter()
-  const supabase = createSupabaseClient()
 
   // Check if user is admin
-  const checkAdminStatus = async (userToCheck?: User | null): Promise<boolean> => {
+  const checkAdminStatus = async (userToCheck?: AdminUser | null): Promise<boolean> => {
     const targetUser = userToCheck || user
     if (!targetUser) return false
 
-    // Check user metadata for admin role
-    const adminStatus = targetUser.user_metadata?.role === 'admin' || targetUser.app_metadata?.role === 'admin'
+    // Admin users from admin_users table are always admin
+    const adminStatus = targetUser.role === 'admin'
     setIsAdmin(adminStatus)
     return adminStatus
   }
 
-  // Sign in with username (we'll use email field for username)
+  // Sign in with username using admin_users table
   const signIn = async (username: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
       setIsLoading(true)
-      
-      // For username-based auth, we'll use a custom email format
-      const email = `${username}@admin.local`
-      
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+
+      const response = await fetch('/api/admin/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
       })
 
-      if (error) {
-        return { success: false, error: error.message }
+      const data = await response.json()
+
+      if (!response.ok || !data.success) {
+        return { success: false, error: data.error || 'Login failed' }
       }
 
       if (data.user) {
-        // Check admin status directly from the user object
-        const adminStatus = data.user.user_metadata?.role === 'admin' || data.user.app_metadata?.role === 'admin'
-
-        if (!adminStatus) {
-          await supabase.auth.signOut()
-          return { success: false, error: 'Access denied. Admin privileges required.' }
-        }
-
         setUser(data.user)
         setIsAdmin(true)
         return { success: true }
@@ -78,12 +77,59 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async (): Promise<void> => {
     try {
       setIsLoading(true)
-      await supabase.auth.signOut()
+
+      // Clear all auth state first
       setUser(null)
       setIsAdmin(false)
+
+      // Call logout API to clear session cookie
+      await fetch('/api/admin/auth/logout', {
+        method: 'POST',
+      })
+
       router.push('/admin/login')
     } catch (error) {
       console.error('Sign out error:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Clear all sessions (useful for debugging)
+  const clearAllSessions = async (): Promise<void> => {
+    try {
+      setIsLoading(true)
+
+      // Clear all auth state
+      setUser(null)
+      setIsAdmin(false)
+
+      // Call logout API to clear session cookie
+      await fetch('/api/admin/auth/logout', {
+        method: 'POST',
+      })
+
+      // Clear any remaining browser storage
+      if (typeof window !== 'undefined') {
+        // Clear all localStorage
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('admin-') || key.startsWith('auth-')) {
+            localStorage.removeItem(key)
+          }
+        })
+
+        // Clear all sessionStorage
+        Object.keys(sessionStorage).forEach(key => {
+          if (key.startsWith('admin-') || key.startsWith('auth-')) {
+            sessionStorage.removeItem(key)
+          }
+        })
+
+        // Clear admin session cookie manually
+        document.cookie = 'admin-session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
+      }
+    } catch (error) {
+      console.error('Clear sessions error:', error)
     } finally {
       setIsLoading(false)
     }
@@ -93,11 +139,23 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession()
+        // Check if we have a valid session
+        const response = await fetch('/api/admin/auth/verify', {
+          method: 'GET',
+          credentials: 'include', // Include cookies
+        })
 
-        if (session?.user) {
-          setUser(session.user)
-          await checkAdminStatus(session.user)
+        if (response.ok) {
+          const data = await response.json()
+          if (data.success && data.user) {
+            console.log('Found existing session for user:', data.user.email || data.user.username)
+            setUser(data.user)
+            await checkAdminStatus(data.user)
+          } else {
+            console.log('No valid session found')
+          }
+        } else {
+          console.log('Session verification failed')
         }
       } catch (error) {
         console.error('Auth initialization error:', error)
@@ -107,22 +165,6 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     initializeAuth()
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === 'SIGNED_IN' && session?.user) {
-          setUser(session.user)
-          await checkAdminStatus(session.user)
-        } else if (event === 'SIGNED_OUT') {
-          setUser(null)
-          setIsAdmin(false)
-        }
-        setIsLoading(false)
-      }
-    )
-
-    return () => subscription.unsubscribe()
   }, [])
 
   const value: AdminAuthContextType = {
@@ -132,6 +174,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     signIn,
     signOut,
     checkAdminStatus,
+    clearAllSessions,
   }
 
   return (
