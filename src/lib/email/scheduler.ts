@@ -244,8 +244,11 @@ export class EmailScheduler {
         })
       }
 
-      // Send emails in batches
-      const results = await emailService.sendBatchEmails(emails, 5, 2000)
+      // Send emails in optimized batches for production
+      // For 50-100+ emails: larger batches, shorter delays
+      const batchSize = process.env.NODE_ENV === 'production' ? 25 : 5
+      const delayMs = process.env.NODE_ENV === 'production' ? 500 : 2000
+      const results = await emailService.sendBatchEmails(emails, batchSize, delayMs)
       
       batch.results = results
       batch.status = results.every(r => r.success) ? 'completed' : 'failed'

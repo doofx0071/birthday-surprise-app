@@ -177,7 +177,7 @@ export class EmailService {
     }
   }
 
-  // Send batch emails with rate limiting
+  // Send batch emails with optimized rate limiting
   async sendBatchEmails(
     emails: Array<{
       to: string
@@ -185,24 +185,31 @@ export class EmailService {
       template: React.ReactElement
       options?: any
     }>,
-    batchSize: number = 10,
-    delayMs: number = 1000
+    batchSize: number = 25, // Increased default for better performance
+    delayMs: number = 500   // Reduced delay for faster processing
   ): Promise<EmailDeliveryResult[]> {
     const results: EmailDeliveryResult[] = []
-    
+    const totalBatches = Math.ceil(emails.length / batchSize)
+
+    console.log(`📧 Processing ${emails.length} emails in ${totalBatches} batches (${batchSize} per batch)`)
+
     for (let i = 0; i < emails.length; i += batchSize) {
       const batch = emails.slice(i, i + batchSize)
-      
+      const batchNumber = Math.floor(i / batchSize) + 1
+
+      console.log(`📦 Processing batch ${batchNumber}/${totalBatches} (${batch.length} emails)`)
+
       const batchPromises = batch.map(email =>
-        this.sendTemplateEmail(email.to, email.subject, email.template, email.options)
+        this.sendTemplateEmailWithRetry(email.to, email.subject, email.template, email.options)
       )
-      
+
       const batchResults = await Promise.allSettled(batchPromises)
-      
+
       batchResults.forEach((result, index) => {
         if (result.status === 'fulfilled') {
           results.push(result.value)
         } else {
+          console.error(`❌ Email failed for ${batch[index].to}:`, result.reason)
           results.push({
             success: false,
             error: result.reason,
@@ -210,14 +217,68 @@ export class EmailService {
           })
         }
       })
-      
+
+      const successCount = batchResults.filter(r => r.status === 'fulfilled').length
+      console.log(`✅ Batch ${batchNumber} completed: ${successCount}/${batch.length} successful`)
+
       // Add delay between batches to respect rate limits
       if (i + batchSize < emails.length) {
         await new Promise(resolve => setTimeout(resolve, delayMs))
       }
     }
+
+    const totalSuccess = results.filter(r => r.success).length
+    console.log(`🎉 Bulk email completed: ${totalSuccess}/${emails.length} emails sent successfully`)
     
     return results
+  }
+
+  // Send email with retry logic for production reliability
+  private async sendTemplateEmailWithRetry(
+    to: string,
+    subject: string,
+    template: React.ReactElement,
+    options?: any,
+    maxRetries: number = 3
+  ): Promise<EmailDeliveryResult> {
+    let lastError: any
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const result = await this.sendTemplateEmail(to, subject, template, options)
+
+        if (result.success) {
+          if (attempt > 1) {
+            console.log(`✅ Email to ${to} succeeded on attempt ${attempt}`)
+          }
+          return result
+        }
+
+        lastError = result.error
+
+        // If it's a permanent failure (like invalid email), don't retry
+        if (result.error?.includes('invalid') || result.error?.includes('rejected')) {
+          break
+        }
+
+      } catch (error) {
+        lastError = error
+        console.warn(`⚠️ Email attempt ${attempt}/${maxRetries} failed for ${to}:`, error)
+      }
+
+      // Wait before retry (exponential backoff)
+      if (attempt < maxRetries) {
+        const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000) // Max 5 seconds
+        await new Promise(resolve => setTimeout(resolve, delay))
+      }
+    }
+
+    console.error(`❌ Email to ${to} failed after ${maxRetries} attempts:`, lastError)
+    return {
+      success: false,
+      error: lastError,
+      recipientEmail: to,
+    }
   }
 
   // Test email configuration

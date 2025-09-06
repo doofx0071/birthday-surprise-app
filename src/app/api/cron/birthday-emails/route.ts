@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { emailScheduler } from '@/lib/email/scheduler'
 import { emailService } from '@/lib/email/mailtrap'
+import { emailQueue } from '@/lib/email/queue'
 
 // Verify cron secret for security
 function verifyCronSecret(request: NextRequest): boolean {
@@ -34,6 +35,9 @@ export async function GET(request: NextRequest) {
     const isDayReminder = emailScheduler.isReminderTime('day')
     const isHourReminder = emailScheduler.isReminderTime('hour')
 
+    // Get email queue statistics
+    const queueStats = await emailQueue.getQueueStats()
+
     return NextResponse.json({
       status: 'ok',
       timestamp: new Date().toISOString(),
@@ -60,6 +64,7 @@ export async function GET(request: NextRequest) {
         createdAt: batch.createdAt.toISOString(),
         completedAt: batch.completedAt?.toISOString(),
       })),
+      emailQueue: queueStats,
     })
   } catch (error) {
     console.error('Cron status check failed:', error)
@@ -92,8 +97,11 @@ export async function POST(request: NextRequest) {
       throw new Error('Email service connection failed')
     }
 
-    // Process birthday emails
+    // Process birthday emails and email queue
     await emailScheduler.processBirthdayEmails()
+
+    // Process any queued emails
+    await emailQueue.processQueue()
 
     const executionTime = Date.now() - startTime
     console.log(`✅ Birthday email cron job completed in ${executionTime}ms`)

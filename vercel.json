@@ -2,7 +2,15 @@
   "crons": [
     {
       "path": "/api/cron/birthday-emails",
-      "schedule": "0 0 * * *"
+      "schedule": "*/5 * * * *"
     }
-  ]
+  ],
+  "functions": {
+    "app/api/cron/birthday-emails.ts": {
+      "maxDuration": 300
+    },
+    "app/api/emails/**/*.ts": {
+      "maxDuration": 180
+    }
+  }
 }
