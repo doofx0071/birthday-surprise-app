@@ -265,18 +265,25 @@ export class EmailScheduler {
 
   // Main function to process birthday emails
   async processBirthdayEmails(): Promise<void> {
-    console.log('Processing birthday emails...')
-    
+    console.log('🔄 Processing birthday emails...')
+
     try {
+      // Check if emails have already been sent to prevent duplicates
+      const emailsAlreadySent = await this.checkEmailsAlreadySent()
+      if (emailsAlreadySent) {
+        console.log('📧 Birthday emails already sent, skipping...')
+        return
+      }
+
       if (this.isBirthdayTime()) {
-        console.log('It\'s birthday time! Sending birthday notifications...')
-        
+        console.log('🎂 It\'s birthday time! Sending birthday notifications...')
+
         // Send birthday notification to girlfriend
         const birthdayRecipients = await this.getEmailRecipients('birthday_notification')
         if (birthdayRecipients.length > 0) {
           const birthdayBatch = await this.createEmailBatch('birthday_notification', birthdayRecipients)
           await this.processBatch(birthdayBatch.id)
-          console.log(`Birthday notification sent to ${birthdayRecipients.length} recipients`)
+          console.log(`✅ Birthday notification sent to ${birthdayRecipients.length} recipients`)
         }
 
         // Send contributor notifications
@@ -284,8 +291,11 @@ export class EmailScheduler {
         if (contributorRecipients.length > 0) {
           const contributorBatch = await this.createEmailBatch('contributor_notification', contributorRecipients)
           await this.processBatch(contributorBatch.id)
-          console.log(`Contributor notifications sent to ${contributorRecipients.length} recipients`)
+          console.log(`✅ Contributor notifications sent to ${contributorRecipients.length} recipients`)
         }
+
+        // Mark emails as sent to prevent duplicates
+        await this.markEmailsAsSent()
       }
 
       // Check for reminder emails
@@ -315,6 +325,72 @@ export class EmailScheduler {
   // Get all batches
   getAllBatches(): EmailBatch[] {
     return Array.from(this.batches.values())
+  }
+
+  // Check if birthday emails have already been sent (database check)
+  private async checkEmailsAlreadySent(): Promise<boolean> {
+    try {
+      const { createClient } = await import('@supabase/supabase-js')
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        { auth: { autoRefreshToken: false, persistSession: false } }
+      )
+
+      const { data, error } = await supabase
+        .from('system_configurations')
+        .select('birthday_emails_sent')
+        .eq('is_active', true)
+        .single()
+
+      if (error) {
+        // If column doesn't exist, assume emails not sent
+        if (error.message?.includes('column "birthday_emails_sent" does not exist')) {
+          console.log('⚠️ birthday_emails_sent column not found, assuming emails not sent')
+          return false
+        }
+        console.error('Error checking email status:', error)
+        return false
+      }
+
+      return data?.birthday_emails_sent === true
+    } catch (error) {
+      console.error('Error checking if emails already sent:', error)
+      return false
+    }
+  }
+
+  // Mark birthday emails as sent in database
+  private async markEmailsAsSent(): Promise<void> {
+    try {
+      const { createClient } = await import('@supabase/supabase-js')
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        { auth: { autoRefreshToken: false, persistSession: false } }
+      )
+
+      const { error } = await supabase
+        .from('system_configurations')
+        .update({
+          birthday_emails_sent: true,
+          birthday_emails_sent_at: new Date().toISOString(),
+        })
+        .eq('is_active', true)
+
+      if (error) {
+        if (error.message?.includes('column "birthday_emails_sent" does not exist')) {
+          console.log('⚠️ birthday_emails_sent column not found, cannot mark as sent')
+          return
+        }
+        throw error
+      }
+
+      console.log('📧 Marked birthday emails as sent in database')
+    } catch (error) {
+      console.error('Error marking emails as sent:', error)
+      // Don't throw to prevent email sending from failing
+    }
   }
 }
 
