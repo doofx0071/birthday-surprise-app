@@ -10,6 +10,7 @@ import {
   Preview,
   Img,
 } from '@react-email/components'
+import { EMAIL_LOGO_URL, emailLogoStyles } from '@/lib/email-logo'
 import type { ContributorNotificationProps } from '@/types/email'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://birthday-surprise-app.vercel.app'
@@ -45,11 +46,13 @@ export function ContributorNotificationEmail({
                     <td style={wrapperStyle}>
 
                       {/* Logo Section */}
-                      <div style={logoSectionStyle}>
+                      <div style={emailLogoStyles.container}>
                         <Img
-                          src="http://localhost:3000/assets/icons/svg/logo.svg"
+                          src={EMAIL_LOGO_URL}
                           alt="Birthday Surprise Logo"
-                          style={logoStyle}
+                          width={80}
+                          height={80}
+                          style={emailLogoStyles.image}
                         />
                       </div>
 
@@ -252,16 +255,3 @@ const buttonStyle = {
   textTransform: 'capitalize' as const,
 }
 
-const logoSectionStyle = {
-  textAlign: 'center' as const,
-  marginBottom: '32px',
-  paddingBottom: '24px',
-  borderBottom: '2px solid #fce7f3',
-}
-
-const logoStyle = {
-  width: '120px',
-  height: '120px',
-  margin: '0 auto',
-  display: 'block',
-}

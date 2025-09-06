@@ -190,6 +190,8 @@ export async function POST(request: NextRequest) {
       longitude: longitude,
       message: messageData.message,
       wants_reminders: messageData.wantsReminders || false,
+      is_approved: false, // Require admin approval
+      is_visible: false,  // Hidden until approved
       ip_address: ip,
       user_agent: userAgent,
     }

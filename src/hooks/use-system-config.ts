@@ -95,16 +95,29 @@ export function useSystemConfig(): UseSystemConfigReturn {
  */
 export function getBirthdayConfigFromSystem(config: SystemConfig | null) {
   if (!config) {
+    // If no config is available, return a default that won't trigger countdown
+    // This should not happen in normal operation since config should always be loaded
+    console.warn('⚠️ No system configuration available, using safe defaults')
     return {
-      targetDate: process.env.NEXT_PUBLIC_BIRTHDAY_DATE || '2025-09-08T00:00:00+08:00',
-      timezone: process.env.NEXT_PUBLIC_TIMEZONE || 'Asia/Manila',
-      girlfriendName: process.env.NEXT_PUBLIC_GIRLFRIEND_NAME?.replace(/"/g, '') || 'Your Special Someone',
+      targetDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year from now
+      timezone: 'Asia/Manila',
+      girlfriendName: 'Your Special Someone',
     }
   }
 
   // Ensure the birthday date is set to exactly midnight in the configured timezone
-  const birthdayDate = config.birthdayDate || '2025-09-08'
+  const birthdayDate = config.birthdayDate
   const timezone = config.timezone || 'Asia/Manila'
+
+  if (!birthdayDate) {
+    console.error('❌ No birthday date found in system configuration')
+    // Return a safe default that won't trigger countdown
+    return {
+      targetDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year from now
+      timezone,
+      girlfriendName: config.birthdayPersonName || 'Your Special Someone',
+    }
+  }
 
   // If the date doesn't include time, add midnight in the specified timezone
   let targetDate = birthdayDate

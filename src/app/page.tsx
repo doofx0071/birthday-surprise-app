@@ -3,13 +3,14 @@
 import { Header } from '@/components/layout'
 import { AboutSection, MessageSection, GallerySection } from '@/components/sections'
 import { CountdownWrapper } from '@/components/countdown/countdown-wrapper'
+import { ContentRevealWrapper } from '@/components/reveal/ContentRevealWrapper'
 import { useSystemConfig, getBirthdayConfigFromSystem } from '@/hooks/use-system-config'
 
 export default function HomePage() {
   const { config, loading, error } = useSystemConfig()
   const birthdayConfig = getBirthdayConfigFromSystem(config)
   return (
-    <div className="min-h-screen w-full bg-white relative">
+    <div className="min-h-screen w-full bg-white relative overflow-hidden">
       {/* Pink Glow Background */}
       <div
         className="absolute inset-0 z-0"
@@ -76,8 +77,10 @@ export default function HomePage() {
         {/* Message Section */}
         <MessageSection />
 
-        {/* Gallery Section */}
-        <GallerySection />
+        {/* Gallery Section - Revealed after countdown */}
+        <ContentRevealWrapper contentType="gallery">
+          <GallerySection />
+        </ContentRevealWrapper>
       </main>
       </div>
     </div>

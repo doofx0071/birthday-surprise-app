@@ -3,8 +3,8 @@
  * Provides logo URLs and utilities for email templates
  */
 
-// Supabase storage URL for the email logo (organized in frontend folder)
-export const EMAIL_LOGO_URL = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/birthday-media/frontend/logo.png`;
+// Supabase storage URL for the email logo (stored in dedicated frontend bucket)
+export const EMAIL_LOGO_URL = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/frontend/logo.png`;
 
 // Fallback logo as a simple SVG data URI (small and email-friendly)
 export const FALLBACK_LOGO_DATA_URI = `data:image/svg+xml;base64,${Buffer.from(`

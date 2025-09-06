@@ -118,7 +118,8 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
         'relative neuro-countdown-container',
         'overflow-hidden w-full max-w-6xl mx-auto',
         'countdown-container countdown-text',
-        styles.container,
+        // Only apply padding when countdown is active, not when showing birthday card
+        timeRemaining.isComplete ? '' : styles.container,
         className
       )}
     >
@@ -127,42 +128,76 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
 
       {/* Content */}
       <div className="relative z-10">
-        {/* Title */}
-        <div className="text-center mb-6">
-          <h1 className={cn(
-            'font-body font-medium text-lg text-charcoal-black/60', // Smaller, lighter text for "Countdown to"
-            styles.title
-          )}>
-            Countdown to
-          </h1>
-          <h2 className={cn(
-            'font-heading font-black text-4xl md:text-5xl lg:text-6xl text-bright-pink drop-shadow-sm', // Much larger, bolder, BRIGHT pink name
-            styles.subtitle
-          )}>
-            {girlfriendName} Birthday
-          </h2>
-
-          {/* Target Date Display */}
-          {showTargetDate && (
-            <p className="font-body text-sm md:text-base text-charcoal-black/60 mt-2">
-              {formatTargetDate(targetDate, dateFormat, timezone)}
-            </p>
-          )}
-        </div>
-
-        {/* Countdown grid */}
+        {/* Birthday Card - 16:9 Responsive */}
         {timeRemaining.isComplete ? (
-          <div className="text-center">
-            <div className="text-6xl md:text-8xl mb-4">🎉</div>
-            <h3 className="font-body text-3xl md:text-5xl font-bold text-primary mb-4">
-              Happy Birthday!
-            </h3>
-            <p className="font-body text-lg md:text-xl text-charcoal-black/70">
-              The special day has arrived! 🎂✨
-            </p>
+          <div className="w-full max-w-6xl mx-auto">
+            {/* 16:9 Aspect Ratio Container with Background */}
+            <div
+              className="relative w-full rounded-2xl overflow-hidden shadow-2xl"
+              style={{
+                aspectRatio: '16/9',
+                backgroundImage: 'url(/assets/images/backgrounds/card-background.png)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
+              }}
+            >
+              {/* Content Overlay */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center px-4 sm:px-6 md:px-8 lg:px-12">
+                  <h1
+                    className={cn(
+                      'text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-black drop-shadow-lg mb-2 sm:mb-3 md:mb-4 uppercase tracking-wider',
+                      styles.subtitle
+                    )}
+                    style={{ fontFamily: 'Kalam, cursive', fontWeight: 700 }}
+                  >
+                    HAPPY BIRTHDAY
+                  </h1>
+                  <h2 className={cn(
+                    'font-black text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-bright-pink drop-shadow-lg mb-3 sm:mb-4 md:mb-6 uppercase tracking-wide truncate max-w-full',
+                    styles.subtitle
+                  )}>
+                    {girlfriendName}
+                  </h2>
+                  <div className="space-y-2 sm:space-y-3 md:space-y-4">
+                    <p className="font-semibold text-sm sm:text-base md:text-lg lg:text-xl text-charcoal-black/80">
+                      The special day has arrived!
+                    </p>
+                    <p className="font-semibold text-sm sm:text-base md:text-lg lg:text-xl text-charcoal-black/80 flex items-center justify-center gap-2">
+                      Enjoy this present!
+                      <span className="text-xl sm:text-2xl md:text-3xl animate-bounce">🎁</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         ) : (
           <>
+            {/* Title - Only show when countdown is active */}
+            <div className="text-center mb-6">
+              <h1 className={cn(
+                'font-body font-medium text-lg text-charcoal-black/60', // Smaller, lighter text for "Countdown to"
+                styles.title
+              )}>
+                Countdown to
+              </h1>
+              <h2 className={cn(
+                'font-heading font-black text-4xl md:text-5xl lg:text-6xl text-bright-pink drop-shadow-sm', // Much larger, bolder, BRIGHT pink name
+                styles.subtitle
+              )}>
+                {girlfriendName} Birthday
+              </h2>
+
+              {/* Target Date Display */}
+              {showTargetDate && (
+                <p className="font-body text-sm md:text-base text-charcoal-black/60 mt-2">
+                  {formatTargetDate(targetDate, dateFormat, timezone)}
+                </p>
+              )}
+            </div>
+
             <div className={cn(
               'grid w-full',
               'countdown-mobile-grid sm:countdown-tablet-grid md:countdown-desktop-grid',
@@ -251,21 +286,11 @@ export const CountdownDisplay: React.FC<CountdownDisplayProps> = ({
             </div>
           </>
         )}
-
-
       </div>
 
       {/* Celebration effects */}
       {enableCelebration && (
         <>
-          <CelebrationAnimation
-            isActive={isCelebrating}
-            showConfetti={showConfetti}
-            showFireworks={true}
-            showRainbow={true}
-            intensity="high"
-            message={`🎉 Happy Birthday ${girlfriendName}! 🎉`}
-          />
           <PulseCelebration
             isActive={timeRemaining.isComplete && !isCelebrating}
             intensity="medium"

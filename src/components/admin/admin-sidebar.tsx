@@ -12,6 +12,7 @@ import {
   EnvelopeIcon,
   CogIcon,
   HeartIcon,
+  EyeIcon,
 } from '@heroicons/react/24/outline'
 
 interface NavItem {
@@ -37,6 +38,11 @@ const navigation: NavItem[] = [
     name: 'Analytics',
     href: '/admin/analytics',
     icon: ChartBarIcon,
+  },
+  {
+    name: 'Client Preview',
+    href: '/admin/client-preview',
+    icon: EyeIcon,
   },
   {
     name: 'Emails',

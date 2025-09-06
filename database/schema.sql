@@ -62,12 +62,23 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO storage.buckets (id, name, public) VALUES ('birthday-media', 'birthday-media', true)
 ON CONFLICT (id) DO NOTHING;
 
+-- Create storage bucket for frontend static assets (logos, icons, etc.)
+INSERT INTO storage.buckets (id, name, public) VALUES ('frontend', 'frontend', true)
+ON CONFLICT (id) DO NOTHING;
+
 -- Create storage policies for file uploads
 CREATE POLICY "Anyone can upload files" ON storage.objects
   FOR INSERT WITH CHECK (bucket_id = 'birthday-media');
 
 CREATE POLICY "Anyone can view files" ON storage.objects
   FOR SELECT USING (bucket_id = 'birthday-media');
+
+-- Create storage policies for frontend assets
+CREATE POLICY "Anyone can view frontend assets" ON storage.objects
+  FOR SELECT USING (bucket_id = 'frontend');
+
+CREATE POLICY "Admins can upload frontend assets" ON storage.objects
+  FOR INSERT WITH CHECK (bucket_id = 'frontend');
 
 -- Create admin view for message management (optional)
 CREATE OR REPLACE VIEW public.messages_admin AS

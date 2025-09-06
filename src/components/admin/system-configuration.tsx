@@ -14,10 +14,11 @@ import {
 } from '@heroicons/react/24/outline'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
+import { LogoUpload } from '@/components/admin/setup/LogoUpload'
 import timezones from 'timezones-list'
 
 const configSchema = z.object({
-  birthdayDate: z.string().min(1, 'Birthday date is required'),
+  birthdayDate: z.string().min(1, 'Birthday date and time is required'),
   birthdayPersonName: z.string().min(1, 'Birthday person name is required'),
   timezone: z.string().min(1, 'Timezone is required'),
   countdownStartDate: z.string().optional(),
@@ -61,6 +62,42 @@ export function SystemConfiguration() {
     fetchConfiguration()
   }, [])
 
+  // Helper function to convert datetime string to datetime-local format
+  const formatDateTimeForInput = (dateTimeString: string) => {
+    if (!dateTimeString) return ''
+
+    try {
+      const date = new Date(dateTimeString)
+      // Format as YYYY-MM-DDTHH:MM for datetime-local input
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+
+      return `${year}-${month}-${day}T${hours}:${minutes}`
+    } catch (error) {
+      console.error('Error formatting datetime:', error)
+      return ''
+    }
+  }
+
+  // Helper function to convert datetime-local input to ISO string
+  const formatDateTimeForAPI = (dateTimeLocal: string, timezone: string) => {
+    if (!dateTimeLocal) return ''
+
+    try {
+      // Create date object from datetime-local input
+      const date = new Date(dateTimeLocal)
+
+      // Convert to ISO string with timezone consideration
+      return date.toISOString()
+    } catch (error) {
+      console.error('Error formatting datetime for API:', error)
+      return dateTimeLocal
+    }
+  }
+
   const fetchConfiguration = async () => {
     try {
       setLoading(true)
@@ -71,7 +108,7 @@ export function SystemConfiguration() {
         
         // Reset form with fetched data
         reset({
-          birthdayDate: data.birthdayDate || '',
+          birthdayDate: formatDateTimeForInput(data.birthdayDate) || '',
           birthdayPersonName: data.birthdayPersonName || '',
           timezone: data.timezone || 'Asia/Manila',
           countdownStartDate: data.countdownStartDate || '',
@@ -95,12 +132,18 @@ export function SystemConfiguration() {
   const onSubmit = async (data: ConfigFormData) => {
     setSaving(true)
     try {
+      // Format the birthday date for API submission
+      const formattedData = {
+        ...data,
+        birthdayDate: formatDateTimeForAPI(data.birthdayDate, data.timezone)
+      }
+
       const response = await fetch('/api/admin/system-config', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(formattedData),
       })
 
       if (response.ok) {
@@ -154,6 +197,9 @@ export function SystemConfiguration() {
         )}
       </div>
 
+      {/* Logo Upload Section */}
+      <LogoUpload className="mb-6" />
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Birthday Information */}
         <div className="bg-white/40 rounded-lg p-6 border border-soft-pink/20">
@@ -165,16 +211,20 @@ export function SystemConfiguration() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-charcoal-black mb-1">
-                Birthday Date
+                Birthday Date & Time
               </label>
               <input
                 {...register('birthdayDate')}
-                type="date"
+                type="datetime-local"
                 className="w-full px-3 py-2 border border-soft-pink/30 rounded-lg focus:border-soft-pink focus:outline-none"
+                placeholder="Select birthday date and time"
               />
               {errors.birthdayDate && (
                 <p className="text-red-500 text-sm mt-1">{errors.birthdayDate.message}</p>
               )}
+              <p className="text-xs text-charcoal-black/60 mt-1">
+                Set the exact date and time for the birthday celebration
+              </p>
             </div>
 
             <div>

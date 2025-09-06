@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
       sender_name: "Cela's Birthday",
       sender_email: '',
       reply_to_email: '',
+      birthday_celebrant_email: '',
       webhook_url: '',
       webhook_secret: '',
       is_active: true,
@@ -41,6 +42,7 @@ export async function GET(request: NextRequest) {
       senderName: config.sender_name,
       senderEmail: config.sender_email,
       replyToEmail: config.reply_to_email,
+      birthdayCelebrantEmail: config.birthday_celebrant_email,
       webhookUrl: config.webhook_url,
       webhookSecret: config.webhook_secret ? '••••••••' : '',
       isActive: config.is_active,
@@ -87,6 +89,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    if (body.birthdayCelebrantEmail && !emailRegex.test(body.birthdayCelebrantEmail)) {
+      return NextResponse.json(
+        { success: false, message: 'Invalid birthday celebrant email format' },
+        { status: 400 }
+      )
+    }
+
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -97,6 +106,7 @@ export async function POST(request: NextRequest) {
       sender_name: body.senderName,
       sender_email: body.senderEmail,
       reply_to_email: body.replyToEmail || '',
+      birthday_celebrant_email: body.birthdayCelebrantEmail || '',
       webhook_url: body.webhookUrl || '',
       webhook_secret: body.webhookSecret && body.webhookSecret !== '••••••••' ? body.webhookSecret : undefined,
     }
@@ -149,6 +159,7 @@ export async function POST(request: NextRequest) {
       senderName: config.sender_name,
       senderEmail: config.sender_email,
       replyToEmail: config.reply_to_email,
+      birthdayCelebrantEmail: config.birthday_celebrant_email,
       webhookUrl: config.webhook_url,
       webhookSecret: config.webhook_secret ? '••••••••' : '',
       isActive: config.is_active,

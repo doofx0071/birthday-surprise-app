@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { countdownTrigger } from '@/lib/email/countdown-trigger'
-import { getTimeUntilBirthday, getBirthdayConfig } from '@/lib/config/birthday'
+import { getTimeUntilBirthday, getBirthdayConfig, getTimeUntilBirthdayFromDatabase, getBirthdayConfigFromDatabase } from '@/lib/config/birthday'
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,9 +11,9 @@ export async function GET(request: NextRequest) {
       case 'status':
         // Get current trigger status and countdown info
         const triggerState = countdownTrigger.getState()
-        const timeRemaining = getTimeUntilBirthday()
-        const config = getBirthdayConfig()
-        
+        const timeRemaining = await getTimeUntilBirthdayFromDatabase()
+        const config = await getBirthdayConfigFromDatabase()
+
         return NextResponse.json({
           success: true,
           data: {
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
       
       case 'start':
         // Start monitoring the countdown
-        countdownTrigger.startMonitoring()
+        await countdownTrigger.startMonitoring()
         return NextResponse.json({
           success: true,
           message: 'Countdown trigger monitoring started',

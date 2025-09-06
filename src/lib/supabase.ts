@@ -69,6 +69,8 @@ export interface MessageInsert {
   longitude?: number
   message: string
   wants_reminders?: boolean
+  is_approved?: boolean
+  is_visible?: boolean
   ip_address?: string
   user_agent?: string
 }

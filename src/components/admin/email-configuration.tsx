@@ -18,6 +18,7 @@ const configSchema = z.object({
   senderName: z.string().min(1, 'Sender name is required'),
   senderEmail: z.string().email('Valid email is required'),
   replyToEmail: z.string().email('Valid reply-to email is required'),
+  birthdayCelebrantEmail: z.string().email('Valid birthday celebrant email is required').optional().or(z.literal('')),
   webhookUrl: z.string().url('Valid webhook URL is required').optional().or(z.literal('')),
   webhookSecret: z.string().optional(),
   testEmail: z.string().email('Valid test email is required').optional().or(z.literal('')),
@@ -30,6 +31,7 @@ interface EmailConfig {
   senderName: string
   senderEmail: string
   replyToEmail: string
+  birthdayCelebrantEmail: string
   webhookUrl: string
   webhookSecret: string
   isActive: boolean
@@ -68,6 +70,7 @@ export function EmailConfiguration() {
           senderName: data.senderName || "Cela's Birthday",
           senderEmail: data.senderEmail || '',
           replyToEmail: data.replyToEmail || '',
+          birthdayCelebrantEmail: data.birthdayCelebrantEmail || '',
           webhookUrl: data.webhookUrl || `${window.location.origin}/api/webhooks/mailtrap`,
           webhookSecret: data.webhookSecret || '',
           testEmail: '',
@@ -90,6 +93,7 @@ export function EmailConfiguration() {
           senderName: data.senderName,
           senderEmail: data.senderEmail,
           replyToEmail: data.replyToEmail,
+          birthdayCelebrantEmail: data.birthdayCelebrantEmail,
           webhookUrl: data.webhookUrl,
           webhookSecret: data.webhookSecret,
         }),
@@ -246,6 +250,24 @@ export function EmailConfiguration() {
               />
               {errors.replyToEmail && (
                 <p className="text-red-500 text-sm mt-1">{errors.replyToEmail.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-charcoal-black mb-1">
+                Birthday Celebrant Email <span className="text-charcoal-black/60">(optional)</span>
+              </label>
+              <input
+                {...register('birthdayCelebrantEmail')}
+                type="email"
+                className="w-full px-3 py-2 border border-soft-pink/30 rounded-lg focus:border-soft-pink focus:outline-none"
+                placeholder="celebrant@example.com"
+              />
+              <p className="text-xs text-charcoal-black/50 mt-1">
+                Email address to receive birthday notification emails
+              </p>
+              {errors.birthdayCelebrantEmail && (
+                <p className="text-red-500 text-sm mt-1">{errors.birthdayCelebrantEmail.message}</p>
               )}
             </div>
           </div>

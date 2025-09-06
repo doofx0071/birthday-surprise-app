@@ -126,8 +126,8 @@ export async function POST(request: NextRequest) {
       latitude: latitude,
       longitude: longitude,
       wants_reminders: data.wantsReminders || false,
-      is_approved: true, // Auto-approve for now
-      is_visible: true,  // Auto-visible for now
+      is_approved: false, // Require admin approval
+      is_visible: false,  // Hidden until approved
       ip_address: ip,
       user_agent: userAgent,
     }

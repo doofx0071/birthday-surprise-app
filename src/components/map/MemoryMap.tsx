@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState, useCallback } from 'react'
 import mapboxgl from 'mapbox-gl'
 import { useMapData, useMapControls } from '@/hooks/useMapData'
 import { createMapInstance, createHeartPinElement, addPulseAnimation } from '@/lib/mapbox'
@@ -21,18 +21,29 @@ export const MemoryMap: React.FC<MemoryMapProps> = ({
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<mapboxgl.Map | null>(null)
   const markers = useRef<mapboxgl.Marker[]>([])
-  
+  const onLoadRef = useRef(onLoad)
+  const onPinClickRef = useRef(onPinClick)
+
+  // Update refs when callbacks change
+  useEffect(() => {
+    onLoadRef.current = onLoad
+  }, [onLoad])
+
+  useEffect(() => {
+    onPinClickRef.current = onPinClick
+  }, [onPinClick])
+
   const { pins, loading, error, refetch } = useMapData()
-  const { 
-    viewState, 
-    filters, 
-    popup, 
-    setViewState, 
-    setFilters, 
-    showPopup, 
+  const {
+    viewState,
+    filters,
+    popup,
+    setViewState,
+    setFilters,
+    showPopup,
     hidePopup,
     flyToLocation,
-    resetView 
+    resetView
   } = useMapControls()
 
   const [isMapLoaded, setIsMapLoaded] = useState(false)
@@ -46,7 +57,7 @@ export const MemoryMap: React.FC<MemoryMapProps> = ({
 
       map.current.on('load', () => {
         setIsMapLoaded(true)
-        onLoad?.({ map: map.current! })
+        onLoadRef.current?.({ map: map.current! })
       })
 
       // Remove the problematic move event listener that causes infinite loop
@@ -62,7 +73,7 @@ export const MemoryMap: React.FC<MemoryMapProps> = ({
         map.current = null
       }
     }
-  }, [onLoad]) // Removed setViewState from dependencies
+  }, []) // Removed onLoad and setViewState from dependencies to prevent re-initialization
 
   // Update map view when viewState changes (but prevent infinite loop)
   useEffect(() => {
@@ -93,15 +104,8 @@ export const MemoryMap: React.FC<MemoryMapProps> = ({
     markers.current.forEach(marker => marker.remove())
     markers.current = []
 
-    // Filter pins based on current filters
-    const filteredPins = pins.filter(pin => {
-      if (!filters.showTextOnly && !pin.contributors.some(c => c.hasMedia)) return false
-      if (!filters.showWithMedia && pin.contributors.some(c => c.hasMedia)) return false
-      return true
-    })
-
-    // Add new markers
-    filteredPins.forEach(pin => {
+    // Add new markers for all pins
+    pins.forEach(pin => {
       const pinElement = createHeartPinElement(
         pin.messageCount > 1 ? 35 : 30,
         pin.messageCount > 1 ? '#FF69B4' : '#FFB6C1',
@@ -135,7 +139,7 @@ export const MemoryMap: React.FC<MemoryMapProps> = ({
         })
 
         // Call external handler
-        onPinClick?.(clickEvent)
+        onPinClickRef.current?.(clickEvent)
 
         // Fly to pin location using direct map method to avoid dependency issues
         if (map.current) {
@@ -150,7 +154,7 @@ export const MemoryMap: React.FC<MemoryMapProps> = ({
       markers.current.push(marker)
     })
 
-  }, [pins, filters, isMapLoaded, loading, showPopup, onPinClick]) // Removed flyToLocation dependency
+  }, [pins, isMapLoaded, loading, showPopup]) // Removed filters, flyToLocation, and onPinClick dependencies
 
   // Apply initial filters (only once on mount)
   useEffect(() => {
@@ -216,32 +220,7 @@ export const MemoryMap: React.FC<MemoryMapProps> = ({
 
       {/* Removed duplicate map controls - using Mapbox's built-in controls instead */}
 
-      {/* Filters */}
-      {showFilters && isMapLoaded && (
-        <div className="absolute top-4 left-4 z-20 bg-white rounded-lg shadow-lg p-3">
-          <div className="text-sm font-medium text-gray-700 mb-2">Show Messages</div>
-          <div className="space-y-2">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={filters.showTextOnly}
-                onChange={(e) => setFilters({ ...filters, showTextOnly: e.target.checked })}
-                className="mr-2 text-pink-500 focus:ring-pink-500"
-              />
-              <span className="text-sm text-gray-600">Text only</span>
-            </label>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={filters.showWithMedia}
-                onChange={(e) => setFilters({ ...filters, showWithMedia: e.target.checked })}
-                className="mr-2 text-pink-500 focus:ring-pink-500"
-              />
-              <span className="text-sm text-gray-600">With photos/videos</span>
-            </label>
-          </div>
-        </div>
-      )}
+
 
       {/* Location popup */}
       {popup && (

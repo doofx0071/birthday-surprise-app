@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS system_configurations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   -- System Configuration Section
-  birth_date DATE NOT NULL,
+  birth_date TIMESTAMP WITH TIME ZONE NOT NULL,
   birthday_person_name VARCHAR(255) NOT NULL,
   timezone VARCHAR(100) NOT NULL DEFAULT 'Asia/Manila',
   
@@ -48,8 +48,8 @@ INSERT INTO system_configurations (
   enable_email_notifications,
   require_message_approval
 ) 
-SELECT 
-  '2025-09-08'::DATE,
+SELECT
+  '2025-09-08T00:00:00+08:00'::TIMESTAMP WITH TIME ZONE,
   'Gracela Elmera C. Betarmos',
   'Asia/Manila',
   true,

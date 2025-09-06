@@ -1,15 +1,45 @@
 'use client'
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import { MemoryMap } from '@/components/map/MemoryMap'
 import { ArrowLeft, MapPin, Heart } from 'lucide-react'
 import Link from 'next/link'
+import { useContentReveal } from '@/hooks/useCountdownStatus'
+import { useRouter } from 'next/navigation'
 
 export default function MemoryMapPage() {
+  const { shouldRevealContent, isLoading } = useContentReveal()
+  const router = useRouter()
+
+  // Memoize callback functions to prevent unnecessary re-renders
+  const handlePinClick = useCallback((event: any) => {
+    console.log('Pin clicked:', event.pin)
+  }, [])
+
+  const handleMapLoad = useCallback((event: any) => {
+    console.log('Map loaded:', event.map)
+  }, [])
+
+  // Note: Removed redirect logic to allow access to Memory Map
+  // The countdown has completed, so content should always be accessible
+
+  // Show loading while checking countdown status
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-rose-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto mb-2"></div>
+          <div className="text-gray-600">Loading...</div>
+        </div>
+      </div>
+    )
+  }
+
+  // Note: Removed conditional rendering - Memory Map is now always accessible
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-rose-50">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-rose-50 relative overflow-hidden">
       {/* Header */}
-      <div className="neuro-card border-b-0 shadow-none">
+      <div className="neuro-card border-b-0 shadow-none relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Back button */}
@@ -34,7 +64,7 @@ export default function MemoryMapPage() {
       </div>
 
       {/* Main content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         {/* Description */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
@@ -55,13 +85,9 @@ export default function MemoryMapPage() {
           <MemoryMap
             height="600px"
             className="w-full"
-            showFilters={true}
-            onPinClick={(event) => {
-              console.log('Pin clicked:', event.pin)
-            }}
-            onLoad={(event) => {
-              console.log('Map loaded:', event.map)
-            }}
+            showFilters={false}
+            onPinClick={handlePinClick}
+            onLoad={handleMapLoad}
           />
         </div>
 
@@ -113,9 +139,9 @@ export default function MemoryMapPage() {
                   <span className="text-pink-600 text-sm font-medium">4</span>
                 </div>
                 <div>
-                  <h4 className="font-medium text-gray-900">Filter Messages</h4>
+                  <h4 className="font-medium text-gray-900">Explore Freely</h4>
                   <p className="text-gray-600 text-sm">
-                    Use the filters on the left to show text-only or media messages
+                    All birthday messages are displayed - explore and discover love from around the world
                   </p>
                 </div>
               </div>
@@ -131,7 +157,7 @@ export default function MemoryMapPage() {
               Join friends and family from around the world in celebrating this special day!
             </p>
             <Link
-              href="/"
+              href="/#messages"
               className="inline-flex items-center px-6 py-3 bg-white text-pink-600 font-medium rounded-lg hover:bg-pink-50 transition-colors"
             >
               <Heart className="w-5 h-5 mr-2" />
