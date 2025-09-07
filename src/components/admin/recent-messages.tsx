@@ -36,7 +36,7 @@ export function RecentMessages() {
 
         if (error) throw error
 
-        const transformedMessages: MessageWithMedia[] = (data || []).map(message => ({
+        const transformedMessages: MessageWithMedia[] = (data || []).map((message: any) => ({
           ...message,
           media_files: message.media_files || []
         }))
