@@ -342,19 +342,5 @@ export async function DELETE(request: NextRequest) {
   }
 }
 
-// Helper function to get message statistics
-export async function getMessageStats() {
-  try {
-    return await messageOperations.getStats()
-  } catch (error) {
-    console.error('Error getting message stats:', error)
-    return {
-      total_messages: 0,
-      total_countries: 0,
-      total_media: 0,
-      latest_message: null,
-      pending_messages: 0,
-      total_with_reminders: 0,
-    }
-  }
-}
+// Helper function to get message statistics (moved to separate utility file)
+// This function is now available in src/app/api/admin/messages/stats/route.ts
