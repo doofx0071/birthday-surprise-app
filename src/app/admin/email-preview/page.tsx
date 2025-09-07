@@ -1,17 +1,25 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { render } from '@react-email/render'
 import PasswordResetEmail from '@/components/emails/password-reset'
 
 export default function EmailPreviewPage() {
+  const [emailHtml, setEmailHtml] = useState<string>('')
   const resetLink = 'https://doofio.site/admin/reset-password?token=sample-reset-token-123'
-  
-  const emailHtml = render(PasswordResetEmail({
-    adminName: 'Admin',
-    resetLink,
-    expirationTime: '1 hour'
-  }))
+
+  useEffect(() => {
+    const generateEmailHtml = async () => {
+      const html = await render(PasswordResetEmail({
+        adminName: 'Admin',
+        resetLink,
+        expirationTime: '1 hour'
+      }))
+      setEmailHtml(html)
+    }
+
+    generateEmailHtml()
+  }, [])
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -36,11 +44,17 @@ export default function EmailPreviewPage() {
             <h2 className="text-lg font-semibold text-gray-800">Email Preview</h2>
           </div>
           <div className="p-6">
-            <iframe
-              srcDoc={emailHtml}
-              className="w-full h-[800px] border border-gray-200 rounded-lg"
-              title="Email Preview"
-            />
+            {emailHtml ? (
+              <iframe
+                srcDoc={emailHtml}
+                className="w-full h-[800px] border border-gray-200 rounded-lg"
+                title="Email Preview"
+              />
+            ) : (
+              <div className="w-full h-[800px] border border-gray-200 rounded-lg flex items-center justify-center bg-gray-50">
+                <div className="text-gray-500">Loading email preview...</div>
+              </div>
+            )}
           </div>
         </div>
 
