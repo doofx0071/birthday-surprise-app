@@ -69,25 +69,33 @@ export function MessageTabs({
   const fetchMessages = async () => {
     try {
       setLoading(true)
-      
-      let query = supabase
-        .from('messages')
-        .select(`
-          *,
-          media_files (*)
-        `)
-        .order('created_at', { ascending: false })
 
-      // Apply status filter
+      // Use admin API route instead of direct Supabase client
+      const params = new URLSearchParams()
       if (activeTab !== 'all') {
-        query = query.eq('status', activeTab)
+        params.append('status', activeTab)
       }
 
-      const { data, error } = await query
+      const response = await fetch(`/api/admin/messages?${params.toString()}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Include cookies for authentication
+      })
 
-      if (error) throw error
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Failed to fetch messages')
+      }
 
-      const filteredMessages: MessageWithMedia[] = (data || []).map((message: any) => ({
+      const result = await response.json()
+
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to fetch messages')
+      }
+
+      const filteredMessages: MessageWithMedia[] = (result.data || []).map((message: any) => ({
         ...message,
         media_files: message.media_files || []
       }))

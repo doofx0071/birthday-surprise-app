@@ -49,11 +49,11 @@ export async function GET(request: NextRequest) {
     // Apply status filter
     if (status && status !== 'all') {
       if (status === 'pending') {
-        query = query.is('status', null).eq('is_approved', false)
+        query = query.eq('status', 'pending')
       } else if (status === 'approved') {
-        query = query.eq('status', 'approved').eq('is_approved', true)
+        query = query.eq('status', 'approved')
       } else if (status === 'rejected') {
-        query = query.eq('status', 'rejected').eq('is_approved', false)
+        query = query.eq('status', 'rejected')
       }
     }
 

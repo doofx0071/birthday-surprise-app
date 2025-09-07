@@ -53,31 +53,33 @@ export function MessageApproval({
   const fetchMessages = async () => {
     try {
       setLoading(true)
-      
-      let query = supabase
-        .from('messages')
-        .select(`
-          *,
-          media_files (*)
-        `)
-        .order('created_at', { ascending: false })
 
-      // Apply status filter
+      // Use admin API route instead of direct Supabase client
+      const params = new URLSearchParams()
       if (filterStatus !== 'all') {
-        if (filterStatus === 'pending') {
-          query = query.eq('status', 'pending')
-        } else if (filterStatus === 'approved') {
-          query = query.eq('status', 'approved')
-        } else if (filterStatus === 'rejected') {
-          query = query.eq('status', 'rejected')
-        }
+        params.append('status', filterStatus)
       }
 
-      const { data, error } = await query
+      const response = await fetch(`/api/admin/messages?${params.toString()}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Include cookies for authentication
+      })
 
-      if (error) throw error
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Failed to fetch messages')
+      }
 
-      let filteredMessages: MessageWithMedia[] = (data || []).map((message: any) => ({
+      const result = await response.json()
+
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to fetch messages')
+      }
+
+      let filteredMessages: MessageWithMedia[] = (result.data || []).map((message: any) => ({
         ...message,
         media_files: message.media_files || []
       }))

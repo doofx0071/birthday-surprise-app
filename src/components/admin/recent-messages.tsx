@@ -24,19 +24,28 @@ export function RecentMessages() {
     const fetchRecentMessages = async () => {
       try {
         setLoading(true)
-        
-        const { data, error } = await supabase
-          .from('messages')
-          .select(`
-            *,
-            media_files (*)
-          `)
-          .order('created_at', { ascending: false })
-          .limit(5)
 
-        if (error) throw error
+        // Use admin API route instead of direct Supabase client
+        const response = await fetch('/api/admin/messages?limit=5', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include', // Include cookies for authentication
+        })
 
-        const transformedMessages: MessageWithMedia[] = (data || []).map((message: any) => ({
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.message || 'Failed to fetch messages')
+        }
+
+        const result = await response.json()
+
+        if (!result.success) {
+          throw new Error(result.message || 'Failed to fetch messages')
+        }
+
+        const transformedMessages: MessageWithMedia[] = (result.data || []).map((message: any) => ({
           ...message,
           media_files: message.media_files || []
         }))
