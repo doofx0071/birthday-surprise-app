@@ -92,7 +92,7 @@ export function AdminSidebar() {
           const Icon = item.icon
 
           return (
-            <Link key={item.name} href={item.href}>
+            <Link key={item.name} href={item.href as any}>
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
