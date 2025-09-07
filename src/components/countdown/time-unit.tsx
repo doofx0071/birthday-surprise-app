@@ -214,14 +214,13 @@ export const FlipTimeUnit: React.FC<FlipTimeUnitProps> = ({
           {/* Current value */}
           <div
             className={cn(
-              'text-charcoal-black mb-2 transition-all duration-600',
+              'text-charcoal-black mb-2 transition-all duration-600 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold',
               isFlipping && 'animate-flip-in',
               styles.value
             )}
             style={{
               fontFamily: 'Arial Black, Arial, sans-serif'
             }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold"
           >
             {formattedValue}
           </div>
@@ -230,13 +229,12 @@ export const FlipTimeUnit: React.FC<FlipTimeUnitProps> = ({
           {isFlipping && (
             <div
               className={cn(
-                'absolute inset-0 text-charcoal-black mb-2 animate-flip-out',
+                'absolute inset-0 text-charcoal-black mb-2 animate-flip-out text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold',
                 styles.value
               )}
               style={{
                 fontFamily: 'Arial Black, Arial, sans-serif'
               }}
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold"
             >
               {formattedPrevious}
             </div>
