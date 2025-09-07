@@ -220,7 +220,7 @@ export class UploadQueue {
       .upload(filePath, file, {
         cacheControl: '3600',
         upsert: false,
-        onUploadProgress: (progress) => {
+        onUploadProgress: (progress: any) => {
           if (signal.aborted) return
 
           const loaded = progress.loaded || 0
