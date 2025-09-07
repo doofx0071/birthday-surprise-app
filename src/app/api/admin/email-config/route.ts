@@ -112,9 +112,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Remove undefined values
-    Object.keys(updateData).forEach(key => {
-      if (updateData[key] === undefined) {
-        delete updateData[key]
+    Object.keys(updateData).forEach((key: string) => {
+      if ((updateData as any)[key] === undefined) {
+        delete (updateData as any)[key]
       }
     })
 

@@ -25,16 +25,16 @@ export default function DebugSessionPage() {
         const sessionStorage: Record<string, string | null> = {}
 
         // Check localStorage
-        Object.keys(window.localStorage).forEach(key => {
+        Object.keys(window.localStorage).forEach((key: string) => {
           if (key.includes('supabase') || key.includes('sb-')) {
-            localStorage[key] = window.localStorage.getItem(key)
+            (localStorage as any)[key] = window.localStorage.getItem(key)
           }
         })
 
         // Check sessionStorage
-        Object.keys(window.sessionStorage).forEach(key => {
+        Object.keys(window.sessionStorage).forEach((key: string) => {
           if (key.includes('supabase') || key.includes('sb-')) {
-            sessionStorage[key] = window.sessionStorage.getItem(key)
+            (sessionStorage as any)[key] = window.sessionStorage.getItem(key)
           }
         })
 

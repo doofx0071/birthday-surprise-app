@@ -112,14 +112,14 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       // Clear any remaining browser storage
       if (typeof window !== 'undefined') {
         // Clear all localStorage
-        Object.keys(localStorage).forEach(key => {
+        Object.keys(localStorage).forEach((key: string) => {
           if (key.startsWith('admin-') || key.startsWith('auth-')) {
             localStorage.removeItem(key)
           }
         })
 
         // Clear all sessionStorage
-        Object.keys(sessionStorage).forEach(key => {
+        Object.keys(sessionStorage).forEach((key: string) => {
           if (key.startsWith('admin-') || key.startsWith('auth-')) {
             sessionStorage.removeItem(key)
           }
