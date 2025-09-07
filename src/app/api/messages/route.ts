@@ -32,7 +32,7 @@ async function autoFinalizeRecentTempFiles(messageId: string) {
     }
 
     // Create temp file data for finalization
-    const tempFiles = []
+    const tempFiles: any[] = []
 
     for (const file of filesInDir) {
       if (file.name.includes('.') && !file.name.includes('thumbnails/')) {

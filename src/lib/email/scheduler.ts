@@ -184,7 +184,7 @@ export class EmailScheduler {
     
     try {
       const stats = await this.getMessageStats()
-      const emails = []
+      const emails: any[] = []
 
       // Import email templates dynamically
       const { BirthdayNotificationEmail } = await import('@/components/emails/BirthdayNotification')

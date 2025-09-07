@@ -4,7 +4,7 @@ export async function GET() {
   try {
     // For now, return empty campaigns array
     // In a real implementation, this would fetch from database
-    const campaigns = []
+    const campaigns: any[] = []
 
     return NextResponse.json({ campaigns })
   } catch (error) {

@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if required SMTP environment variables are set
-    const missingSmtpConfig = []
+    const missingSmtpConfig: string[] = []
     if (!smtpConfig.host) missingSmtpConfig.push('MAILTRAP_HOST')
     if (!smtpConfig.port) missingSmtpConfig.push('MAILTRAP_PORT')
     if (!smtpConfig.username) missingSmtpConfig.push('MAILTRAP_USERNAME')
