@@ -552,7 +552,7 @@ export const MessageForm: React.FC<MessageFormProps> = ({
               </div>
 
               {/* Auto-enable reminders - no checkbox needed */}
-              <input type="hidden" {...form.register('wantsReminders')} value={true} />
+              <input type="hidden" {...form.register('wantsReminders')} value="true" />
 
               {/* Submit Button */}
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
