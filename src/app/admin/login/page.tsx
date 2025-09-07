@@ -44,7 +44,7 @@ export default function AdminLoginPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (!authLoading && user && isAdmin) {
-      router.push(redirectPath)
+      router.push(redirectPath as any)
     }
   }, [user, isAdmin, authLoading, router, redirectPath])
 
@@ -59,7 +59,7 @@ export default function AdminLoginPage() {
           title: 'Login Successful',
           description: 'Welcome to the admin dashboard!',
         })
-        router.push(redirectPath)
+        router.push(redirectPath as any)
       } else {
         toast({
           title: 'Login Failed',
