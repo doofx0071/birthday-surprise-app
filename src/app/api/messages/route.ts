@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
     const messageData = validationResult.data
 
     // Get client IP and user agent for security/analytics
-    const ip = request.ip ||
+    const ip = (request as any).ip ||
                request.headers.get('x-forwarded-for') ||
                request.headers.get('x-real-ip') ||
                'unknown'
