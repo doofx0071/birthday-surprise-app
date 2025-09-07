@@ -44,8 +44,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         message: 'Pending review email sent successfully',
-        messageId: result.messageId,
-        deliveredAt: result.deliveredAt,
+        messageId: (result as any).messageId,
+        deliveredAt: (result as any).deliveredAt,
       })
     } else {
       console.error('Failed to send pending review email:', result.error)

@@ -108,8 +108,8 @@ export async function POST(request: NextRequest) {
         success: true,
         message: 'Admin notification sent successfully',
         adminEmail: adminEmail,
-        messageId: result.messageId,
-        deliveredAt: result.deliveredAt,
+        messageId: (result as any).messageId,
+        deliveredAt: (result as any).deliveredAt,
       })
     } else {
       console.error(`❌ Failed to send admin notification to ${adminEmail}:`, result.error)

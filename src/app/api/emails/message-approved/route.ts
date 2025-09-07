@@ -46,8 +46,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         message: 'Message approved email sent successfully',
-        messageId: result.messageId,
-        deliveredAt: result.deliveredAt,
+        messageId: (result as any).messageId,
+        deliveredAt: (result as any).deliveredAt,
       })
     } else {
       console.error('Failed to send message approved email:', result.error)

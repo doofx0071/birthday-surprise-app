@@ -237,9 +237,9 @@ export async function GET(request: NextRequest) {
 
         results.results.sendTest = {
           success: result.success,
-          messageId: result.messageId,
-          recipientEmail: result.recipientEmail,
-          deliveredAt: result.deliveredAt,
+          messageId: (result as any).messageId,
+          recipientEmail: (result as any).recipientEmail,
+          deliveredAt: (result as any).deliveredAt,
           error: result.error,
         }
       } catch (error) {

@@ -65,9 +65,9 @@ export async function POST(request: NextRequest) {
       console.log(`✅ Thank you email sent successfully to ${contributorEmail}`)
       return NextResponse.json({
         success: true,
-        messageId: result.messageId,
-        recipientEmail: result.recipientEmail,
-        deliveredAt: result.deliveredAt,
+        messageId: (result as any).messageId,
+        recipientEmail: (result as any).recipientEmail,
+        deliveredAt: (result as any).deliveredAt,
         message: 'Thank you email sent successfully',
       })
     } else {
