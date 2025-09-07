@@ -88,8 +88,8 @@ export default function DebugSessionPage() {
             <div><strong>User:</strong> {user ? user.email : 'None'}</div>
             <div><strong>Is Admin:</strong> {isAdmin ? 'Yes' : 'No'}</div>
             <div><strong>User ID:</strong> {user?.id || 'None'}</div>
-            <div><strong>User Role (metadata):</strong> {user?.user_metadata?.role || 'None'}</div>
-            <div><strong>User Role (app_metadata):</strong> {user?.app_metadata?.role || 'None'}</div>
+            <div><strong>User Role:</strong> {user?.role || 'None'}</div>
+            <div><strong>Username:</strong> {user?.username || 'None'}</div>
           </div>
         </BirthdayCard>
 
