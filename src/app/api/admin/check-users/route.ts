@@ -44,7 +44,7 @@ export async function GET() {
     ) : []
 
     // Return user information (without sensitive data like passwords)
-    const authUserInfo = authAdminUsers.map(user => ({
+    const authUserInfo = authAdminUsers.map((user: any) => ({
       id: user.id,
       email: user.email,
       username: user.user_metadata?.username,
@@ -54,7 +54,7 @@ export async function GET() {
       email_confirmed_at: user.email_confirmed_at,
     }))
 
-    const adminUsersTableInfo = adminUsersTableData ? adminUsersTableData.map(user => ({
+    const adminUsersTableInfo = adminUsersTableData ? adminUsersTableData.map((user: any) => ({
       id: user.id,
       username: user.username,
       email: user.email,

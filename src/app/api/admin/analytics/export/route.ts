@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
         mediaCountMap.set(file.message_id, count + 1)
       })
 
-      const csvRows = (messages || []).map(message => [
+      const csvRows = (messages || []).map((message: any) => [
         new Date(message.created_at).toLocaleDateString(),
         message.id,
         message.name || '',
