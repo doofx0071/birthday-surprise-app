@@ -20,7 +20,7 @@ export async function uploadFileToStorage(
       .upload(fileName, file, {
         cacheControl: '3600',
         upsert: false,
-        onUploadProgress: (progress) => {
+        onUploadProgress: (progress: any) => {
           if (onProgress) {
             const uploadProgress: UploadProgress = {
               loaded: progress.loaded || 0,
