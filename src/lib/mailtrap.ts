@@ -599,10 +599,10 @@ export const sendEmailSmart = async (
   // Fallback to SMTP
   try {
     if (type === 'birthday') {
-      const result = await sendBirthdayReminder(to, templateData)
+      const result = await sendBirthdayReminder(to, templateData as any)
       return { ...result, method: 'SMTP' }
     } else {
-      const result = await sendThankYouEmail(to, templateData)
+      const result = await sendThankYouEmail(to, templateData as any)
       return { ...result, method: 'SMTP' }
     }
   } catch (error) {
