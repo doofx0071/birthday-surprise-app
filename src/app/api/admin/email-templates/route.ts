@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
 
     // Convert React templates to API format
     const formattedReactTemplates = await Promise.all(
-      reactTemplates.map(async (template) => {
+      reactTemplates.map(async (template: any) => {
         let htmlContent = ''
         let previewHtml = ''
 
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
     )
 
     // Format custom templates
-    const formattedCustomTemplates = (customTemplates || []).map(template => ({
+    const formattedCustomTemplates = (customTemplates || []).map((template: any) => ({
       id: template.id,
       name: template.name,
       subject: template.subject,
