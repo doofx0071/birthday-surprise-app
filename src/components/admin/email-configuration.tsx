@@ -169,14 +169,14 @@ export function EmailConfiguration() {
       <div className="bg-white/40 rounded-lg p-4 border border-soft-pink/20">
         <div className="flex items-center space-x-3">
           <div className={`w-3 h-3 rounded-full ${
-            config?.isConfigured ? 'bg-green-500' : 'bg-yellow-500'
+            (config as any)?.isConfigured ? 'bg-green-500' : 'bg-yellow-500'
           }`} />
           <div>
             <p className="font-medium text-charcoal-black">
               Email Configuration Status
             </p>
             <p className="text-sm text-charcoal-black/60">
-              {config?.isConfigured 
+              {(config as any)?.isConfigured
                 ? 'Email service is configured and ready'
                 : 'Email service needs configuration'
               }
