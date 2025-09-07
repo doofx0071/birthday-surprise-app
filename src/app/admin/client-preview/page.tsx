@@ -54,7 +54,7 @@ export default function ClientPreviewPage() {
           previewMode={previewMode}
           onPreviewModeChange={setPreviewMode}
           isFullscreen={isFullscreen}
-          onFullscreenToggle={setIsFullscreen}
+          onFullscreenToggle={() => setIsFullscreen(!isFullscreen)}
           countdownStatus={activePreview.status}
         />
       </motion.div>
