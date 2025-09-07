@@ -104,7 +104,7 @@ export function MediaStatistics({ dateRange, customDateRange, refreshTrigger }: 
         date.setDate(date.getDate() + i)
         const dateStr = date.toISOString().split('T')[0]
         
-        const uploadsOnDate = mediaFiles?.filter(file => 
+        const uploadsOnDate = mediaFiles?.filter((file: any) =>
           file.created_at.startsWith(dateStr)
         ).length || 0
         
