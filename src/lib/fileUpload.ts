@@ -352,7 +352,7 @@ export async function cancelTempUploads(tempId: string): Promise<void> {
       return
     }
 
-    const filesToDelete = files.map(file => `temp/${tempId}/${file.name}`)
+    const filesToDelete = files.map((file: any) => `temp/${tempId}/${file.name}`)
 
     if (filesToDelete.length > 0) {
       await supabase.storage
