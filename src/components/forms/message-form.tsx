@@ -43,6 +43,9 @@ interface MessageFormProps {
   disabled?: boolean
 }
 
+// Constants
+const maxMessageLength = 2000
+
 export const MessageForm: React.FC<MessageFormProps> = ({
   onSubmit,
   onSuccess,
