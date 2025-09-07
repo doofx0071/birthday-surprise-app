@@ -88,8 +88,8 @@ export function QuickActions() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {quickActions.map((action, index) => {
           const ActionComponent = action.href ? Link : 'button'
-          const actionProps = action.href 
-            ? { href: action.href }
+          const actionProps = action.href
+            ? { href: action.href as any }
             : { onClick: action.onClick }
 
           return (
