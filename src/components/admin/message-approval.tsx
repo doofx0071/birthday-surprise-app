@@ -77,7 +77,7 @@ export function MessageApproval({
 
       if (error) throw error
 
-      let filteredMessages: MessageWithMedia[] = (data || []).map(message => ({
+      let filteredMessages: MessageWithMedia[] = (data || []).map((message: any) => ({
         ...message,
         media_files: message.media_files || []
       }))
@@ -85,7 +85,7 @@ export function MessageApproval({
       // Apply search filter
       if (searchQuery) {
         const query = searchQuery.toLowerCase()
-        filteredMessages = filteredMessages.filter(message =>
+        filteredMessages = filteredMessages.filter((message: any) =>
           message.name.toLowerCase().includes(query) ||
           message.email.toLowerCase().includes(query) ||
           message.message.toLowerCase().includes(query) ||
