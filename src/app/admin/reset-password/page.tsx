@@ -76,7 +76,7 @@ export default function ResetPasswordPage() {
       if (response.ok) {
         setIsSuccess(true)
         setTimeout(() => {
-          router.push('/admin/login?from=reset')
+          router.push('/admin/login?from=reset' as any)
         }, 3000)
       } else {
         const errorData = await response.json()

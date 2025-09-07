@@ -17,7 +17,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
     if (!isLoading) {
       if (!user) {
         // Not authenticated, redirect to login
-        router.push('/admin/login')
+        router.push('/admin/login' as any)
       } else {
         // Authenticated, allow access
         setIsChecking(false)

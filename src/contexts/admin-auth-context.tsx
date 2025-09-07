@@ -87,7 +87,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
         method: 'POST',
       })
 
-      router.push('/admin/login')
+      router.push('/admin/login' as any)
     } catch (error) {
       console.error('Sign out error:', error)
     } finally {
@@ -200,7 +200,7 @@ export function useAdminRouteProtection() {
   useEffect(() => {
     if (!isLoading) {
       if (!user || !isAdmin) {
-        router.push('/admin/login')
+        router.push('/admin/login' as any)
       }
     }
   }, [user, isLoading, isAdmin, router])

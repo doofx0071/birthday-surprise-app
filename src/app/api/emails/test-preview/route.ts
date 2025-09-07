@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     const websiteUrl = searchParams.get('websiteUrl') || 'https://doofio.site'
 
     // Render the email template
-    const emailHtml = render(
+    const emailHtml = await render(
       TestEmail({
         recipientName,
         recipientEmail,

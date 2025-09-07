@@ -316,7 +316,7 @@ export function AdminHeader() {
                 <button
                   onClick={() => {
                     setShowNotifications(false)
-                    router.push('/admin/notifications')
+                    router.push('/admin/notifications' as any)
                   }}
                   className="w-full py-2 px-4 text-center text-sm font-medium text-soft-pink hover:text-white hover:bg-soft-pink rounded-lg transition-all duration-200 border border-soft-pink/30 hover:border-soft-pink"
                 >

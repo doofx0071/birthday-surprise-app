@@ -128,7 +128,7 @@ export function useAdminAuth(): UseAdminAuthReturn {
       })
 
       // Redirect to login page
-      router.push('/admin/login')
+      router.push('/admin/login' as any)
 
       // Force a page reload to clear any cached data
       window.location.href = '/admin/login'
@@ -171,7 +171,7 @@ export function useAdminRouteProtection() {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push('/admin/login')
+      router.push('/admin/login' as any)
     }
   }, [isAuthenticated, isLoading, router])
 
