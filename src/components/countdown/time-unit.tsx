@@ -86,14 +86,13 @@ export const TimeUnit: React.FC<TimeUnitProps> = ({
         {/* Value */}
         <div
           className={cn(
-            'text-charcoal-black mb-2 transition-all duration-300',
+            'text-charcoal-black mb-2 transition-all duration-300 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold',
             isAnimating && 'animate-bounce',
             styles.value
           )}
           style={{
             fontFamily: 'Arial Black, Arial, sans-serif'
           }}
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold"
         >
           {formattedValue.split('').map((digit, index) => (
             <span
