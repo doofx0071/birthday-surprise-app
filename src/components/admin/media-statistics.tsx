@@ -75,7 +75,7 @@ export function MediaStatistics({ dateRange, customDateRange, refreshTrigger }: 
 
       // Process data
       const totalFiles = mediaFiles?.length || 0
-      const totalSize = mediaFiles?.reduce((sum, file) => sum + (file.file_size || 0), 0) || 0
+      const totalSize = mediaFiles?.reduce((sum: any, file: any) => sum + (file.file_size || 0), 0) || 0
       
       const filesByType: { [key: string]: number } = {}
       let imageFiles = 0
