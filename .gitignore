@@ -131,3 +131,6 @@ temp/
 # Supabase
 supabase/.branches
 supabase/.temp
+
+# Test files
+test file for tests/
