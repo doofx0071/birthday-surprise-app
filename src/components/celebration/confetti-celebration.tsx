@@ -104,7 +104,7 @@ export const ConfettiCelebration: React.FC<ConfettiCelebrationProps> = ({
 
   return (
     <ReactCanvasConfetti
-      refConfetti={getInstance}
+      {...({ refConfetti: getInstance } as any)}
       className={className}
       style={{
         position: 'fixed',
