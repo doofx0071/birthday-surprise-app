@@ -373,7 +373,7 @@ export function EmailTemplateEditor() {
                         {prop.label} {prop.required && <span className="text-red-500">*</span>}
                       </label>
                       <input
-                        {...register(prop.key)}
+                        {...register(prop.key as any)}
                         type={prop.type === 'number' ? 'number' : prop.type === 'email' ? 'email' : 'text'}
                         className="w-full px-3 py-2 border border-soft-pink/30 rounded-lg focus:border-soft-pink focus:outline-none"
                         onChange={(e) => {
