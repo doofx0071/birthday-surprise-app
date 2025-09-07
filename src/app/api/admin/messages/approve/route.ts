@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSupabaseAdmin } from '@/lib/supabase'
+import { getCurrentAdminUser } from '@/lib/admin-auth'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
