@@ -275,7 +275,7 @@ export const WorkingMessageForm: React.FC<WorkingMessageFormProps> = ({ classNam
                       <LocationPicker
                         value={field.value || ''}
                         onChange={field.onChange}
-                        onLocationSelect={(location) => {
+                        onLocationDetected={(location: any) => {
                           form.setValue('locationCity', location.city || '')
                           form.setValue('locationCountry', location.country || '')
                           form.setValue('latitude', location.latitude)
