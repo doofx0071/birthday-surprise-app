@@ -40,7 +40,7 @@ export async function verifyAdminAuth() {
     }
 
     // Check if user has admin role
-    const isAdmin = user.user_metadata?.role === 'admin' || user.app_metadata?.role === 'admin'
+    const isAdmin = (user as any).user_metadata?.role === 'admin' || (user as any).app_metadata?.role === 'admin'
 
     if (!isAdmin) {
       return { isAuthenticated: true, user, error: 'Not authorized' }

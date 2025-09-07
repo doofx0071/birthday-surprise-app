@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if user has admin role
-    const isAdmin = user.user_metadata?.role === 'admin' || user.app_metadata?.role === 'admin'
+    const isAdmin = (user as any).user_metadata?.role === 'admin' || (user as any).app_metadata?.role === 'admin'
     if (!isAdmin) {
       return NextResponse.json(
         { error: 'Admin access required' },
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
     // Return user info with display email preference
     return NextResponse.json({
       id: user.id,
-      username: user.user_metadata?.username || 'admin',
+      username: (user as any).user_metadata?.username || 'admin',
       email: 'admin@snoorlaxx.com', // Display email as requested
       role: 'Administrator',
       status: 'Active',

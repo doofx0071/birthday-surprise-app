@@ -71,8 +71,8 @@ export async function POST(request: NextRequest) {
       hasUser: !!user,
       userEmail: user?.email,
       authError: authError?.message,
-      userMetadata: user?.user_metadata,
-      appMetadata: user?.app_metadata
+      userMetadata: (user as any)?.user_metadata,
+      appMetadata: (user as any)?.app_metadata
     })
 
     if (authError || !user) {
@@ -84,11 +84,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user has admin role
-    const isAdmin = user.user_metadata?.role === 'admin' || user.app_metadata?.role === 'admin'
+    const isAdmin = (user as any).user_metadata?.role === 'admin' || (user as any).app_metadata?.role === 'admin'
     if (!isAdmin) {
       console.log('Admin approval auth failed - not admin:', {
-        userMetadata: user.user_metadata,
-        appMetadata: user.app_metadata
+        userMetadata: (user as any).user_metadata,
+        appMetadata: (user as any).app_metadata
       })
       return NextResponse.json(
         { success: false, message: 'Admin access required' },

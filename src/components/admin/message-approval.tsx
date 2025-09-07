@@ -112,7 +112,7 @@ export function MessageApproval({
     try {
       console.log('Admin approval - context user check:', {
         contextUser: user?.email,
-        contextUserRole: user?.user_metadata?.role || user?.app_metadata?.role,
+        contextUserRole: (user as any)?.user_metadata?.role || (user as any)?.app_metadata?.role,
         hasContextUser: !!user
       })
 
