@@ -87,7 +87,7 @@ export function MessageTabs({
 
       if (error) throw error
 
-      const filteredMessages: MessageWithMedia[] = (data || []).map(message => ({
+      const filteredMessages: MessageWithMedia[] = (data || []).map((message: any) => ({
         ...message,
         media_files: message.media_files || []
       }))
