@@ -4,7 +4,7 @@ import * as React from 'react'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
-import { AnimatedHeartIcon } from '@/design-system/icons/animated-birthday-icons'
+import { AnimatedHeartIcon, AnimatedSparkleIcon } from '@/design-system/icons/animated-birthday-icons'
 
 interface BirthdayTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string
