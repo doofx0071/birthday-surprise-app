@@ -25,25 +25,39 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Birthday Surprise',
-    template: '%s | Birthday Surprise',
+    default: "Cela's Birthday",
+    template: "%s | Cela's Birthday",
   },
   description: 'A beautiful birthday surprise web application with countdown timer, message collection, and memory map',
   keywords: ['birthday', 'surprise', 'countdown', 'messages', 'celebration'],
   authors: [{ name: 'Birthday Surprise Team' }],
   creator: 'Birthday Surprise Team',
+  icons: {
+    icon: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/frontend/logo.png`,
+    shortcut: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/frontend/logo.png`,
+    apple: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/frontend/logo.png`,
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: 'https://birthday-surprise-app.vercel.app',
-    title: 'Birthday Surprise',
+    title: "Cela's Birthday",
     description: 'A beautiful birthday surprise web application',
-    siteName: 'Birthday Surprise',
+    siteName: "Cela's Birthday",
+    images: [
+      {
+        url: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/frontend/logo.png`,
+        width: 1200,
+        height: 630,
+        alt: "Cela's Birthday Logo",
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Birthday Surprise',
+    title: "Cela's Birthday",
     description: 'A beautiful birthday surprise web application',
+    images: [`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/frontend/logo.png`],
   },
   robots: {
     index: false, // Keep private for the surprise
@@ -57,8 +71,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html 
-      lang="en" 
+    <html
+      lang="en"
       className={`${inter.variable} ${playfairDisplay.variable} ${poppins.variable} antialiased`}
     >
       <body className="min-h-screen bg-background text-foreground" suppressHydrationWarning>
