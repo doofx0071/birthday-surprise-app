@@ -80,9 +80,6 @@ export function ContributorNotificationEmail({
                           🎂 <strong>{messageCount}</strong> heartfelt birthday messages collected
                         </Text>
                         <Text style={statsTextStyle}>
-                          💕 <strong>{contributorCount}</strong> friends and family participated
-                        </Text>
-                        <Text style={statsTextStyle}>
                           🌍 <strong>{locationCount}</strong> countries represented in this celebration
                         </Text>
                       </div>

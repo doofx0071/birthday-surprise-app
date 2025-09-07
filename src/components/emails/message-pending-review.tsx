@@ -6,7 +6,6 @@ import {
   Head,
   Body,
   Text,
-  Button,
   Preview,
   Img,
 } from '@react-email/components'
@@ -73,26 +72,7 @@ export function MessagePendingReview({
                         <Text style={previewTextStyle}>"{messagePreview}"</Text>
                       </div>
 
-                      {/* Call to Action Button */}
-                      <table role="presentation" border={0} cellPadding={0} cellSpacing={0} style={buttonTableStyle}>
-                        <tbody>
-                          <tr>
-                            <td align="center">
-                              <table role="presentation" border={0} cellPadding={0} cellSpacing={0}>
-                                <tbody>
-                                  <tr>
-                                    <td>
-                                      <Button href={websiteUrl} style={buttonStyle}>
-                                        Visit Birthday Surprise
-                                      </Button>
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
+
 
                       {/* What Happens Next */}
                       <Text style={sectionHeadingStyle}>What happens next?</Text>
@@ -230,28 +210,7 @@ const previewTextStyle = {
 
 
 
-const buttonTableStyle = {
-  boxSizing: 'border-box' as const,
-  minWidth: '100% !important',
-  width: '100%',
-  marginBottom: '16px',
-}
 
-const buttonStyle = {
-  backgroundColor: '#ec4899',
-  border: 'solid 2px #ec4899',
-  borderRadius: '8px',
-  boxSizing: 'border-box' as const,
-  color: '#ffffff',
-  cursor: 'pointer',
-  display: 'inline-block',
-  fontSize: '16px',
-  fontWeight: 'bold',
-  margin: 0,
-  padding: '16px 32px',
-  textDecoration: 'none',
-  textTransform: 'capitalize' as const,
-}
 
 const sectionHeadingStyle = {
   fontFamily: 'Helvetica, sans-serif',

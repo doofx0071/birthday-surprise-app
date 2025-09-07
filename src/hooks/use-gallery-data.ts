@@ -21,12 +21,12 @@ export function useGalleryData(limit: number = 20): GalleryDataHook {
   const [hasMore, setHasMore] = useState(true)
 
   // Fetch messages with media files
-  const fetchMessages = useCallback(async (reset = false) => {
+  const fetchMessages = useCallback(async (reset = false, currentOffset?: number) => {
     try {
       setLoading(true)
       setError(null)
 
-      const currentOffset = reset ? 0 : offset
+      const useOffset = reset ? 0 : (currentOffset ?? offset)
 
       // Query messages with media files using Supabase's nested select
       const { data: messagesData, error: messagesError, count } = await supabase
@@ -47,7 +47,7 @@ export function useGalleryData(limit: number = 20): GalleryDataHook {
         .eq('is_approved', true)
         .eq('is_visible', true)
         .order('created_at', { ascending: false })
-        .range(currentOffset, currentOffset + limit - 1)
+        .range(useOffset, useOffset + limit - 1)
 
       if (messagesError) {
         throw new Error(`Failed to fetch messages: ${messagesError.message}`)
@@ -69,7 +69,7 @@ export function useGalleryData(limit: number = 20): GalleryDataHook {
 
       // Check if there are more messages
       const totalCount = count || 0
-      setHasMore(currentOffset + limit < totalCount)
+      setHasMore(useOffset + limit < totalCount)
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch messages'
@@ -78,23 +78,25 @@ export function useGalleryData(limit: number = 20): GalleryDataHook {
     } finally {
       setLoading(false)
     }
-  }, [offset, limit])
+  }, [limit])
 
   // Load more messages (pagination)
   const loadMore = useCallback(async () => {
     if (!hasMore || loading) return
-    await fetchMessages(false)
-  }, [fetchMessages, hasMore, loading])
+    await fetchMessages(false, offset)
+  }, [fetchMessages, hasMore, loading, offset])
 
   // Refetch messages (reset)
   const refetch = useCallback(async () => {
     setOffset(0)
-    await fetchMessages(true)
+    setHasMore(true)
+    setError(null)
+    await fetchMessages(true, 0)
   }, [fetchMessages])
 
   // Initial load
   useEffect(() => {
-    fetchMessages(true)
+    fetchMessages(true, 0)
   }, [])
 
   // Set up real-time subscription for new messages
@@ -111,7 +113,7 @@ export function useGalleryData(limit: number = 20): GalleryDataHook {
         },
         () => {
           // Refetch when messages change
-          fetchMessages(true)
+          fetchMessages(true, 0)
         }
       )
       .on(
@@ -123,7 +125,7 @@ export function useGalleryData(limit: number = 20): GalleryDataHook {
         },
         () => {
           // Refetch when media files change
-          fetchMessages(true)
+          fetchMessages(true, 0)
         }
       )
       .subscribe()

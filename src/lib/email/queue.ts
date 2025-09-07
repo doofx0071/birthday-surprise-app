@@ -256,11 +256,11 @@ class EmailQueue {
         return ContributorNotificationEmail(data)
         
       case 'thank_you':
-        const { ThankYouEmail } = await import('@/components/emails/ThankYou')
+        const { ThankYouEmail } = await import('@/components/emails/ThankYouEmail')
         return ThankYouEmail(data)
         
       case 'pending_review':
-        const { PendingReviewEmail } = await import('@/components/emails/PendingReview')
+        const { PendingReviewEmail } = await import('@/components/emails/message-pending-review')
         return PendingReviewEmail(data)
         
       default:

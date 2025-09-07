@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { AdminLayout } from '@/components/admin/admin-layout'
+import { AdminLayoutClient } from '@/components/admin/admin-layout-client'
 
 interface CountdownStatus {
   currentDate: string
@@ -134,7 +134,7 @@ export default function TestCountdownPage() {
   }, [])
 
   return (
-    <AdminLayout>
+    <AdminLayoutClient>
       <div className="max-w-4xl mx-auto p-6">
         <h1 className="text-3xl font-bold mb-6">🧪 Test Countdown & Email System</h1>
 
@@ -269,6 +269,6 @@ export default function TestCountdownPage() {
           </div>
         )}
       </div>
-    </AdminLayout>
+    </AdminLayoutClient>
   )
 }
