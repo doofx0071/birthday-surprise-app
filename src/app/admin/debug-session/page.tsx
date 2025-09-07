@@ -21,8 +21,8 @@ export default function DebugSessionPage() {
 
     const checkStorage = () => {
       if (typeof window !== 'undefined') {
-        const localStorage = {}
-        const sessionStorage = {}
+        const localStorage: Record<string, string | null> = {}
+        const sessionStorage: Record<string, string | null> = {}
 
         // Check localStorage
         Object.keys(window.localStorage).forEach(key => {
