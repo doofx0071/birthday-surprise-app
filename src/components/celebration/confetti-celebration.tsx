@@ -188,7 +188,7 @@ export const HeartConfettiCelebration: React.FC<ConfettiCelebrationProps> = ({
 
   return (
     <ReactCanvasConfetti
-      refConfetti={getInstance}
+      {...({ refConfetti: getInstance } as any)}
       className={className}
       style={{
         position: 'fixed',
@@ -253,7 +253,7 @@ export const GentleConfettiAmbiance: React.FC<{
 
   return (
     <ReactCanvasConfetti
-      refConfetti={getInstance}
+      {...({ refConfetti: getInstance } as any)}
       className={className}
       style={{
         position: 'fixed',
