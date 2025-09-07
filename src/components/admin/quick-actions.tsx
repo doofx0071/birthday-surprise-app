@@ -100,7 +100,7 @@ export function QuickActions() {
               transition={{ duration: 0.3, delay: index * 0.1 }}
             >
               <ActionComponent
-                {...actionProps}
+                {...(actionProps as any)}
                 className="block w-full text-left"
               >
                 <motion.div
