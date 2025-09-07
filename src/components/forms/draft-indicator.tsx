@@ -94,7 +94,7 @@ export const DraftIndicator: React.FC<DraftIndicatorProps> = ({
           >
             <div className="flex items-start space-x-3">
               <div className="flex-shrink-0 mt-1">
-                <AnimatedSparkleIcon size="sm" color="blue" intensity="normal" />
+                <AnimatedSparkleIcon size="sm" color="current" intensity="normal" />
               </div>
               <div className="flex-1">
                 <h4 className="font-semibold text-blue-900 mb-1">
