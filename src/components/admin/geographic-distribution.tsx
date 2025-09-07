@@ -61,7 +61,7 @@ export function GeographicDistribution({ dateRange, customDateRange, refreshTrig
         const location = message.location || ''
 
         // Extract country from location string (assuming format like "City, Country")
-        const parts = location.split(',').map(p => p.trim())
+        const parts = location.split(',').map((p: any) => p.trim())
         const country = parts.length > 1 ? parts[parts.length - 1] : 'Unknown'
 
         countryMap.set(country, (countryMap.get(country) || 0) + 1)
