@@ -139,9 +139,9 @@ export class EmailScheduler {
         .single()
 
       return {
-        messageCount: stats?.total_messages || 0,
-        contributorCount: stats?.total_contributors || 0,
-        locationCount: stats?.total_locations || 0,
+        messageCount: (stats as any)?.total_messages || 0,
+        contributorCount: (stats as any)?.total_contributors || 0,
+        locationCount: (stats as any)?.total_locations || 0,
       }
     } catch (error) {
       console.error('Failed to get message stats:', error)
