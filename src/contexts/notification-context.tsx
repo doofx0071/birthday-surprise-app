@@ -61,7 +61,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         return
       }
 
-      const readIds = new Set(data?.map(item => item.notification_id) || [])
+      const readIds = new Set(data?.map((item: any) => item.notification_id) || [])
       setReadStates(readIds)
     } catch (error) {
       console.error('Error fetching read states:', error)
