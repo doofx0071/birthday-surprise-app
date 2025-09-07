@@ -78,19 +78,19 @@ export function EngagementMetrics({ dateRange, customDateRange, refreshTrigger }
       const { data: mediaFiles, error: mediaError } = await supabase
         .from('media_files')
         .select('message_id')
-        .in('message_id', messages?.map(m => m.id) || [])
+        .in('message_id', messages?.map((m: any) => m.id) || [])
 
       if (mediaError) throw mediaError
 
       // Calculate metrics using current schema
       const totalMessages = messages?.length || 0
-      const approvedMessages = messages?.filter(m => m.status === 'approved').length || 0
-      const pendingMessages = messages?.filter(m => m.status === 'pending').length || 0
-      const rejectedMessages = messages?.filter(m => m.status === 'rejected').length || 0
-      const messagesWithReminders = messages?.filter(m => m.wants_reminders).length || 0
-      
-      const messageIdsWithMedia = new Set(mediaFiles?.map(mf => mf.message_id) || [])
-      const messagesWithMedia = messages?.filter(m => messageIdsWithMedia.has(m.id)).length || 0
+      const approvedMessages = messages?.filter((m: any) => m.status === 'approved').length || 0
+      const pendingMessages = messages?.filter((m: any) => m.status === 'pending').length || 0
+      const rejectedMessages = messages?.filter((m: any) => m.status === 'rejected').length || 0
+      const messagesWithReminders = messages?.filter((m: any) => m.wants_reminders).length || 0
+
+      const messageIdsWithMedia = new Set(mediaFiles?.map((mf: any) => mf.message_id) || [])
+      const messagesWithMedia = messages?.filter((m: any) => messageIdsWithMedia.has(m.id)).length || 0
 
       const engagementData: EngagementData = {
         totalMessages,
