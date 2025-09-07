@@ -1,5 +1,6 @@
 // Export all upload components
 export { FileUpload } from './FileUpload'
+export type { FileUploadRef } from './FileUpload'
 export { FilePreview } from './FilePreview'
 export { ProgressBar, CircularProgress } from './ProgressBar'
 
