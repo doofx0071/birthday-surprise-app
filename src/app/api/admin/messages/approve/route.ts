@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { getCurrentAdminUser } from '@/lib/admin-auth'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 
 // Helper function to send approval email
 async function sendApprovalEmail(message: any) {
@@ -46,58 +44,18 @@ const approvalSchema = z.object({
  */
 export async function POST(request: NextRequest) {
   try {
-    // Use cookie-based authentication (same pattern as health endpoints)
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value
-          },
-          set(name: string, value: string, options: any) {
-            cookieStore.set({ name, value, ...options })
-          },
-          remove(name: string, options: any) {
-            cookieStore.set({ name, value: '', ...options })
-          },
-        },
-      }
-    )
+    // Verify admin authentication using custom JWT system
+    const adminUser = await getCurrentAdminUser()
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-
-    console.log('Admin approval auth check:', {
-      hasUser: !!user,
-      userEmail: user?.email,
-      authError: authError?.message,
-      userMetadata: (user as any)?.user_metadata,
-      appMetadata: (user as any)?.app_metadata
-    })
-
-    if (authError || !user) {
-      console.log('Admin approval auth failed - no user:', { authError: authError?.message })
+    if (!adminUser) {
+      console.log('Admin approval auth failed - no admin user found')
       return NextResponse.json(
         { success: false, message: 'Unauthorized - Please log in as admin' },
         { status: 401 }
       )
     }
 
-    // Check if user has admin role
-    const isAdmin = (user as any).user_metadata?.role === 'admin' || (user as any).app_metadata?.role === 'admin'
-    if (!isAdmin) {
-      console.log('Admin approval auth failed - not admin:', {
-        userMetadata: (user as any).user_metadata,
-        appMetadata: (user as any).app_metadata
-      })
-      return NextResponse.json(
-        { success: false, message: 'Admin access required' },
-        { status: 403 }
-      )
-    }
-
-    console.log('✅ Admin authentication successful for:', user.email)
+    console.log('✅ Admin authentication successful for:', adminUser.email)
 
     // Parse and validate request body
     const body = await request.json()
