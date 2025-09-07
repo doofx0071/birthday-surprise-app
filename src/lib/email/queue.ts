@@ -260,8 +260,8 @@ class EmailQueue {
         return ThankYouEmail(data)
         
       case 'pending_review':
-        const { PendingReviewEmail } = await import('@/components/emails/message-pending-review')
-        return PendingReviewEmail(data)
+        const { MessagePendingReview } = await import('@/components/emails/message-pending-review')
+        return MessagePendingReview(data)
         
       default:
         throw new Error(`Unknown email template: ${templateName}`)
