@@ -126,12 +126,12 @@ export async function GET(request: NextRequest) {
     // Use real stats if available, otherwise use calculated stats
     const stats = statsData || {
       total_events: events?.length || 0,
-      delivered: events?.filter(e => e.event_type === 'delivery').length || 0,
-      opened: events?.filter(e => e.event_type === 'open').length || 0,
-      clicked: events?.filter(e => e.event_type === 'click').length || 0,
-      bounced: events?.filter(e => e.event_type === 'bounce' || e.event_type === 'soft_bounce').length || 0,
-      spam: events?.filter(e => e.event_type === 'spam').length || 0,
-      unsubscribed: events?.filter(e => e.event_type === 'unsubscribe').length || 0,
+      delivered: events?.filter((e: any) => e.event_type === 'delivery').length || 0,
+      opened: events?.filter((e: any) => e.event_type === 'open').length || 0,
+      clicked: events?.filter((e: any) => e.event_type === 'click').length || 0,
+      bounced: events?.filter((e: any) => e.event_type === 'bounce' || e.event_type === 'soft_bounce').length || 0,
+      spam: events?.filter((e: any) => e.event_type === 'spam').length || 0,
+      unsubscribed: events?.filter((e: any) => e.event_type === 'unsubscribe').length || 0,
       delivery_rate: 0,
       open_rate: 0,
       click_rate: 0,

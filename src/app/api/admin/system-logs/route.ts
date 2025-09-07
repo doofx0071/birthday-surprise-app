@@ -45,10 +45,10 @@ export async function GET(request: NextRequest) {
       total: count || 0,
       last24h: stats?.length || 0,
       byLevel: {
-        info: stats?.filter(log => log.level === 'info').length || 0,
-        warning: stats?.filter(log => log.level === 'warning').length || 0,
-        error: stats?.filter(log => log.level === 'error').length || 0,
-        debug: stats?.filter(log => log.level === 'debug').length || 0,
+        info: stats?.filter((log: any) => log.level === 'info').length || 0,
+        warning: stats?.filter((log: any) => log.level === 'warning').length || 0,
+        error: stats?.filter((log: any) => log.level === 'error').length || 0,
+        debug: stats?.filter((log: any) => log.level === 'debug').length || 0,
       }
     }
 

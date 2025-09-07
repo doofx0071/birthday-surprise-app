@@ -65,9 +65,9 @@ export async function GET(request: NextRequest) {
     const activityStats = {
       last24Hours: {
         total: recentActivity?.length || 0,
-        sent: recentActivity?.filter(item => item.status === 'sent').length || 0,
-        failed: recentActivity?.filter(item => item.status === 'failed').length || 0,
-        pending: recentActivity?.filter(item => item.status === 'pending').length || 0,
+        sent: recentActivity?.filter((item: any) => item.status === 'sent').length || 0,
+        failed: recentActivity?.filter((item: any) => item.status === 'failed').length || 0,
+        pending: recentActivity?.filter((item: any) => item.status === 'pending').length || 0,
       }
     }
 

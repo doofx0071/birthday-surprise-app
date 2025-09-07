@@ -38,7 +38,7 @@ export async function GET() {
     }
 
     // Filter admin users from auth
-    const authAdminUsers = users ? users.filter(user =>
+    const authAdminUsers = users ? users.filter((user: any) =>
       user.user_metadata?.role === 'admin' ||
       user.app_metadata?.role === 'admin'
     ) : []
