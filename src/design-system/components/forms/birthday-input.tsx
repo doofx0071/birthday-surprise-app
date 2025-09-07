@@ -4,7 +4,7 @@ import * as React from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
-import { AnimatedHeartIcon } from '@/design-system/icons/animated-birthday-icons'
+import { AnimatedHeartIcon, AnimatedSparkleIcon } from '@/design-system/icons/animated-birthday-icons'
 
 interface BirthdayInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string
