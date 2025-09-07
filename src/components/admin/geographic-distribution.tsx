@@ -56,7 +56,7 @@ export function GeographicDistribution({ dateRange, customDateRange, refreshTrig
       const countryMap = new Map<string, number>()
       let totalMessages = 0
 
-      data?.forEach(message => {
+      data?.forEach((message: any) => {
         totalMessages++
         const location = message.location || ''
 

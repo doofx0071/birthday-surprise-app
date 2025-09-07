@@ -69,8 +69,8 @@ export async function POST(request: NextRequest) {
       ]
 
       // Create a map of message IDs to media file counts
-      const mediaCountMap = new Map()
-      mediaFiles?.forEach(file => {
+      const mediaCountMap = new Map<string, number>()
+      mediaFiles?.forEach((file: any) => {
         const count = mediaCountMap.get(file.message_id) || 0
         mediaCountMap.set(file.message_id, count + 1)
       })
@@ -109,8 +109,8 @@ export async function POST(request: NextRequest) {
       const totalMediaFiles = mediaFiles?.length || 0
 
       // Geographic distribution
-      const locationMap = new Map()
-      messages?.forEach(message => {
+      const locationMap = new Map<string, number>()
+      messages?.forEach((message: any) => {
         if (message.location) {
           const parts = message.location.split(',')
           const country = parts.length > 1 ? parts[parts.length - 1].trim() : 'Unknown'

@@ -128,7 +128,7 @@ export function AnalyticsOverview({ dateRange, customDateRange, refreshTrigger }
 
       // Count unique countries from location data
       const uniqueCountries = new Set()
-      locationData?.forEach(message => {
+      locationData?.forEach((message: any) => {
         if (message.location) {
           // Extract country from location string (assuming format like "City, Country")
           const parts = message.location.split(',')

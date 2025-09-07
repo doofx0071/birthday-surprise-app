@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Process events
-    events?.forEach(event => {
+    events?.forEach((event: any) => {
       const dateKey = event.created_at.split('T')[0]
       const dailyStat = dailyStatsMap.get(dateKey)
 

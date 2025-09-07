@@ -108,7 +108,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       const allNotifications: Notification[] = []
 
       // Add message notifications
-      recentMessages?.forEach((message) => {
+      recentMessages?.forEach((message: any) => {
         const notificationId = `message-${message.id}`
         allNotifications.push({
           id: notificationId,
@@ -123,7 +123,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       })
 
       // Add media upload notifications
-      recentMedia?.forEach((media) => {
+      recentMedia?.forEach((media: any) => {
         const notificationId = `media-${media.id}`
         allNotifications.push({
           id: notificationId,
@@ -138,7 +138,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       })
 
       // Add system log notifications
-      recentLogs?.forEach((log) => {
+      recentLogs?.forEach((log: any) => {
         const notificationId = `log-${log.id}`
         allNotifications.push({
           id: notificationId,
@@ -153,7 +153,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       })
 
       // Add email notifications
-      recentEmails?.forEach((email) => {
+      recentEmails?.forEach((email: any) => {
         const notificationId = `email-${email.id}`
         const status = email.clicked ? 'clicked' : email.opened ? 'opened' : email.delivered ? 'delivered' : 'sent'
         allNotifications.push({

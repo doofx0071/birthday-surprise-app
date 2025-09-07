@@ -82,7 +82,7 @@ export function MediaStatistics({ dateRange, customDateRange, refreshTrigger }: 
       let videoFiles = 0
       let otherFiles = 0
 
-      mediaFiles?.forEach(file => {
+      mediaFiles?.forEach((file: any) => {
         const type = file.file_type || 'unknown'
         filesByType[type] = (filesByType[type] || 0) + 1
         

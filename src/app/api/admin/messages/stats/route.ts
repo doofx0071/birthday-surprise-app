@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
 
     const uniqueCountries = new Set<string>()
 
-    messages?.forEach(message => {
+    messages?.forEach((message: any) => {
       // Count by approval status
       if (message.is_approved === true) {
         stats.approved++

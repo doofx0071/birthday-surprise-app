@@ -79,7 +79,7 @@ export function MessageTrends({ dateRange, customDateRange, refreshTrigger }: Me
         trendsMap.set(dateKey, { total: 0, approved: 0, pending: 0 })
       })
 
-      data?.forEach(message => {
+      data?.forEach((message: any) => {
         const dateKey = format(new Date(message.created_at), 'yyyy-MM-dd')
         const current = trendsMap.get(dateKey) || { total: 0, approved: 0, pending: 0 }
 
