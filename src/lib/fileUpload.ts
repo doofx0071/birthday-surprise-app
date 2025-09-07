@@ -317,7 +317,7 @@ export async function cleanupTempFiles(): Promise<void> {
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
     const filesToDelete: string[] = []
 
-    files.forEach(file => {
+    files.forEach((file: any) => {
       if (file.created_at && new Date(file.created_at) < oneDayAgo) {
         filesToDelete.push(`temp/${file.name}`)
       }
