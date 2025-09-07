@@ -31,7 +31,7 @@ export const useAutoSave = ({
   onSave,
   onRestore
 }: UseAutoSaveOptions) => {
-  const timeoutRef = useRef<NodeJS.Timeout>()
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const lastSavedRef = useRef<string>('')
   const draftIdRef = useRef<string>('')
   const [isClientSide, setIsClientSide] = useState(false)
