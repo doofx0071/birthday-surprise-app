@@ -154,7 +154,7 @@ export const DraftIndicator: React.FC<DraftIndicatorProps> = ({
                     animate={{ rotate: 360 }}
                     transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                   >
-                    <AnimatedSparkleIcon size="xs" color="blue" animate={false} />
+                    <AnimatedSparkleIcon size="xs" color="current" animate={false} />
                   </motion.div>
                   <span>Saving draft...</span>
                 </>
