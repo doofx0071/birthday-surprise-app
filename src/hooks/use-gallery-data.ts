@@ -54,7 +54,7 @@ export function useGalleryData(limit: number = 20): GalleryDataHook {
       }
 
       // Transform the data to match our interface
-      const transformedMessages: MessageWithMedia[] = (messagesData || []).map(message => ({
+      const transformedMessages: MessageWithMedia[] = (messagesData || []).map((message: any) => ({
         ...message,
         media_files: message.media_files || []
       }))
