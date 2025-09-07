@@ -182,16 +182,16 @@ export function EmailConfiguration() {
               }
             </p>
           </div>
-          {config?.lastTested && (
+          {(config as any)?.lastTested && (
             <div className="ml-auto">
               <div className="flex items-center space-x-2">
-                {config.testResult === 'success' ? (
+                {(config as any).testResult === 'success' ? (
                   <CheckCircleIcon className="w-5 h-5 text-green-500" />
                 ) : (
                   <ExclamationTriangleIcon className="w-5 h-5 text-red-500" />
                 )}
                 <span className="text-sm text-charcoal-black/60">
-                  Last tested: {new Date(config.lastTested).toLocaleString()}
+                  Last tested: {new Date((config as any).lastTested).toLocaleString()}
                 </span>
               </div>
             </div>
